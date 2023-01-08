@@ -34,7 +34,7 @@ public class Server implements Runnable {
 		}
 
 		authentication();
-		synchronizeDB();
+		syncClientWithServerDB();
 		handleClient(link);
 		
 	}
@@ -42,8 +42,12 @@ public class Server implements Runnable {
 	private void authentication() {
 		// TODO Auto-generated method stub
 		while(true) {
-			if(userExists()) {
-				if(correctLoginInfo()) {
+			//Въведи user И парола
+			Scanner input = new Scanner(System.in);
+			String username = input.nextLine();
+			String password = input.nextLine();
+			if(userExists(username)) {
+				if(correctLoginInfo(username,password)) {
 					break;
 				}
 			}
@@ -110,18 +114,22 @@ public class Server implements Runnable {
 		}
 	}
 
-	private boolean correctLoginInfo() {
+	private boolean correctLoginInfo(String username, String password) {
+		// Пробвай да дръшнеш usera i parolata ot bazata za " username " ako sa ravni vurni true;
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	private boolean userExists() {
+	private boolean userExists(String username) {
+		// Провери в базата дали съществува и върни труе ако съществува, ако не връща 
 		return false;
 		// TODO Auto-generated method stub
 		
 	}
 
-	private void synchronizeDB() {
+	private void syncClientWithServerDB() {
+		// Разпиши syncClientDBwithServerDB();
+		//
 		// TODO Auto-generated method stub
 		
 	}
