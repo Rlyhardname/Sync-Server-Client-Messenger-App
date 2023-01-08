@@ -63,7 +63,15 @@ public class ConnectToDB {
 	private void notifyUser(String string) {
 		// TODO Auto-generated method stub
 		// check if user is online and if true = send update 
+		if(isOnline()) {
+			
+		};
 		// else if offline do nothing, and when user gets online he will ask for updates when connecting(will send his db i guess and we compare to our and send him updated tables info which he can imput in his db)
+	}
+
+	private boolean isOnline() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	public static ResultSet selectRoomUsers(Statement stmt) throws SQLException {

@@ -32,28 +32,53 @@ public class Server implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
+		authentication();
 		synchronizeDB();
 		handleClient(link);
 		
 	}
 
-	private void synchronizeDB() {
+	private void authentication() {
 		// TODO Auto-generated method stub
-		
+		while(true) {
+			if(userExists()) {
+				if(correctLoginInfo()) {
+					break;
+				}
+			}
+		}
 	}
+
 
 	private void handleClient(Socket link) {
 		
 		Scanner input = null;
 		try {
+			input = new Scanner(link.getInputStream());
+			String update = input.nextLine();
+			while(!(update = input.nextLine()).equals("-1")) {
+				String[] data = update.split(",");
+				updateServerDB(data[0],data[1]);
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} finally {
+			input.close();
+		}
+		
+		try {
 			
 			input = new Scanner(link.getInputStream());
 			PrintWriter output = new PrintWriter(link.getOutputStream(), true);
 			int numMessages = 0;
+			
+			
 			String message = input.nextLine();
-			handleMessage(message);
 			while (!message.equals("*CLOSE*")) {
+			handleMessage(message);
+			
 				System.out.println("\nMessage received...");
 				numMessages++;
 				output.println("Message" + numMessages + ": " + message);
@@ -73,6 +98,32 @@ public class Server implements Runnable {
 			}
 		}
 
+	}
+	
+
+	private void updateServerDB(String updateType, String string2) {
+		// TODO Auto-generated method stub
+		if(updateType.equals("1")) {
+			//update client DATA in server db
+		} else {
+			//update add client messages in chatroom with name X 
+		}
+	}
+
+	private boolean correctLoginInfo() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	private boolean userExists() {
+		return false;
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void synchronizeDB() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void handleMessage(String message) {
