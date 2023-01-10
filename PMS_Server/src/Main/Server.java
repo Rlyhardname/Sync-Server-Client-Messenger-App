@@ -33,7 +33,7 @@ public class Server implements Runnable {
 			e.printStackTrace();
 		}
 
-		authentication();
+		authentication(); // moje i client side no po-skoro taka shte ostane
 		syncClientWithServerDB();
 		handleClient(link);
 		
@@ -42,14 +42,18 @@ public class Server implements Runnable {
 	private void authentication() {
 		// TODO Auto-generated method stub
 		while(true) {
-			//Въведи user И парола
+			//Въведи user И парола sus system in za test
+			//input = new Scanner(link.getInputStream()); 4akame ime i parola
 			Scanner input = new Scanner(System.in);
 			String username = input.nextLine();
 			String password = input.nextLine();
 			if(userExists(username)) {
 				if(correctLoginInfo(username,password)) {
+					// uspeshno sme se svurzali... 
 					break;
 				}
+			}else {
+				//create account
 			}
 		}
 	}
@@ -128,10 +132,7 @@ public class Server implements Runnable {
 	}
 
 	private void syncClientWithServerDB() {
-		// Разпиши syncClientDBwithServerDB();
-		//
-		// TODO Auto-generated method stub
-		
+		// Select every entry in DB between client's last logout and current login time now() and send them to client vs array of messages or new DB with the entries between those 2 dates
 	}
 
 	private void handleMessage(String message) {
@@ -142,19 +143,16 @@ public class Server implements Runnable {
 		// ----->>>> Insert Code here
 		// Select members in room that changed state
 		String sql = "Select User_ID from char_room_wharehouse where char_room_ID = msg[0]";
-		new ConnectToDB(msg,TasksDB.notifyUsers);
+		new ServerSideDB(msg,TasksDB.notifyUsers);
 		
 		// notify room members if online to request update.
 		notifyOnline();
 		
 	}
 	
-	private void connectToDB() {
-		
-	}
 
 	private void notifyOnline() {
-		
+		// prepovtarq se sus ServerSideDB notify
 		
 	}
 
