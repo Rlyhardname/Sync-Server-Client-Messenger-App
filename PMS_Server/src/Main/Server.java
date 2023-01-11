@@ -75,6 +75,8 @@ public class Server extends Thread {
 
 			} else {
 				createAccount(db, input);
+				input.close();
+				db.closeConnection();
 			}
 		}
 	}
@@ -88,12 +90,28 @@ public class Server extends Thread {
 		// TODO Auto-generated method stub
 		do {
 			String username = input.nextLine();
-			if (!db.isUser(username)) {
-				String password = input.nextLine();
-				db.createUser(username, password);
+			if (userDataIsValid(username, 20)) {
+				if (!db.isUser(username)) {
+					String password = input.nextLine();
+					if (userDataIsValid(password, 32)) {
+						db.createUser(username, password);
+					}
+
+				}
 			}
+
 		} while (true);
 
+	}
+
+	private boolean userDataIsValid(String username, int i) {
+		// TODO Auto-generated method stub
+		// foreach String[] = {"#","$",","," Insert ", " Update ", " Delete "} ect...
+		// username.compare() to see if some symbol is in the username return false and
+		// send client error message + return false
+		// then check if username is less than i symbols and return true if both
+		// conditions are met
+		return false;
 	}
 
 	private boolean userExists(String username, ServerSideDB db) {
