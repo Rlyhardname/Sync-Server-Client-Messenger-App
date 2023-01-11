@@ -9,8 +9,32 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-public class Server implements Runnable {
+public class Server extends Thread {
 
+	private static class hohoho implements Runnable{
+
+		
+	
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			Thread t1 = new Thread(new hohoho());
+			t1.start();
+			System.out.println("ISKAME 6-ki!");
+		}
+		
+		
+		
+	}
+	
+	public static void main(String[] args) {
+
+		new Server().start();
+	
+		
+
+	}
 	public static int port = 1337;
 	public static ServerSocket serverSocket;
 	public static HashMap<String, Socket> onlineUsers;
@@ -22,17 +46,20 @@ public class Server implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		do {
-			this.run();
-		} while (true);
 
+		
 	}
 
 	private void connectClient() {
 		// TODO Auto-generated method stub
 		Socket link = null;
 		try {
+			
 			link = serverSocket.accept();
+			Thread t1 = new Thread(this);
+			t1.start();
+			// new thread
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -41,6 +68,14 @@ public class Server implements Runnable {
 		authentication(link); // moje i client side no po-skoro taka shte ostane
 		syncClientWithServerDB();
 		handleClient(link);
+
+	}
+	
+	@Override
+	public void run() {
+
+		System.out.println("new thread");
+		connectClient();
 
 	}
 
@@ -187,16 +222,6 @@ public class Server implements Runnable {
 
 	}
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		new Server();
-	}
-
-	@Override
-	public void run() {
-
-		connectClient();
-
-	}
+	
 
 }
