@@ -172,4 +172,17 @@ public class ServerSideDB {
 		return false;
 	}
 
+	public void createUser(String username, String password) {
+		// TODO Auto-generated method stub
+		String sql = "INSERT INTO User"
+				+ "Values(@username, @password)";
+		try {
+			stmt.executeQuery(sql);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
 }

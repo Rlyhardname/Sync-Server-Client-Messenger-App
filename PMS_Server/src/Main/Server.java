@@ -11,30 +11,6 @@ import java.util.Scanner;
 
 public class Server extends Thread {
 
-	private static class hohoho implements Runnable{
-
-		
-	
-
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			Thread t1 = new Thread(new hohoho());
-			t1.start();
-			System.out.println("ISKAME 6-ki!");
-		}
-		
-		
-		
-	}
-	
-	public static void main(String[] args) {
-
-		new Server().start();
-	
-		
-
-	}
 	public static int port = 1337;
 	public static ServerSocket serverSocket;
 	public static HashMap<String, Socket> onlineUsers;
@@ -47,34 +23,32 @@ public class Server extends Thread {
 			e.printStackTrace();
 		}
 
-		
 	}
 
 	private void connectClient() {
 		// TODO Auto-generated method stub
 		Socket link = null;
 		try {
-			
+
 			link = serverSocket.accept();
-			Thread t1 = new Thread(this);
-			t1.start();
-			// new thread
-			
+			Thread newClient = new Thread(this);
+			newClient.start();
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		authentication(link); // moje i client side no po-skoro taka shte ostane
+		authentication(link); // seems done
 		syncClientWithServerDB();
 		handleClient(link);
 
 	}
-	
+
 	@Override
 	public void run() {
 
-		System.out.println("new thread");
+		System.out.println("Waiting for new client");
 		connectClient();
 
 	}
@@ -84,19 +58,42 @@ public class Server extends Thread {
 		while (true) {
 			// Въведи user И парола sus system in za test
 			// input = new Scanner(link.getInputStream()); 4akame ime i parola
+
 			Scanner input = new Scanner(System.in);
 			String username = input.nextLine();
-			String password = input.nextLine();
 			ServerSideDB db = new ServerSideDB();
-			if (userExists(username, db)) {
-				if (correctLoginInfo(username, password, db)) {
-					onlineUsers.put(username, link);
-					break;
+			if (!username.equals("create")) {
+				String password = input.nextLine();
+				if (userExists(username, db)) {
+					if (correctLoginInfo(username, password, db)) {
+						login(username, link);
+						input.close();
+						db.closeConnection();
+						break;
+					}
 				}
+
 			} else {
-				// create account
+				createAccount(db, input);
 			}
 		}
+	}
+
+	private void login(String username, Socket link) {
+		// TODO Auto-generated method stub
+		onlineUsers.put(username, link);
+	}
+
+	private void createAccount(ServerSideDB db, Scanner input) {
+		// TODO Auto-generated method stub
+		do {
+			String username = input.nextLine();
+			if (!db.isUser(username)) {
+				String password = input.nextLine();
+				db.createUser(username, password);
+			}
+		} while (true);
+
 	}
 
 	private boolean userExists(String username, ServerSideDB db) {
@@ -221,7 +218,5 @@ public class Server extends Thread {
 		// prepovtarq se sus ServerSideDB notify
 
 	}
-
-	
 
 }
