@@ -236,5 +236,12 @@ public class Server extends Thread {
 		// prepovtarq se sus ServerSideDB notify
 
 	}
+	
+	private void createTable() {
+		ServerSideDB db = new ServerSideDB();
+		db.createTables();{
+			
+		}
+	}
 
 }
