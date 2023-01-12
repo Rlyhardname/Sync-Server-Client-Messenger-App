@@ -206,13 +206,15 @@ public class ServerSideDB {
 	
 	boolean createTableUser() {
 		String sql = "CREATE TABLE User"
-				+ "(Username VARCHAR(25)"
-				+ "Password VARCHAR(32)"
+				+ "(Username VARCHAR(25),"
+				+ "Password VARCHAR(32),"
 				+ "PRIMARY KEY (Username))";
 		try {
 			if(stmt.execute(sql)) {
 				return true;
-			};
+			}
+		
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

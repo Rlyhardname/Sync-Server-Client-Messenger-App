@@ -285,9 +285,9 @@ public class Server extends Thread {
 
 	}
 
-	private void createTable() {
+	public void createTable() {
 		ServerSideDB db = new ServerSideDB();
-		if(db.createTableUser()==true) {
+		if(db.createTableUser()) {
 			System.out.println("DB succesfully created!");
 		};
 		db.closeConnection();
