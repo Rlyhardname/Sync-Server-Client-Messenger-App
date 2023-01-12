@@ -17,12 +17,14 @@ public class ServerSideDB {
 	static final String PASS = "dCBZXTf49PcL3L97lWXP";
 	Connection conn;
 	Statement stmt;
+	PreparedStatement prep;
 	Enum task;
 	String[] args;
 
 	ServerSideDB() {
 		conn = null;
 		stmt = null;
+		prep = null;
 		try {
 			Class.forName(JDBC_DRIVER);
 			System.out.println("Connecting to database...");
@@ -34,7 +36,7 @@ public class ServerSideDB {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("Query has been executed and connection has been closed");
+
 	}
 
 	public void closeConnection() {
@@ -53,6 +55,7 @@ public class ServerSideDB {
 		} catch (SQLException se) {
 			se.printStackTrace();
 		}
+		// System.out.println("Query has been executed and connection has been closed");
 
 	}
 
@@ -78,7 +81,7 @@ public class ServerSideDB {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	
+
 			try {
 				while (resultSet.next()) {
 					try {
@@ -93,7 +96,7 @@ public class ServerSideDB {
 				e.printStackTrace();
 			}
 		}
-	
+
 		return users;
 	}
 
@@ -136,16 +139,17 @@ public class ServerSideDB {
 	}
 
 	public boolean isRegisteredUser(String username) {
-		String sql = "Select username from char_room_wharehouse where username = @username";
+		String sql = "SELECT username FROM User " + " where username = ?";
 		try {
-			stmt.executeQuery(sql);
-			ResultSet rs = stmt.getResultSet();
-			while(rs.next()) {
-				if(rs.getString(1) != null) {
+			prep = conn.prepareStatement(sql);
+			prep.setString(1, username);	
+			ResultSet rs = 	prep.executeQuery();
+			while (rs.next()) {
+				if (rs.getString(1) != null) {
 					return true;
 				}
 			}
-		
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -155,16 +159,17 @@ public class ServerSideDB {
 
 	public boolean passwordIsCorrect(String username, String password) {
 		// TODO Auto-generated method stub
-		String sql = "Select password from char_room_wharehouse where username = @username";
+		String sql = "SELECT password from User where username = ?";
 		try {
-			stmt.executeQuery(sql);
-			ResultSet rs = stmt.getResultSet();
-			while(rs.next()) {
-				if(rs.getString(1).equals(password)) {
+			prep = conn.prepareStatement(sql);
+			prep.setString(1, username);
+			ResultSet rs = prep.executeQuery();
+			while (rs.next()) {
+				if (rs.getString(1).equals(password)) {
 					return true;
 				}
 			}
-		
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -174,67 +179,77 @@ public class ServerSideDB {
 
 	public boolean createUser(String username, String password) {
 		// TODO Auto-generated method stub
-		String sql = "INSERT INTO User"
-				+ "Values(@username, @password)";
+		String sql = "INSERT INTO User " + "VALUES(?,?)";
+
 		try {
-			stmt.executeQuery(sql);
+			prep = conn.prepareStatement(sql);
+			prep.setString(1, username);
+			prep.setString(2, password);
+			prep.execute();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		sql = "SELECT username FROM User"
-				+ "WHERE username=@username";
+		sql = "SELECT username FROM User " + "WHERE username=?";
+
 		ResultSet rs = null;
 		try {
-			stmt.executeQuery(sql);
-			rs = stmt.getResultSet();
-			if(!(rs.isBeforeFirst())){
+			prep = conn.prepareStatement(sql);
+			prep.setString(1, username);
+			rs = prep.executeQuery();// prep.getResultSet();
+			if (!(rs.isBeforeFirst())) {
+
 				return false;
 			}
-		} catch (SQLException e) {
+
+		} catch (
+
+		SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return true;
 	}
 
 	public void createTables() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	boolean createTableUser() {
-		String sql = "CREATE TABLE User"
-				+ "(Username VARCHAR(25),"
-				+ "Password VARCHAR(32),"
+		String sql = "CREATE TABLE User" + "(Username VARCHAR(25)," + "Password VARCHAR(32),"
 				+ "PRIMARY KEY (Username))";
 		try {
-			if(stmt.execute(sql)) {
+			if (stmt.execute(sql)) {
 				return true;
 			}
-		
-			
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return false;
 	}
+
 	private void createTableUserLog() {
-		
+
 	}
+
 	private void createTableUserAdditionalInfo() {
-		
+
 	}
+
 	private void createTableChatRoom() {
-		
+
 	}
+
 	private void createTableChatRoomWarehouse() {
-		
+
 	}
+
 	private void createTableMessageData() {
-		
+
 	}
 
 	public void loginTime(String username) {

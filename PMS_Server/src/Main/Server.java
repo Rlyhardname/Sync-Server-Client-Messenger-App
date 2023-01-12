@@ -32,8 +32,8 @@ public class Server extends Thread {
 		try {
 
 			link = serverSocket.accept();
-			Thread newClient = new Thread(this);
-			newClient.start();
+//			Thread newClient = new Thread(this);
+//			newClient.start();
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -41,6 +41,7 @@ public class Server extends Thread {
 		}
 
 		authentication(link); // seems done
+		printActiveUsers();
 		syncClientWithServerDB();
 		handleClient(link);
 
@@ -59,46 +60,62 @@ public class Server extends Thread {
 		while (true) {
 			// Въведи user И парола sus system in za test
 			// input = new Scanner(link.getInputStream()); 4akame ime i parola
-
-			Scanner input = new Scanner(System.in);
-			String username = input.nextLine();
+			Scanner input = null;
 			ServerSideDB db = new ServerSideDB();
-			if (!username.equals("create")) {
-				String password = input.nextLine();
-				if (loginUserExists(username, db, link)) {
-					if (correctLoginInfo(username, password, db, link)) {
-						login(username, db, link);
-						input.close();
-						db.closeConnection();
-						break;
-					}
-				}
+			try {
+				input = new Scanner(System.in);
+				System.out.println("Enter username: ");
+				String username = input.nextLine();
 
-			} else {
-				createAccount(db, input, link);
-				input.close();
-				db.closeConnection();
+				if (!username.equals("create")) {
+					System.out.println("Enter password: ");
+					String password = input.nextLine();
+					if (loginUserExists(username, db, link)) {
+						if (correctLoginInfo(username, password, db, link)) {
+							login(username, db, link);
+							input.close();
+							db.closeConnection();
+							break;
+						}
+					}
+
+				} else {
+					createAccount(db, input, link);
+
+				}
+			} catch (Exception e) {
+				System.out.println("Neshto grumna!");
 			}
+			db.closeConnection();
 		}
 	}
 
 	private void login(String username, ServerSideDB db, Socket link) {
 		// TODO Auto-generated method stub
+		String msg = "LoginSuccess"+","+"Succesfully logged in!";
+		sendMessage(msg,link);		
 		onlineUsers.put(username, link);
 		db.loginTime(username);
+	}
+
+	public void printActiveUsers() {
+		onlineUsers.forEach((key, value) -> System.out.println(key + value));
 	}
 
 	private void createAccount(ServerSideDB db, Scanner input, Socket link) {
 		// TODO Auto-generated method stub
 		do {
+			System.out.println("Write username for new account: ");
 			String username = input.nextLine();
 			if (userDataIsValid(username, 20, link)) {
 				if (!db.isRegisteredUser(username)) {
+					System.out.println("Write password for new account");
 					String password = input.nextLine();
 					if (userDataIsValid(password, 32, link)) {
 						if (db.createUser(username, password)) {
 							String msg = "AccountCreated" + "," + "Account Succesfully created!";
 							sendMessage(msg, link);
+							break;
 						} else {
 							String msg = "CreateAccountError" + "," + "Database error, try again!";
 							sendMessage(msg, link);
@@ -287,9 +304,10 @@ public class Server extends Thread {
 
 	public void createTable() {
 		ServerSideDB db = new ServerSideDB();
-		if(db.createTableUser()) {
+		if (db.createTableUser()) {
 			System.out.println("DB succesfully created!");
-		};
+		}
+		;
 		db.closeConnection();
 
 	}

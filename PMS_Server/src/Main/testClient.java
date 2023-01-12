@@ -34,9 +34,10 @@ public class testClient {
 			userEntry = new Scanner(System.in);
 			String message,response;
 			do {
-				System.out.println("Enter message: ");
-				message = userEntry.nextLine();
-				output.println(message);
+//				System.out.println("Enter message: ");
+//				message = userEntry.nextLine();
+//				output.println(message);
+				message = "go";
 				response = input.nextLine();
 				System.out.println("SERVER: " + response);
 			

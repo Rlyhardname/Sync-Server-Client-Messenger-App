@@ -4,8 +4,9 @@ public class EntryPoint {
 
 	public static void main(String[] args) {
 
-		new Server().createTable();
-		
+		Server server = new Server();
+		server.start();
+	
 		
 
 	}
