@@ -66,7 +66,7 @@ public class Server extends Thread {
 			if (!username.equals("create")) {
 				String password = input.nextLine();
 				if (loginUserExists(username, db, link)) {
-					if (correctLoginInfo(username, password, db,link)) {
+					if (correctLoginInfo(username, password, db, link)) {
 						login(username, link);
 						input.close();
 						db.closeConnection();
@@ -96,21 +96,11 @@ public class Server extends Thread {
 					String password = input.nextLine();
 					if (userDataIsValid(password, 32, link)) {
 						if (db.createUser(username, password)) {
-							try {
-								PrintWriter output = new PrintWriter(link.getOutputStream(), true);
-								output.println("AccountCreated" + "," + "Account Succesfully created!");
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+							String msg = "AccountCreated" + "," + "Account Succesfully created!";
+							sendMessage(msg,link);
 						} else {
-							try {
-								PrintWriter output = new PrintWriter(link.getOutputStream(), true);
-								output.println("CreateAccountError" + "," + "Database error, try again!");
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+							String msg = "CreateAccountError" + "," + "Database error, try again!";
+							sendMessage(msg,link);
 						}
 					}
 
@@ -122,22 +112,15 @@ public class Server extends Thread {
 	}
 
 	private boolean userDataIsValid(String userData, int i, Socket link) {
-		PrintWriter output = null;
 		String dataType = null;
-		try {
-			output = new PrintWriter(link.getOutputStream(), true);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 		if (i == 20) {
 			dataType = "username";
 		} else if (i == 32) {
 			dataType = "password";
 		}
 		if (userData.length() > i) {
-			output.println("LenghtError" + "," + dataType + "," + "Is too long!");
+			String msg = "LenghtError" + "," + dataType + "," + "Is too long!";
+			sendMessage(msg,link);
 			return false;
 		}
 		String[] forbbidenSymbols = { "#", "$", ",", "%", "!", "@", "^", "*", "(", ")", "+", "{", "}", "[", "]", "'",
@@ -145,8 +128,8 @@ public class Server extends Thread {
 
 		for (String string : forbbidenSymbols) {
 			if (userData.contains(string)) {
-				output.println(
-						"ForbidenSymbolError" + "," + dataType + "," + "Contrains forbidden symbol!" + "," + string);
+				String msg = "ForbidenSymbolError" + "," + dataType + "," + "Contrains forbidden symbol!" + "," + string;
+				sendMessage(msg,link);
 				return false;
 			}
 		}
@@ -157,33 +140,35 @@ public class Server extends Thread {
 	private boolean loginUserExists(String username, ServerSideDB db, Socket link) {
 
 		boolean condition = db.isRegisteredUser(username);
-		if (condition==false) {
-			try {
-				PrintWriter output = new PrintWriter(link.getOutputStream(), true);
-				output.println("UsernameError" + "," + "There is no user: "+username+" in our databases!");
-				return false;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		if (condition == false) {
+			String msg = "UsernameError" + "," + "There is no user: " + username + " in our databases!";
+			sendMessage(msg,link);
+			return false;
+
 		}
 
 		return true;
 	}
 
 	private boolean correctLoginInfo(String username, String password, ServerSideDB db, Socket link) {
-		if (db.passwordIsCorrect(username, password)==false) {
-			try {
-				PrintWriter output = new PrintWriter(link.getOutputStream(), true);
-				output.println("PasswordError" + "," + "Password doesn't match for username "+username);
-				return false;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			// send client GUI notification to change view
+		if (db.passwordIsCorrect(username, password) == false) {
+			String msg = "PasswordError" + "," + "Password doesn't match for username " + username;
+			sendMessage(msg, link);
+			return false;
 		}
-		return false;
+		return true;
+	}
+
+	private void sendMessage(String msg, Socket link) {
+		PrintWriter output;
+		try {
+			output = new PrintWriter(link.getOutputStream(), true);
+			output.println(msg);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	private void handleClient(Socket link) {
