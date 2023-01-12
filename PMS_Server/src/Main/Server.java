@@ -67,7 +67,7 @@ public class Server extends Thread {
 				String password = input.nextLine();
 				if (loginUserExists(username, db, link)) {
 					if (correctLoginInfo(username, password, db, link)) {
-						login(username, link);
+						login(username, db, link);
 						input.close();
 						db.closeConnection();
 						break;
@@ -82,9 +82,10 @@ public class Server extends Thread {
 		}
 	}
 
-	private void login(String username, Socket link) {
+	private void login(String username, ServerSideDB db, Socket link) {
 		// TODO Auto-generated method stub
 		onlineUsers.put(username, link);
+		db.loginTime(username);
 	}
 
 	private void createAccount(ServerSideDB db, Scanner input, Socket link) {
@@ -97,10 +98,10 @@ public class Server extends Thread {
 					if (userDataIsValid(password, 32, link)) {
 						if (db.createUser(username, password)) {
 							String msg = "AccountCreated" + "," + "Account Succesfully created!";
-							sendMessage(msg,link);
+							sendMessage(msg, link);
 						} else {
 							String msg = "CreateAccountError" + "," + "Database error, try again!";
-							sendMessage(msg,link);
+							sendMessage(msg, link);
 						}
 					}
 
@@ -120,7 +121,7 @@ public class Server extends Thread {
 		}
 		if (userData.length() > i) {
 			String msg = "LenghtError" + "," + dataType + "," + "Is too long!";
-			sendMessage(msg,link);
+			sendMessage(msg, link);
 			return false;
 		}
 		String[] forbbidenSymbols = { "#", "$", ",", "%", "!", "@", "^", "*", "(", ")", "+", "{", "}", "[", "]", "'",
@@ -128,8 +129,9 @@ public class Server extends Thread {
 
 		for (String string : forbbidenSymbols) {
 			if (userData.contains(string)) {
-				String msg = "ForbidenSymbolError" + "," + dataType + "," + "Contrains forbidden symbol!" + "," + string;
-				sendMessage(msg,link);
+				String msg = "ForbidenSymbolError" + "," + dataType + "," + "Contrains forbidden symbol!" + ","
+						+ string;
+				sendMessage(msg, link);
 				return false;
 			}
 		}
@@ -142,7 +144,7 @@ public class Server extends Thread {
 		boolean condition = db.isRegisteredUser(username);
 		if (condition == false) {
 			String msg = "UsernameError" + "," + "There is no user: " + username + " in our databases!";
-			sendMessage(msg,link);
+			sendMessage(msg, link);
 			return false;
 
 		}

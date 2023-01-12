@@ -222,4 +222,9 @@ public class ServerSideDB {
 	private void createTableMessageData() {
 		
 	}
+
+	public void loginTime(String username) {
+		// TODO Auto-generated method stub
+		// LocalDateTime.now() insert into user_log where username = username;
+	}
 }
