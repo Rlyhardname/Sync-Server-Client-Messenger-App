@@ -142,8 +142,8 @@ public class ServerSideDB {
 		String sql = "SELECT username FROM User " + " where username = ?";
 		try {
 			prep = conn.prepareStatement(sql);
-			prep.setString(1, username);	
-			ResultSet rs = 	prep.executeQuery();
+			prep.setString(1, username);
+			ResultSet rs = prep.executeQuery();
 			while (rs.next()) {
 				if (rs.getString(1) != null) {
 					return true;
@@ -249,7 +249,7 @@ public class ServerSideDB {
 	}
 
 	private void createTableMessageData() {
-
+		// my conflict 
 	}
 
 	public void loginTime(String username) {
