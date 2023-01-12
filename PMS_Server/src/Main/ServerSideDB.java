@@ -185,4 +185,27 @@ public class ServerSideDB {
 		
 	}
 
+	public void createTables() {
+		// TODO Auto-generated method stub
+		createTableUser();
+	}
+	
+	private void createTableUser() {
+		
+	}
+	private void createTableUserLog() {
+		
+	}
+	private void createTableUserAdditionalInfo() {
+		
+	}
+	private void createTableChatRoom() {
+		
+	}
+	private void createTableChatRoomWarehouse() {
+		
+	}
+	private void createTableMessageData() {
+		
+	}
 }
