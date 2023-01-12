@@ -135,7 +135,7 @@ public class ServerSideDB {
 		this.args = args;
 	}
 
-	public boolean isUser(String username) {
+	public boolean isRegisteredUser(String username) {
 		String sql = "Select username from char_room_wharehouse where username = @username";
 		try {
 			stmt.executeQuery(sql);
@@ -172,7 +172,7 @@ public class ServerSideDB {
 		return false;
 	}
 
-	public void createUser(String username, String password) {
+	public boolean createUser(String username, String password) {
 		// TODO Auto-generated method stub
 		String sql = "INSERT INTO User"
 				+ "Values(@username, @password)";
@@ -182,7 +182,21 @@ public class ServerSideDB {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		sql = "SELECT username FROM User"
+				+ "WHERE username=@username";
+		ResultSet rs = null;
+		try {
+			stmt.executeQuery(sql);
+			rs = stmt.getResultSet();
+			if(!(rs.isBeforeFirst())){
+				return false;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+		return true;
 	}
 
 	public void createTables() {

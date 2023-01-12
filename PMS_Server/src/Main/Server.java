@@ -1,6 +1,7 @@
 package Main;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -64,8 +65,8 @@ public class Server extends Thread {
 			ServerSideDB db = new ServerSideDB();
 			if (!username.equals("create")) {
 				String password = input.nextLine();
-				if (userExists(username, db)) {
-					if (correctLoginInfo(username, password, db)) {
+				if (loginUserExists(username, db, link)) {
+					if (correctLoginInfo(username, password, db,link)) {
 						login(username, link);
 						input.close();
 						db.closeConnection();
@@ -74,7 +75,7 @@ public class Server extends Thread {
 				}
 
 			} else {
-				createAccount(db, input);
+				createAccount(db, input, link);
 				input.close();
 				db.closeConnection();
 			}
@@ -86,15 +87,31 @@ public class Server extends Thread {
 		onlineUsers.put(username, link);
 	}
 
-	private void createAccount(ServerSideDB db, Scanner input) {
+	private void createAccount(ServerSideDB db, Scanner input, Socket link) {
 		// TODO Auto-generated method stub
 		do {
 			String username = input.nextLine();
-			if (userDataIsValid(username, 20)) {
-				if (!db.isUser(username)) {
+			if (userDataIsValid(username, 20, link)) {
+				if (!db.isRegisteredUser(username)) {
 					String password = input.nextLine();
-					if (userDataIsValid(password, 32)) {
-						db.createUser(username, password);
+					if (userDataIsValid(password, 32, link)) {
+						if (db.createUser(username, password)) {
+							try {
+								PrintWriter output = new PrintWriter(link.getOutputStream(), true);
+								output.println("AccountCreated" + "," + "Account Succesfully created!");
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						} else {
+							try {
+								PrintWriter output = new PrintWriter(link.getOutputStream(), true);
+								output.println("CreateAccountError" + "," + "Database error, try again!");
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
 					}
 
 				}
@@ -104,22 +121,66 @@ public class Server extends Thread {
 
 	}
 
-	private boolean userDataIsValid(String username, int i) {
-		// TODO Auto-generated method stub
-		// foreach String[] = {"#","$",","," Insert ", " Update ", " Delete "} ect...
-		// username.compare() to see if some symbol is in the username return false and
-		// send client error message + return false
-		// then check if username is less than i symbols and return true if both
-		// conditions are met
-		return false;
+	private boolean userDataIsValid(String userData, int i, Socket link) {
+		PrintWriter output = null;
+		String dataType = null;
+		try {
+			output = new PrintWriter(link.getOutputStream(), true);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		if (i == 20) {
+			dataType = "username";
+		} else if (i == 32) {
+			dataType = "password";
+		}
+		if (userData.length() > i) {
+			output.println("LenghtError" + "," + dataType + "," + "Is too long!");
+			return false;
+		}
+		String[] forbbidenSymbols = { "#", "$", ",", "%", "!", "@", "^", "*", "(", ")", "+", "{", "}", "[", "]", "'",
+				"\"", " Insert ", " Update ", " Delete " };
+
+		for (String string : forbbidenSymbols) {
+			if (userData.contains(string)) {
+				output.println(
+						"ForbidenSymbolError" + "," + dataType + "," + "Contrains forbidden symbol!" + "," + string);
+				return false;
+			}
+		}
+
+		return true;
 	}
 
-	private boolean userExists(String username, ServerSideDB db) {
-		return db.isUser(username);
+	private boolean loginUserExists(String username, ServerSideDB db, Socket link) {
+
+		boolean condition = db.isRegisteredUser(username);
+		if (condition==false) {
+			try {
+				PrintWriter output = new PrintWriter(link.getOutputStream(), true);
+				output.println("UsernameError" + "," + "There is no user: "+username+" in our databases!");
+				return false;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return true;
 	}
 
-	private boolean correctLoginInfo(String username, String password, ServerSideDB db) {
-		if (db.passwordIsCorrect(username, password)) {
+	private boolean correctLoginInfo(String username, String password, ServerSideDB db, Socket link) {
+		if (db.passwordIsCorrect(username, password)==false) {
+			try {
+				PrintWriter output = new PrintWriter(link.getOutputStream(), true);
+				output.println("PasswordError" + "," + "Password doesn't match for username "+username);
+				return false;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			// send client GUI notification to change view
 		}
 		return false;
@@ -236,12 +297,12 @@ public class Server extends Thread {
 		// prepovtarq se sus ServerSideDB notify
 
 	}
-	
+
 	private void createTable() {
 		ServerSideDB db = new ServerSideDB();
-		db.createTables();{
-			
-		}
+		db.createTables();
+		db.closeConnection();
+
 	}
 
 }
