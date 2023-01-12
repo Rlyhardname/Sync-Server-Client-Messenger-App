@@ -201,11 +201,23 @@ public class ServerSideDB {
 
 	public void createTables() {
 		// TODO Auto-generated method stub
-		createTableUser();
+		
 	}
 	
-	private void createTableUser() {
-		
+	boolean createTableUser() {
+		String sql = "CREATE TABLE User"
+				+ "(Username VARCHAR(25)"
+				+ "Password VARCHAR(32)"
+				+ "PRIMARY KEY (Username))";
+		try {
+			if(stmt.execute(sql)) {
+				return true;
+			};
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 	private void createTableUserLog() {
 		
