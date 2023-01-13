@@ -3,14 +3,23 @@ package Main;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.InetAddress;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
+
+//import com.mysql.cj.xdevapi.Client;
+
 public class ClientGUI {
 
+	private static InetAddress host;
+	private static int PORT = 1337;
 	private JFrame frame;
+	private TestClient client;
 
 	/**
 	 * Launch the application.
@@ -33,6 +42,8 @@ public class ClientGUI {
 	 */
 	public ClientGUI() {
 		initialize();
+		client = new TestClient("account1","password");
+		
 	}
 
 	/**
@@ -48,9 +59,24 @@ public class ClientGUI {
 		JButton sendText = new JButton("SEND TEXT");
 		frame.add(text);
 		frame.add(sendText);
-		
+		sendText.addActionListener(e -> selectionButtonPressed(client));
 	}
 	
+//	private static void sendMessage(InetAddress localIP, int PORT) {
+//		PrintWriter output;
+//		try {
+//		
+//			output = new PrintWriter(link.getOutputStream(), true);
+//			output.println(msg);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
 	
+	private Object selectionButtonPressed(TestClient client) {
+		client.sendMessage();
+		return null;
+	}
 
 }

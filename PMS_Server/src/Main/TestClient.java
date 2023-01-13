@@ -1,0 +1,111 @@
+package Main;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Scanner;
+
+public class TestClient extends Thread {
+
+	private InetAddress host;
+	private final int PORT = 1337;
+	private String username;
+	private String password;
+	private BufferedReader input;
+	private PrintWriter output;
+	private Socket link;
+
+	TestClient(String user, String pass) {
+		{
+			username = user;
+			password = pass;
+
+			try {
+				host = InetAddress.getLocalHost();
+				link = new Socket(host, PORT);
+				input = new BufferedReader(new InputStreamReader(link.getInputStream()));
+				output = new PrintWriter(link.getOutputStream(), true);
+			} catch (IOException e) {
+				System.out.println("Host ID not found");
+				System.exit(1);
+			}
+
+		}
+	}
+
+	@Override
+	public void run() {
+
+		accessServer();
+	}
+
+	private void accessServer() {
+		login(link, input, output, username, password);
+	}
+
+	public void login(Socket link, BufferedReader input, PrintWriter output, String username2, String password2) {
+		String message = "", serverMsg = "";
+		do {
+
+			try {
+				serverMsg = input.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			if (serverMsg.equals("Username")) {
+				System.out.println("Entering username: Account1");
+				System.out.println(serverMsg);
+				output.println(username2);
+			} else if (serverMsg.equals("Password")) {
+				System.out.println("Entering password: password");
+				System.out.println(serverMsg);
+				output.println(password2);
+			} else if (serverMsg.equals("LoginSuccess\" + \",\" + \"Succesfully logged in!")) {
+				System.out.println(serverMsg);
+				message = "*CLOSE*";
+			} else {
+
+				System.out.println(serverMsg);
+			}
+
+		} while (!message.equals("*CLOSE*"));
+	}
+
+	public void sendMessage() {
+
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public InetAddress getHost() {
+		return host;
+	}
+
+	public void setHost(InetAddress host) {
+		this.host = host;
+	}
+
+	public int getPORT() {
+		return PORT;
+	}
+
+}
