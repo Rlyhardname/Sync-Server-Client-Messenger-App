@@ -53,7 +53,7 @@ public class Server extends Thread {
 
 		int i = 0;
 		do {
-			
+
 			System.err.println(i++);
 			if (order.equals("Sleep")) {
 				try {
@@ -62,11 +62,11 @@ public class Server extends Thread {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			} if (order.equals("Print")) {
+			}
+			if (order.equals("Print")) {
 				printActiveUsers();
 				order = "Sleep";
 			}
-			
 
 		} while (true);
 
@@ -87,7 +87,7 @@ public class Server extends Thread {
 			e.printStackTrace();
 		}
 
-		authentication(link); 
+		authentication(link);
 		syncClientWithServerDB();
 		handleClient(link);
 
@@ -106,18 +106,30 @@ public class Server extends Thread {
 			ServerSideDB db = new ServerSideDB();
 			try {
 				input = new BufferedReader(new InputStreamReader(link.getInputStream()));
-				//sendMessage("Username", link);
+				// sendMessage("Username", link);
 				// System.out.println("Enter username: ");
 				String msg = input.readLine();
 				String[] commandUserPass = handleLogin(msg);
-				String username = commandUserPass[1];
+				String username = "";
+				String password = "";
+				try {
+					username = commandUserPass[1];
+				} catch (ArrayIndexOutOfBoundsException e) {
+					continue;
+				}
+
 				System.out.println("Client returned username : " + username);
 
 				if (!username.equals("create")) {
 
-					//sendMessage("Password", link);
+					// sendMessage("Password", link);
 
-					String password = commandUserPass[2];
+					try {
+						password = commandUserPass[2];
+					} catch (ArrayIndexOutOfBoundsException e) {
+						continue;
+					}
+
 					System.out.println("Client returned password : " + password);
 					if (loginUserExists(username, db, link)) {
 						if (correctLoginInfo(username, password, db, link)) {
@@ -137,8 +149,8 @@ public class Server extends Thread {
 			db.closeConnection();
 		}
 	}
-	
-	private String[] handleLogin(String msg){
+
+	private String[] handleLogin(String msg) {
 		String[] entries = msg.split(",");
 		return entries;
 	}
@@ -151,7 +163,7 @@ public class Server extends Thread {
 		db.loginTime(username);
 	}
 
-	public static synchronized void printActiveUsers() {		
+	public static synchronized void printActiveUsers() {
 		ServerGUI.printArea();
 	}
 
@@ -214,7 +226,7 @@ public class Server extends Thread {
 		boolean condition = db.isRegisteredUser(username);
 		if (condition == false) {
 			String msg = "UsernameError" + "," + "There is no user: " + username + " in our databases!";
-			//sendMessage(msg, link);
+			// sendMessage(msg, link);
 			return false;
 
 		}
@@ -225,7 +237,7 @@ public class Server extends Thread {
 	private boolean correctLoginInfo(String username, String password, ServerSideDB db, Socket link) {
 		if (db.passwordIsCorrect(username, password) == false) {
 			String msg = "PasswordError" + "," + "Password doesn't match for username " + username;
-		//	sendMessage(msg, link);
+			// sendMessage(msg, link);
 			return false;
 		}
 		return true;

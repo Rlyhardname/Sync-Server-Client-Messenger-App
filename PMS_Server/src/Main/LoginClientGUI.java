@@ -3,6 +3,8 @@ package Main;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -20,7 +22,7 @@ public class LoginClientGUI {
 	/**
 	 * Launch the application.
 	 */
-	public static void startGUI(){
+	public static void startGUI() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -39,7 +41,7 @@ public class LoginClientGUI {
 	public LoginClientGUI() {
 		initialize();
 		client = new TestClient();
-		client.setLogin(this);
+
 	}
 
 	/**
@@ -51,9 +53,9 @@ public class LoginClientGUI {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new FlowLayout());
 		username = new JTextField();
-		username.setPreferredSize(new Dimension(200,50));
+		username.setPreferredSize(new Dimension(200, 50));
 		password = new JTextField();
-		password.setPreferredSize(new Dimension(200,50));
+		password.setPreferredSize(new Dimension(200, 50));
 		JButton login = new JButton("LOGIN");
 		signUp = new JButton("SIGN UP");
 		frame.add(username);
@@ -61,20 +63,20 @@ public class LoginClientGUI {
 		frame.add(login);
 		frame.add(signUp);
 		login.addActionListener(e -> selectionButtonPressed());
+
 	}
-	
+
 	private Object selectionButtonPressed() {
 		String user = username.getText();
-		String pass = password.getText().toString();		
+		String pass = password.getText().toString();
 		client.setUsername(user);
 		client.setPassword(pass);
 		signUp.setText("LOGIN FAILED");
-		if(client.accessServer()) {
+		if (client.accessServer()) {
 			frame.dispose();
-		};
-		
+
+			// ClientGUI.startClientGUI();
+		}
 		return null;
 	}
-	// ClientGUI.startClientGUI();
-
 }
