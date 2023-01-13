@@ -7,6 +7,7 @@ public class EntryPoint {
 		Server server = new Server();
 		server.start();
 		new StartClients();
+		Server.order = "Print";
 	
 		
 

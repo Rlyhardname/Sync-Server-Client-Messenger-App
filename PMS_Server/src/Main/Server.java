@@ -9,17 +9,25 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Server extends Thread {
 
 	public static int port = 1337;
 	public static ServerSocket serverSocket;
-	public static HashMap<String, Socket> onlineUsers;
+	public static ConcurrentHashMap<String, Socket> onlineUsers;
+	public static int operation;
+	public Thread operationThread;
+	public static String order;
 
 	Server() {
-		onlineUsers = new HashMap<String, Socket>();
+		operation = 0;
+		Thread operationThread = new Thread(this);
+		operationThread.start();
+		onlineUsers = new ConcurrentHashMap<String, Socket>();
 		try {
 			serverSocket = new ServerSocket(port);
 		} catch (IOException e) {
@@ -28,8 +36,45 @@ public class Server extends Thread {
 
 	}
 
+	private void pickOperation(int i) {
+		switch (i) {
+		case 0:
+			operation = 1;
+			order = "Sleep";
+			waitForOperations();
+			break;
+		case 1:
+			connectClient();
+			break;
+		}
+	}
+
+	static void waitForOperations() {
+
+		int i = 0;
+		do {
+			
+			System.err.println(i++);
+			if (order.equals("Sleep")) {
+				try {
+					sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} if (order.equals("Print")) {
+				printActiveUsers();
+				order = "Sleep";
+			}
+			
+
+		} while (true);
+
+	}
+
 	private void connectClient() {
 		// TODO Auto-generated method stub
+		System.out.println("Waiting for new client");
 		Socket link = null;
 		try {
 
@@ -43,7 +88,7 @@ public class Server extends Thread {
 		}
 
 		authentication(link); // seems done
-		printActiveUsers();
+		// printActiveUsers();
 		syncClientWithServerDB();
 		handleClient(link);
 
@@ -52,8 +97,7 @@ public class Server extends Thread {
 	@Override
 	public void run() {
 
-		System.out.println("Waiting for new client");
-		connectClient();
+		pickOperation(operation);
 
 	}
 
@@ -105,8 +149,14 @@ public class Server extends Thread {
 		db.loginTime(username);
 	}
 
-	public void printActiveUsers() {
-		onlineUsers.forEach((key, value) -> System.out.println(key + value));
+	public static synchronized void printActiveUsers() {
+		try {
+			onlineUsers.forEach(
+					(key, value) -> System.out.println("Active UserName: :" + key + "Active user password: " + value));
+		} catch (ConcurrentModificationException e) {
+			System.err.println("Nishkite neshto ne se razbraha!");
+		}
+
 	}
 
 	private void createAccount(ServerSideDB db, Scanner input, Socket link) {
