@@ -20,6 +20,7 @@ public class ClientGUI {
 	private static int PORT = 1337;
 	private JFrame frame;
 	private TestClient client;
+	private JTextField text;
 
 	/**
 	 * Launch the application.
@@ -54,7 +55,7 @@ public class ClientGUI {
 		frame.setBounds(100, 100, 450, 300);		
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setLayout(new FlowLayout());
-		JTextField text = new JTextField();
+		text = new JTextField();
 		text.setPreferredSize(new Dimension(200,50));
 		JButton sendText = new JButton("SEND TEXT");
 		frame.add(text);
@@ -75,7 +76,9 @@ public class ClientGUI {
 //	}
 	
 	private Object selectionButtonPressed(TestClient client) {
-		client.sendMessage();
+		String msg = text.getText().toString();
+		client.sendMessage(msg);
+		text.setText("");
 		return null;
 	}
 

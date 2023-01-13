@@ -44,10 +44,10 @@ public class TestClient extends Thread {
 	}
 
 	private void accessServer() {
-		login(link, input, output, username, password);
+		login();
 	}
 
-	public void login(Socket link, BufferedReader input, PrintWriter output, String username2, String password2) {
+	public boolean login() {
 		String message = "", serverMsg = "";
 		do {
 
@@ -60,11 +60,11 @@ public class TestClient extends Thread {
 			if (serverMsg.equals("Username")) {
 				System.out.println("Entering username: Account1");
 				System.out.println(serverMsg);
-				output.println(username2);
+				output.println(username);
 			} else if (serverMsg.equals("Password")) {
 				System.out.println("Entering password: password");
 				System.out.println(serverMsg);
-				output.println(password2);
+				output.println(password);
 			} else if (serverMsg.equals("LoginSuccess\" + \",\" + \"Succesfully logged in!")) {
 				System.out.println(serverMsg);
 				message = "*CLOSE*";
@@ -74,10 +74,13 @@ public class TestClient extends Thread {
 			}
 
 		} while (!message.equals("*CLOSE*"));
+		return true;
 	}
 
-	public void sendMessage() {
+	public void sendMessage(String msg) {
 
+		output.println(msg);
+		
 	}
 
 	public String getUsername() {
