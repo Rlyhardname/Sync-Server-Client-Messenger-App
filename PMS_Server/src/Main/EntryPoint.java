@@ -6,10 +6,12 @@ public class EntryPoint {
 
 	public static void main(String[] args) {
 
-		GUI.startGUI();
+		ServerGUI.startGUI();
 		Server server = new Server();
 		server.start();
-		new StartClients();
+		new testClient("account1","password");
+		// FOR TESTING MULTIPLE CLIENTS
+		//new StartClients(); 
 		
 	
 		

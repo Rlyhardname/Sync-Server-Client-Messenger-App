@@ -150,7 +150,7 @@ public class Server extends Thread {
 	}
 
 	public static synchronized void printActiveUsers() {		
-		GUI.printArea();
+		ServerGUI.printArea();
 	}
 
 	private void createAccount(ServerSideDB db, Scanner input, Socket link) {

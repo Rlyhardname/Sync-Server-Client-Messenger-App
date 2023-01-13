@@ -18,6 +18,7 @@ public class testClient extends Thread{
 		{
 			username = user;
 			password = pass;
+			ClientGUI.startClientGUI();
 			try {
 				host = InetAddress.getLocalHost();
 			} catch (UnknownHostException e) {
