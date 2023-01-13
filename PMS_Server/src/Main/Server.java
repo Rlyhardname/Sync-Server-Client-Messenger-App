@@ -1,6 +1,8 @@
 package Main;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -32,8 +34,8 @@ public class Server extends Thread {
 		try {
 
 			link = serverSocket.accept();
-//			Thread newClient = new Thread(this);
-//			newClient.start();
+			Thread newClient = new Thread(this);
+			newClient.start();
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -57,30 +59,35 @@ public class Server extends Thread {
 
 	private void authentication(Socket link) {
 		// TODO Auto-generated method stub
+		BufferedReader input = null;
 		while (true) {
 			// Въведи user И парола sus system in za test
 			// input = new Scanner(link.getInputStream()); 4akame ime i parola
-			Scanner input = null;
+
 			ServerSideDB db = new ServerSideDB();
 			try {
-				input = new Scanner(System.in);
-				System.out.println("Enter username: ");
-				String username = input.nextLine();
+				input = new BufferedReader(new InputStreamReader(link.getInputStream()));
+				sendMessage("Username", link);
+				// System.out.println("Enter username: ");
+				String username = input.readLine();
+				System.out.println("Client returned username : " + username);
 
 				if (!username.equals("create")) {
-					System.out.println("Enter password: ");
-					String password = input.nextLine();
+
+					sendMessage("Password", link);
+
+					String password = input.readLine();
+					System.out.println("Client returned password : " + password);
 					if (loginUserExists(username, db, link)) {
 						if (correctLoginInfo(username, password, db, link)) {
 							login(username, db, link);
-							input.close();
 							db.closeConnection();
 							break;
 						}
 					}
 
 				} else {
-					createAccount(db, input, link);
+					// createAccount(db, input, link);
 
 				}
 			} catch (Exception e) {
@@ -92,8 +99,8 @@ public class Server extends Thread {
 
 	private void login(String username, ServerSideDB db, Socket link) {
 		// TODO Auto-generated method stub
-		String msg = "LoginSuccess"+","+"Succesfully logged in!";
-		sendMessage(msg,link);		
+		String msg = "LoginSuccess" + "," + "Succesfully logged in!";
+		sendMessage(msg, link);
 		onlineUsers.put(username, link);
 		db.loginTime(username);
 	}
@@ -192,11 +199,19 @@ public class Server extends Thread {
 
 	private void handleClient(Socket link) {
 
-		Scanner input = null;
+		System.out.println("sleep for 10 mins");
 		try {
-			input = new Scanner(link.getInputStream());
-			String update = input.nextLine();
-			while (!(update = input.nextLine()).equals("-1")) {
+			this.sleep(1000 * 1000);
+		} catch (InterruptedException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		BufferedReader input = null;
+		try {
+
+			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
+			String update = input.readLine();
+			while (!(update = input.readLine()).equals("-1")) {
 				String[] data = update.split(",");
 				updateServerDB(data[0], data[1]);
 			}
@@ -204,31 +219,32 @@ public class Server extends Thread {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} finally {
-			input.close();
+
 		}
 
 		try {
 
-			input = new Scanner(link.getInputStream());
+			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
 			PrintWriter output = new PrintWriter(link.getOutputStream(), true);
 			int numMessages = 0;
 
-			String message = input.nextLine();
+			String message = input.readLine();
 			while (!message.equals("*CLOSE*")) {
 				handleMessage(message);
 
 				System.out.println("\nMessage received...");
 				numMessages++;
 				output.println("Message" + numMessages + ": " + message);
-				message = input.nextLine();
+				message = input.readLine();
 			}
 			output.println("Messages received: " + numMessages);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
 			System.out.println("\nClose connection...");
-			input.close();
+
 			try {
+				input.close();
 				link.close();
 			} catch (IOException e) {
 				System.out.println("\nUnable to close...");

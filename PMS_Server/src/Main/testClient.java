@@ -7,54 +7,100 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-public class testClient {
+public class testClient extends Thread{
 
 	private static InetAddress host;
 	private static int PORT = 1337;
-	
-	public static void main(String[] args) {
-		
-		try {
-			host =  InetAddress.getLocalHost();
-		}catch(UnknownHostException e) {
-			System.out.println("Host ID not found");
-			System.exit(1);
+	private String username;
+	private String password;
+
+	testClient(String user, String pass) {
+		{
+			username = user;
+			password = pass;
+			try {
+				host = InetAddress.getLocalHost();
+			} catch (UnknownHostException e) {
+				System.out.println("Host ID not found");
+				System.exit(1);
+			}
+			
 		}
-		accessServer();
 	}
 
-	private static void accessServer() {
+	@Override
+	public void run(){
+		accessServer(username, password);
+	}
+	
+	private static void accessServer(String username2, String password2) {
 		Socket link = null;
 		Scanner input = null;
 		Scanner userEntry = null;
-		try{
-			link = new Socket(host,PORT);
+		try {
+			link = new Socket(host, PORT);
 			input = new Scanner(link.getInputStream());
-			PrintWriter output = new PrintWriter(link.getOutputStream(),true);
+			PrintWriter output = new PrintWriter(link.getOutputStream(), true);
 			userEntry = new Scanner(System.in);
-			String message,response;
-			do {
-//				System.out.println("Enter message: ");
-//				message = userEntry.nextLine();
-//				output.println(message);
-				message = "go";
-				response = input.nextLine();
-				System.out.println("SERVER: " + response);
+			String message = "", serverMsg;
 			
-			}while(!message.equals("*CLOSE*"));
-		}catch(IOException e) {
+
+			do {
+
+				serverMsg = input.nextLine();
+
+				if (serverMsg.equals("Username")) {
+					System.out.println("Entering username: Account1");
+					System.out.println(serverMsg);
+					output.println(username2);
+				} else if (serverMsg.equals("Password")) {
+					System.out.println("Entering password: password");
+					System.out.println(serverMsg);
+					output.println(password2);
+				} else if(serverMsg.equals("LoginSuccess\" + \",\" + \"Succesfully logged in!")){
+					System.out.println(serverMsg);
+					message = "*CLOSE*";
+				}else {
+				
+					System.out.println(serverMsg);
+				}
+//				message = userEntry.nextLine();
+//				
+//				message = "go";
+//				
+//				System.out.println("SERVER: " + serverMsg);
+
+			} while (!message.equals("*CLOSE*"));
+		} catch (IOException e) {
 			e.printStackTrace();
-		}finally {
-			System.out.println("Closing connection...");
-			input.close();
-			userEntry.close();
-			try {
-				link.close();
-			}catch(IOException e) {
-				System.out.println("Unable to dissconect...");
-				System.exit(1);
-			}
 		}
+//		} finally {
+//			System.out.println("Closing connection...");
+//			input.close();
+//			userEntry.close();
+//			try {
+//				link.close();
+//			} catch (IOException e) {
+//				System.out.println("Unable to dissconect...");
+//				System.exit(1);
+//			}
+//		}
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 }

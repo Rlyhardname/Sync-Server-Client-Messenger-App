@@ -6,6 +6,7 @@ public class EntryPoint {
 
 		Server server = new Server();
 		server.start();
+		new testClient("account1", "password").start();
 	
 		
 
