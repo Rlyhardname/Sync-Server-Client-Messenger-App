@@ -150,12 +150,18 @@ public class Server extends Thread {
 	}
 
 	public static synchronized void printActiveUsers() {
-		try {
-			onlineUsers.forEach(
-					(key, value) -> System.out.println("Active UserName: :" + key + "Active user password: " + value));
-		} catch (ConcurrentModificationException e) {
-			System.err.println("Nishkite neshto ne se razbraha!");
-		}
+
+		
+		GUI.printArea();
+//
+		// NE TRII!!!!!!!!!!!!!!!!!!!!!
+		//  
+//		try {
+//			Server.onlineUsers.forEach(
+//					(key, value) -> System.out.println("Active UserName: :" + key + "Active user password: " + value));
+//		} catch (ConcurrentModificationException e) {
+//			System.err.println("Nishkite neshto ne se razbraha!");
+//		}
 
 	}
 
