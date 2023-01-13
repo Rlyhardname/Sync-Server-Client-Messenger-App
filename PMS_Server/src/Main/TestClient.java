@@ -55,7 +55,7 @@ public class TestClient extends Thread {
 
 	public boolean isLoginSuccess() {
 		String serverMsg = receiveMessage();
-		if (serverMsg.equals("LoginSuccess\" + \",\" + \"Succesfully logged in!")) {
+		if (serverMsg.equals("LoginSuccess,Succesfully logged in!")) {
 			return true;
 		}
 		return false;

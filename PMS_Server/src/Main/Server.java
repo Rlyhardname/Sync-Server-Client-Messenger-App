@@ -87,8 +87,7 @@ public class Server extends Thread {
 			e.printStackTrace();
 		}
 
-		authentication(link); // seems done
-		// printActiveUsers();
+		authentication(link); 
 		syncClientWithServerDB();
 		handleClient(link);
 
@@ -102,25 +101,23 @@ public class Server extends Thread {
 	}
 
 	private void authentication(Socket link) {
-		// TODO Auto-generated method stub
 		BufferedReader input = null;
 		while (true) {
-			// Въведи user И парола sus system in za test
-			// input = new Scanner(link.getInputStream()); 4akame ime i parola
-
 			ServerSideDB db = new ServerSideDB();
 			try {
 				input = new BufferedReader(new InputStreamReader(link.getInputStream()));
-				sendMessage("Username", link);
+				//sendMessage("Username", link);
 				// System.out.println("Enter username: ");
-				String username = input.readLine();
+				String msg = input.readLine();
+				String[] commandUserPass = handleLogin(msg);
+				String username = commandUserPass[1];
 				System.out.println("Client returned username : " + username);
 
 				if (!username.equals("create")) {
 
-					sendMessage("Password", link);
+					//sendMessage("Password", link);
 
-					String password = input.readLine();
+					String password = commandUserPass[2];
 					System.out.println("Client returned password : " + password);
 					if (loginUserExists(username, db, link)) {
 						if (correctLoginInfo(username, password, db, link)) {
@@ -135,10 +132,15 @@ public class Server extends Thread {
 
 				}
 			} catch (Exception e) {
-				System.out.println("Neshto grumna!");
+				e.printStackTrace();
 			}
 			db.closeConnection();
 		}
+	}
+	
+	private String[] handleLogin(String msg){
+		String[] entries = msg.split(",");
+		return entries;
 	}
 
 	private void login(String username, ServerSideDB db, Socket link) {
@@ -212,7 +214,7 @@ public class Server extends Thread {
 		boolean condition = db.isRegisteredUser(username);
 		if (condition == false) {
 			String msg = "UsernameError" + "," + "There is no user: " + username + " in our databases!";
-			sendMessage(msg, link);
+			//sendMessage(msg, link);
 			return false;
 
 		}
@@ -223,7 +225,7 @@ public class Server extends Thread {
 	private boolean correctLoginInfo(String username, String password, ServerSideDB db, Socket link) {
 		if (db.passwordIsCorrect(username, password) == false) {
 			String msg = "PasswordError" + "," + "Password doesn't match for username " + username;
-			sendMessage(msg, link);
+		//	sendMessage(msg, link);
 			return false;
 		}
 		return true;
