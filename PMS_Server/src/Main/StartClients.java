@@ -10,7 +10,10 @@ public class StartClients {
 				{ "soggy", "doggy" }, { "zzzzz", "kkkk" } };
 		for (int i = 0; i < 7; i++) {
 			for (int j = 0; j < 1; j++) {
-				new TestClient(clients[i][0], clients[i][1]).start();
+				TestClient client = new TestClient();
+				client.start();
+				client.setName(clients[i][0]);
+				client.setPassword(clients[i][1]);
 			}
 		}
 	}

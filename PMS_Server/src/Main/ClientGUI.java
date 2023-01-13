@@ -43,7 +43,7 @@ public class ClientGUI {
 	 */
 	public ClientGUI() {
 		initialize();
-		client = new TestClient("account1","password");
+		
 		
 	}
 
@@ -62,18 +62,7 @@ public class ClientGUI {
 		frame.add(sendText);
 		sendText.addActionListener(e -> selectionButtonPressed(client));
 	}
-	
-//	private static void sendMessage(InetAddress localIP, int PORT) {
-//		PrintWriter output;
-//		try {
-//		
-//			output = new PrintWriter(link.getOutputStream(), true);
-//			output.println(msg);
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
+
 	
 	private Object selectionButtonPressed(TestClient client) {
 		String msg = text.getText().toString();

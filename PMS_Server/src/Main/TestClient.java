@@ -19,11 +19,8 @@ public class TestClient extends Thread {
 	private PrintWriter output;
 	private Socket link;
 
-	TestClient(String user, String pass) {
+	TestClient() {
 		{
-			username = user;
-			password = pass;
-
 			try {
 				host = InetAddress.getLocalHost();
 				link = new Socket(host, PORT);
@@ -40,13 +37,37 @@ public class TestClient extends Thread {
 	@Override
 	public void run() {
 
-		accessServer();
+	
 	}
 
-	private void accessServer() {
-		login();
+	void accessServer() {
+		
+		loginMessage(username,password);
+		if(isLoginSuccess()) {
+			ClientGUI.startClientGUI();
+
+		}
 	}
 
+	public boolean isLoginSuccess() {
+		String serverMsg = receiveMessage();
+		if (serverMsg.equals("LoginSuccess\" + \",\" + \"Succesfully logged in!")) {
+			return true;
+		}
+		return false;
+	
+	}
+	
+	public String receiveMessage() {
+		String msg = "";
+		try {
+			msg = input.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return msg;
+	}
 	public boolean login() {
 		String message = "", serverMsg = "";
 		do {
@@ -76,7 +97,22 @@ public class TestClient extends Thread {
 		} while (!message.equals("*CLOSE*"));
 		return true;
 	}
+	public StringBuffer concatStrings(String... data) {
+		StringBuffer concat = new StringBuffer();
+		
+		for (String string : data) {
+			concat.append(string);
+			concat.append(",");
+		}
 
+		concat.deleteCharAt(concat.length()-1);
+		return concat;
+	}
+	public void loginMessage(String user, String pass) {
+		String msg = concatStrings(user,pass).toString();
+		output.println("LOGIN"+","+msg);
+
+	}
 	public void sendMessage(String msg) {
 
 		output.println(msg);

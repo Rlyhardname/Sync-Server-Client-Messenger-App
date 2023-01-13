@@ -9,7 +9,8 @@ public class EntryPoint {
 		ServerGUI.startGUI();
 		Server server = new Server();
 		server.start();
-		ClientGUI.startClientGUI();
+		LoginClientGUI.startGUI();
+		
 		
 		// FOR TESTING MULTIPLE CLIENTS
 		//new StartClients(); 
