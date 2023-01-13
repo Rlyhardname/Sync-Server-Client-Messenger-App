@@ -15,6 +15,7 @@ public class LoginClientGUI {
 	private JTextField password;
 	private TestClient client;
 	private JButton signUp;
+	private LoginClientGUI window;
 
 	/**
 	 * Launch the application.
@@ -38,6 +39,7 @@ public class LoginClientGUI {
 	public LoginClientGUI() {
 		initialize();
 		client = new TestClient();
+		client.setLogin(this);
 	}
 
 	/**
@@ -66,8 +68,11 @@ public class LoginClientGUI {
 		String pass = password.getText().toString();		
 		client.setUsername(user);
 		client.setPassword(pass);
-		client.accessServer();
 		signUp.setText("LOGIN FAILED");
+		if(client.accessServer()) {
+			frame.dispose();
+		};
+		
 		return null;
 	}
 	// ClientGUI.startClientGUI();

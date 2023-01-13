@@ -18,6 +18,9 @@ public class TestClient extends Thread {
 	private BufferedReader input;
 	private PrintWriter output;
 	private Socket link;
+	private LoginClientGUI login;
+
+
 
 	TestClient() {
 		{
@@ -40,13 +43,14 @@ public class TestClient extends Thread {
 	
 	}
 
-	void accessServer() {
+	boolean accessServer() {
 		
 		loginMessage(username,password);
 		if(isLoginSuccess()) {
 			ClientGUI.startClientGUI();
-
+			return true;
 		}
+		return false;
 	}
 
 	public boolean isLoginSuccess() {
@@ -145,6 +149,13 @@ public class TestClient extends Thread {
 
 	public int getPORT() {
 		return PORT;
+	}
+	public LoginClientGUI getLogin() {
+		return login;
+	}
+
+	public void setLogin(LoginClientGUI login) {
+		this.login = login;
 	}
 
 }
