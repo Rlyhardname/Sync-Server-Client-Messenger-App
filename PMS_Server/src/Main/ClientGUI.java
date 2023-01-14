@@ -19,17 +19,19 @@ public class ClientGUI {
 	private static InetAddress host;
 	private static int PORT = 1337;
 	private JFrame frame;
-	private TestClient client;
+	private ClientLogic client;
 	private JTextField text;
+	private JButton newClient;
 
 	/**
 	 * Launch the application.
+	 * @param tr 
 	 */
-	public static void startClientGUI() {
+	public static void startClientGUI(ClientLogic client) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ClientGUI window = new ClientGUI();
+					ClientGUI window = new ClientGUI(client);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -40,10 +42,11 @@ public class ClientGUI {
 
 	/**
 	 * Create the application.
+	 * @param tr 
 	 */
-	public ClientGUI() {
+	public ClientGUI(ClientLogic client) {
 		initialize();
-		
+		this.client = client;
 		
 	}
 
@@ -54,20 +57,37 @@ public class ClientGUI {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);		
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setLayout(new FlowLayout());
+		frame.getContentPane().setLayout(new FlowLayout());
 		text = new JTextField();
 		text.setPreferredSize(new Dimension(200,50));
 		JButton sendText = new JButton("SEND TEXT");
-		frame.add(text);
-		frame.add(sendText);
+		frame.getContentPane().add(text);
+		frame.getContentPane().add(sendText);
+		
+		newClient = new JButton("newClient");
+		frame.getContentPane().add(newClient);
 		sendText.addActionListener(e -> selectionButtonPressed(client));
+		newClient.addActionListener(e -> selectionButtonPressed1(client));
 	}
 
 	
-	private Object selectionButtonPressed(TestClient client) {
+	private Object selectionButtonPressed1(ClientLogic client2) {
+		LoginClientGUI.startGUI();
+		return null;
+	}
+
+	private Object selectionButtonPressed(ClientLogic client) {
 		String msg = text.getText().toString();
 		client.sendMessage(msg);
-		text.setText("");
+		
+		String text1 = "";
+		try {
+			text1 = client.getInput().readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		text.setText(text1);
 		return null;
 	}
 

@@ -10,14 +10,19 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+
 public class LoginClientGUI {
 
 	private JFrame frame;
 	private JTextField username;
 	private JTextField password;
-	private TestClient client;
+	private ClientLogic client;
 	private JButton signUp;
 	private LoginClientGUI window;
+	private JButton login;
+	private Thread tr;
 
 	/**
 	 * Launch the application.
@@ -40,8 +45,10 @@ public class LoginClientGUI {
 	 */
 	public LoginClientGUI() {
 		initialize();
-		client = new TestClient();
-
+		client = new ClientLogic();
+		client.start();
+		
+		
 	}
 
 	/**
@@ -51,32 +58,52 @@ public class LoginClientGUI {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(new FlowLayout());
+		frame.getContentPane().setLayout(new FlowLayout());
 		username = new JTextField();
 		username.setPreferredSize(new Dimension(200, 50));
 		password = new JTextField();
 		password.setPreferredSize(new Dimension(200, 50));
-		JButton login = new JButton("LOGIN");
+		login = new JButton("LOGIN");
 		signUp = new JButton("SIGN UP");
-		frame.add(username);
-		frame.add(password);
-		frame.add(login);
-		frame.add(signUp);
+		username.setText("account1");
+		password.setText("password");
+		frame.getContentPane().add(username);
+		frame.getContentPane().add(password);
+		frame.getContentPane().add(login);
+		frame.getContentPane().add(signUp);
+
 		login.addActionListener(e -> selectionButtonPressed());
 
 	}
 
 	private Object selectionButtonPressed() {
+
 		String user = username.getText();
 		String pass = password.getText().toString();
 		client.setUsername(user);
 		client.setPassword(pass);
 		signUp.setText("LOGIN FAILED");
-		if (client.accessServer()) {
+		// client.setOperation(1);
+		try {
+			if(client.accessServer()) {
+				ClientGUI.startClientGUI(client);
+				
+				frame.dispose();
+			}
+		}catch(RuntimeException e) {
 			frame.dispose();
-
-			// ClientGUI.startClientGUI();
 		}
+		
+		System.out.println("Izliza li ot access server?");
+//			do {
+//
+//			} while (client.getOperation() == -2 || client.getOperation() == -3);
+//
+//			if (client.getOperation() == -2) {
+//				
+//			}
+
 		return null;
 	}
+
 }

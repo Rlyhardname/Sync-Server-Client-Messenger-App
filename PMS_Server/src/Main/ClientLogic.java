@@ -9,7 +9,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-public class TestClient extends Thread {
+import javax.swing.JFrame;
+
+public class ClientLogic extends Thread {
 
 	private InetAddress host;
 	private final int PORT = 1337;
@@ -17,14 +19,35 @@ public class TestClient extends Thread {
 	private String password;
 	private BufferedReader input;
 	private PrintWriter output;
+	public BufferedReader getInput() {
+		return input;
+	}
+
+	public void setInput(BufferedReader input) {
+		this.input = input;
+	}
+
+	public PrintWriter getOutput() {
+		return output;
+	}
+
+	public void setOutput(PrintWriter output) {
+		this.output = output;
+	}
+
 	private Socket link;
 	private LoginClientGUI login;
+	private int operation;
+	private boolean operationIsTrue;
+	public Thread operationThread;
 
-
-
-	TestClient() {
+	ClientLogic() {
 		{
 			try {
+				operationThread = new Thread(this);
+				operationThread.start();
+				operation = -1;
+				operationIsTrue = false;
 				host = InetAddress.getLocalHost();
 				link = new Socket(host, PORT);
 				input = new BufferedReader(new InputStreamReader(link.getInputStream()));
@@ -39,15 +62,28 @@ public class TestClient extends Thread {
 
 	@Override
 	public void run() {
+		// process();
+	}
 
-	
+	public void process() {
+		do {
+			System.out.println(operation);
+			if (operation == 1) {
+				if (accessServer()) {
+					operation = -2;
+				} else {
+					operation = -3;
+				}
+
+			}
+
+		} while (operation != 1337);
 	}
 
 	boolean accessServer() {
-		
-		loginMessage(username,password);
-		if(isLoginSuccess()) {
-			ClientGUI.startClientGUI();
+		loginMessage(username, password);
+		if (isLoginSuccess()) {
+
 			return true;
 		}
 		return false;
@@ -58,10 +94,11 @@ public class TestClient extends Thread {
 		if (serverMsg.equals("LoginSuccess,Succesfully logged in!")) {
 			return true;
 		}
+		System.out.println(serverMsg);
 		return false;
-	
+
 	}
-	
+
 	public String receiveMessage() {
 		String msg = "";
 		try {
@@ -72,6 +109,7 @@ public class TestClient extends Thread {
 		}
 		return msg;
 	}
+
 	public boolean login() {
 		String message = "", serverMsg = "";
 		do {
@@ -101,26 +139,29 @@ public class TestClient extends Thread {
 		} while (!message.equals("*CLOSE*"));
 		return true;
 	}
+
 	public StringBuffer concatStrings(String... data) {
 		StringBuffer concat = new StringBuffer();
-		
+
 		for (String string : data) {
 			concat.append(string);
 			concat.append(",");
 		}
 
-		concat.deleteCharAt(concat.length()-1);
+		concat.deleteCharAt(concat.length() - 1);
 		return concat;
 	}
+
 	public void loginMessage(String user, String pass) {
-		String msg = concatStrings(user,pass).toString();
-		output.println("LOGIN"+","+msg);
+		String msg = concatStrings(user, pass).toString();
+		output.println("LOGIN" + "," + msg);
 
 	}
+
 	public void sendMessage(String msg) {
 
 		output.println(msg);
-		
+
 	}
 
 	public String getUsername() {
@@ -150,12 +191,29 @@ public class TestClient extends Thread {
 	public int getPORT() {
 		return PORT;
 	}
+
 	public LoginClientGUI getLogin() {
 		return login;
 	}
 
 	public void setLogin(LoginClientGUI login) {
 		this.login = login;
+	}
+
+	public int getOperation() {
+		return operation;
+	}
+
+	public void setOperation(int operation) {
+		this.operation = operation;
+	}
+
+	public boolean isOperationIsTrue() {
+		return operationIsTrue;
+	}
+
+	public void setOperationIsTrue(boolean operationIsTrue) {
+		this.operationIsTrue = operationIsTrue;
 	}
 
 }

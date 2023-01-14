@@ -71,8 +71,9 @@ public class ServerSideDB {
 	public ArrayList<String> selectRoomUsers() throws SQLException {
 		// Maybe change to String[] after tests
 		ArrayList<String> users = new ArrayList<String>();
-		String sql = "Select User_ID from char_room_wharehouse where char_room_ID = args[1]";
-		stmt.executeQuery(sql);
+		String sql = "Select username from user where user = ?";
+		prep = conn.prepareStatement(sql);
+		ResultSet rs = prep.executeQuery();
 		if (task.ordinal() == 1) {
 			ResultSet resultSet = null;
 			try {
@@ -122,21 +123,6 @@ public class ServerSideDB {
 		return false;
 	}
 
-	public Enum getTask() {
-		return task;
-	}
-
-	public void setTask(Enum task) {
-		this.task = task;
-	}
-
-	public String[] getArgs() {
-		return args;
-	}
-
-	public void setArgs(String[] args) {
-		this.args = args;
-	}
 
 	public boolean isRegisteredUser(String username) {
 		String sql = "SELECT username FROM User " + " where username = ?";
@@ -257,5 +243,21 @@ public class ServerSideDB {
 	public void loginTime(String username) {
 		// TODO Auto-generated method stub
 		// LocalDateTime.now() insert into user_log where username = username;
+	}
+
+	public Enum getTask() {
+		return task;
+	}
+
+	public void setTask(Enum task) {
+		this.task = task;
+	}
+
+	public String[] getArgs() {
+		return args;
+	}
+
+	public void setArgs(String[] args) {
+		this.args = args;
 	}
 }

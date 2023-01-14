@@ -24,8 +24,9 @@ public class Server extends Thread {
 	public static String order;
 
 	Server() {
+		
 		operation = 0;
-		Thread operationThread = new Thread(this);
+		operationThread = new Thread(this);
 		operationThread.start();
 		onlineUsers = new ConcurrentHashMap<String, Socket>();
 		try {
@@ -79,6 +80,7 @@ public class Server extends Thread {
 		try {
 
 			link = serverSocket.accept();
+			System.out.println("ClientConnected");
 			Thread newClient = new Thread(this);
 			newClient.start();
 
@@ -96,12 +98,14 @@ public class Server extends Thread {
 	@Override
 	public void run() {
 
-		pickOperation(operation);
+		connectClient();
+		//pickOperation(operation);
 
 	}
 
 	private void authentication(Socket link) {
 		BufferedReader input = null;
+		PrintWriter output = null;
 		while (true) {
 			ServerSideDB db = new ServerSideDB();
 			try {
@@ -133,15 +137,15 @@ public class Server extends Thread {
 					System.out.println("Client returned password : " + password);
 					if (loginUserExists(username, db, link)) {
 						if (correctLoginInfo(username, password, db, link)) {
-							login(username, db, link);
+							login(username, db, link , output);
 							db.closeConnection();
 							break;
 						}
 					}
 
 				} else {
-					// createAccount(db, input, link);
-
+				//	createAccount(db, input, link, output);
+//
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -155,10 +159,11 @@ public class Server extends Thread {
 		return entries;
 	}
 
-	private void login(String username, ServerSideDB db, Socket link) {
+	private void login(String username, ServerSideDB db, Socket link, PrintWriter output) {
 		// TODO Auto-generated method stub
 		String msg = "LoginSuccess" + "," + "Succesfully logged in!";
-		sendMessage(msg, link);
+		System.out.println("vliza li v login?");
+		sendMessage(msg, link, output);
 		onlineUsers.put(username, link);
 		db.loginTime(username);
 	}
@@ -167,32 +172,32 @@ public class Server extends Thread {
 		ServerGUI.printArea();
 	}
 
-	private void createAccount(ServerSideDB db, Scanner input, Socket link) {
-		// TODO Auto-generated method stub
-		do {
-			System.out.println("Write username for new account: ");
-			String username = input.nextLine();
-			if (userDataIsValid(username, 20, link)) {
-				if (!db.isRegisteredUser(username)) {
-					System.out.println("Write password for new account");
-					String password = input.nextLine();
-					if (userDataIsValid(password, 32, link)) {
-						if (db.createUser(username, password)) {
-							String msg = "AccountCreated" + "," + "Account Succesfully created!";
-							sendMessage(msg, link);
-							break;
-						} else {
-							String msg = "CreateAccountError" + "," + "Database error, try again!";
-							sendMessage(msg, link);
-						}
-					}
-
-				}
-			}
-
-		} while (true);
-
-	}
+//	private void createAccount(ServerSideDB db, Scanner input, Socket link, PrintWriter output) {
+//		// TODO Auto-generated method stub
+//		do {
+//			System.out.println("Write username for new account: ");
+//			String username = input.nextLine();
+//			if (userDataIsValid(username, 20, link)) {
+//				if (!db.isRegisteredUser(username)) {
+//					System.out.println("Write password for new account");
+//					String password = input.nextLine();
+//					if (userDataIsValid(password, 32, link, output)) {
+//						if (db.createUser(username, password)) {
+//							String msg = "AccountCreated" + "," + "Account Succesfully created!";
+//							sendMessage(msg, link, output);
+//							break;
+//						} else {
+//							String msg = "CreateAccountError" + "," + "Database error, try again!";
+//							sendMessage(msg, link, output);
+//						}
+//					}
+//
+//				}
+//			}
+//
+//		} while (true);
+//
+//	}
 
 	private boolean userDataIsValid(String userData, int i, Socket link) {
 		String dataType = null;
@@ -203,7 +208,7 @@ public class Server extends Thread {
 		}
 		if (userData.length() > i) {
 			String msg = "LenghtError" + "," + dataType + "," + "Is too long!";
-			sendMessage(msg, link);
+		//	sendMessage(msg, link);
 			return false;
 		}
 		String[] forbbidenSymbols = { "#", "$", ",", "%", "!", "@", "^", "*", "(", ")", "+", "{", "}", "[", "]", "'",
@@ -213,7 +218,7 @@ public class Server extends Thread {
 			if (userData.contains(string)) {
 				String msg = "ForbidenSymbolError" + "," + dataType + "," + "Contrains forbidden symbol!" + ","
 						+ string;
-				sendMessage(msg, link);
+			//	sendMessage(msg, link);
 				return false;
 			}
 		}
@@ -243,8 +248,8 @@ public class Server extends Thread {
 		return true;
 	}
 
-	private void sendMessage(String msg, Socket link) {
-		PrintWriter output;
+	private void sendMessage(String msg, Socket link, PrintWriter output) {
+		
 		try {
 			output = new PrintWriter(link.getOutputStream(), true);
 			output.println(msg);
@@ -256,59 +261,70 @@ public class Server extends Thread {
 	}
 
 	private void handleClient(Socket link) {
-
-		System.out.println("sleep for 10 mins");
-		try {
-			this.sleep(1000 * 1000);
-		} catch (InterruptedException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
 		BufferedReader input = null;
+		PrintWriter output = null;
 		try {
-
 			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
-			String update = input.readLine();
-			while (!(update = input.readLine()).equals("-1")) {
-				String[] data = update.split(",");
-				updateServerDB(data[0], data[1]);
-			}
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} finally {
-
-		}
-
-		try {
-
-			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
-			PrintWriter output = new PrintWriter(link.getOutputStream(), true);
-			int numMessages = 0;
-
-			String message = input.readLine();
-			while (!message.equals("*CLOSE*")) {
-				handleMessage(message);
-
-				System.out.println("\nMessage received...");
-				numMessages++;
-				output.println("Message" + numMessages + ": " + message);
-				message = input.readLine();
-			}
-			output.println("Messages received: " + numMessages);
+			output = new PrintWriter(link.getOutputStream(), true);
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
-			System.out.println("\nClose connection...");
-
-			try {
-				input.close();
-				link.close();
-			} catch (IOException e) {
-				System.out.println("\nUnable to close...");
-				System.exit(1);
-			}
 		}
+		do{
+			try {
+				String entry = input.readLine();
+				output.println("off be");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}while(true);
+	
+//		do {
+//			try {
+//
+//				input = new BufferedReader(new InputStreamReader(link.getInputStream()));
+//				String update = input.readLine();
+//				String[] data = update.split(",");
+//				updateServerDB(data[0], data[1]);
+//
+//			} catch (IOException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			} finally {
+//				break;
+//			}
+//		} while (true);
+//
+//		try {
+//
+//			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
+//			PrintWriter output = new PrintWriter(link.getOutputStream(), true);
+//			int numMessages = 0;
+//
+//			String message = input.readLine();
+//			while (!message.equals("*CLOSE*")) {
+//				handleMessage(message);
+//
+//				System.out.println("\nMessage received...");
+//				numMessages++;
+//				output.println("Message" + numMessages + ": " + message);
+//				message = input.readLine();
+//			}
+//			output.println("Messages received: " + numMessages);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} finally {
+//			System.out.println("\nClose connection...");
+//
+//			try {
+//				input.close();
+//				link.close();
+//			} catch (IOException e) {
+//				System.out.println("\nUnable to close...");
+//				System.exit(1);
+//			}
+//		}
 
 	}
 
@@ -326,35 +342,40 @@ public class Server extends Thread {
 		// now() and send them to client vs array of messages or new DB with the entries
 		// between those 2 dates
 	}
-
+	
 	private void handleMessage(String message) {
+		
+	}
+	
+
+	private void handleMessageTrash(String message) {
 		// TODO Auto-generated method stub
 		// Index: 0 userSending 1 - Chat_Room_ID; 2 -
 		// MessageType(text,image,text+image,voice); 3:
 		// Message
-		String[] msg = message.split(",");
-		// - Update DB char_ROOM
-		// ----->>>> Insert Code here
-		// Select members in room that changed state
-		String sql = "Select User_ID from char_room_wharehouse where char_room_ID = msg[0]";
-		ServerSideDB db = new ServerSideDB();
-		db.setArgs(msg);
-		db.setTask(TasksDB.notifyUsers);
-		ArrayList<String> users = null;
-		try {
-			users = db.selectRoomUsers();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		for (String user : users) {
-			if (isOnline(user) && !user.equals(msg[0])) {
-				updateUser(db, user);
-			}
-		}
-		// notify room members if online to request update.
-		notifyOnline();
+//		String[] msg = message.split(",");
+//		// - Update DB char_ROOM
+//		// ----->>>> Insert Code here
+//		// Select members in room that changed state
+//		String sql = "Select User_ID from char_room_wharehouse where char_room_ID = msg[0]";
+//		ServerSideDB db = new ServerSideDB();
+//		db.setArgs(msg);
+//		db.setTask(TasksDB.notifyUsers);
+//		ArrayList<String> users = null;
+//		try {
+//			users = db.selectRoomUsers();
+//		} catch (SQLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		for (String user : users) {
+//			if (isOnline(user) && !user.equals(msg[0])) {
+//				updateUser(db, user);
+//			}
+//		}
+//		// notify room members if online to request update.
+//		notifyOnline();
 
 	}
 
