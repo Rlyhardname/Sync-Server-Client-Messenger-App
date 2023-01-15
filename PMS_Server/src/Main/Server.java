@@ -24,7 +24,7 @@ public class Server extends Thread {
 	public static String order;
 
 	Server() {
-		
+
 		operation = 0;
 		operationThread = new Thread(this);
 		operationThread.start();
@@ -99,59 +99,70 @@ public class Server extends Thread {
 	public void run() {
 
 		connectClient();
-		//pickOperation(operation);
+		// pickOperation(operation);
 
 	}
 
 	private void authentication(Socket link) {
 		BufferedReader input = null;
 		PrintWriter output = null;
+		try {
+			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		while (true) {
 			ServerSideDB db = new ServerSideDB();
+
+			// sendMessage("Username", link);
+			// System.out.println("Enter username: ");
+			String msg = "";
 			try {
-				input = new BufferedReader(new InputStreamReader(link.getInputStream()));
-				// sendMessage("Username", link);
-				// System.out.println("Enter username: ");
-				String msg = input.readLine();
-				String[] commandUserPass = handleLogin(msg);
-				String username = "";
-				String password = "";
+				msg = input.readLine();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			String[] commandUserPass = handleLogin(msg);
+			String username = "";
+			String password = "";
+			try {
+				username = commandUserPass[1];
+			} catch (ArrayIndexOutOfBoundsException e) {
+				continue;
+			}
+
+			System.out.println("Client returned username : " + username);
+
+			if (!username.equals("create")) {
+
+				// sendMessage("Password", link);
+
 				try {
-					username = commandUserPass[1];
+					password = commandUserPass[2];
 				} catch (ArrayIndexOutOfBoundsException e) {
 					continue;
 				}
 
-				System.out.println("Client returned username : " + username);
-
-				if (!username.equals("create")) {
-
-					// sendMessage("Password", link);
-
-					try {
-						password = commandUserPass[2];
-					} catch (ArrayIndexOutOfBoundsException e) {
-						continue;
+				System.out.println("Client returned password : " + password);
+				if (loginUserExists(username, db, link, output)) {
+					System.out.println("tuk 1");
+					if (correctLoginInfo(username, password, db, link,output)) {
+						System.out.println("tuk 2");
+						login(username, db, link, output);
+						System.out.println("tuk 3");
+						db.closeConnection();
+						break;
 					}
-
-					System.out.println("Client returned password : " + password);
-					if (loginUserExists(username, db, link)) {
-						if (correctLoginInfo(username, password, db, link)) {
-							login(username, db, link , output);
-							db.closeConnection();
-							break;
-						}
-					}
-
-				} else {
-				//	createAccount(db, input, link, output);
-//
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
+
+			} else {
+				// createAccount(db, input, link, output);
+//
 			}
-			db.closeConnection();
 		}
+		// db.closeConnection();
+
 	}
 
 	private String[] handleLogin(String msg) {
@@ -208,7 +219,7 @@ public class Server extends Thread {
 		}
 		if (userData.length() > i) {
 			String msg = "LenghtError" + "," + dataType + "," + "Is too long!";
-		//	sendMessage(msg, link);
+			// sendMessage(msg, link);
 			return false;
 		}
 		String[] forbbidenSymbols = { "#", "$", ",", "%", "!", "@", "^", "*", "(", ")", "+", "{", "}", "[", "]", "'",
@@ -218,7 +229,7 @@ public class Server extends Thread {
 			if (userData.contains(string)) {
 				String msg = "ForbidenSymbolError" + "," + dataType + "," + "Contrains forbidden symbol!" + ","
 						+ string;
-			//	sendMessage(msg, link);
+				// sendMessage(msg, link);
 				return false;
 			}
 		}
@@ -226,12 +237,12 @@ public class Server extends Thread {
 		return true;
 	}
 
-	private boolean loginUserExists(String username, ServerSideDB db, Socket link) {
+	private boolean loginUserExists(String username, ServerSideDB db, Socket link, PrintWriter output) {
 
 		boolean condition = db.isRegisteredUser(username);
 		if (condition == false) {
 			String msg = "UsernameError" + "," + "There is no user: " + username + " in our databases!";
-			// sendMessage(msg, link);
+			sendMessage(msg, link,output);
 			return false;
 
 		}
@@ -239,17 +250,17 @@ public class Server extends Thread {
 		return true;
 	}
 
-	private boolean correctLoginInfo(String username, String password, ServerSideDB db, Socket link) {
+	private boolean correctLoginInfo(String username, String password, ServerSideDB db, Socket link, PrintWriter output) {
 		if (db.passwordIsCorrect(username, password) == false) {
 			String msg = "PasswordError" + "," + "Password doesn't match for username " + username;
-			// sendMessage(msg, link);
+			sendMessage(msg, link,output);
 			return false;
 		}
 		return true;
 	}
 
 	private void sendMessage(String msg, Socket link, PrintWriter output) {
-		
+
 		try {
 			output = new PrintWriter(link.getOutputStream(), true);
 			output.println(msg);
@@ -270,7 +281,7 @@ public class Server extends Thread {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		do{
+		do {
 			try {
 				String entry = input.readLine();
 				output.println("off be");
@@ -278,8 +289,8 @@ public class Server extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}while(true);
-	
+		} while (true);
+
 //		do {
 //			try {
 //
@@ -342,11 +353,10 @@ public class Server extends Thread {
 		// now() and send them to client vs array of messages or new DB with the entries
 		// between those 2 dates
 	}
-	
+
 	private void handleMessage(String message) {
-		
+
 	}
-	
 
 	private void handleMessageTrash(String message) {
 		// TODO Auto-generated method stub
