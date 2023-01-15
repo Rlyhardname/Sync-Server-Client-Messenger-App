@@ -18,6 +18,7 @@ public class ServerGUI {
 	JFrame frame;
 	static JTextArea textArea;
 	Server server;
+	ServerVer2 server2;
 
 	/**
 	 * Launch the application.
@@ -42,6 +43,11 @@ public class ServerGUI {
 		initialize();
 		server = new Server();
 		server.start();
+		
+//		server2 = new ServerVer2();
+//		ServerVer2.serverDefaultSettings(this);
+//		Thread serverTwoThread = new Thread(server2);
+//		serverTwoThread.start();
 	}
 
 	/**
@@ -64,6 +70,21 @@ public class ServerGUI {
 
 		print.addActionListener(e -> selectionButtonPressed());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	public static void createNewConnection() {
+		Thread newClient = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+//				ServerVer2 newServerClient = new ServerVer2();
+//				Thread serverTwoThread = new Thread(newServerClient);
+//				serverTwoThread.start();
+				Server server1 = new Server();
+				server1.start();
+			}
+			
+		});
+		newClient.start();
 	}
 
 	private Object selectionButtonPressed() {

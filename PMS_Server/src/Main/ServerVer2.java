@@ -9,27 +9,26 @@ import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerVer2 implements Runnable {
+	
 	public static final int PORT = 1337;
 	public static ServerSocket serverSocket;
 	public static ConcurrentHashMap<String, Socket> onlineUsers;
+	public static ServerGUI serverGUI;
+	
 	private Socket link;
 	private PrintWriter output;
 	private BufferedReader input;
 	private String username;
 	private String password;
 
-	public static int operation;
-	public Thread operationThread;
-	public static String order;
-
 	ServerVer2() {
 		Initialize();
-
 	}
 
-	private static void serverDefaultSettings() {
+	public static void serverDefaultSettings(ServerGUI gui) {
 
 		try {
+			serverGUI = gui;
 			serverSocket = new ServerSocket(PORT);
 			onlineUsers = new ConcurrentHashMap<String, Socket>();
 		} catch (IOException e) {
@@ -39,7 +38,6 @@ public class ServerVer2 implements Runnable {
 
 	private void Initialize() {
 
-		link = null;
 		try {
 			link = serverSocket.accept();
 			output = new PrintWriter(link.getOutputStream(), true);
@@ -50,17 +48,17 @@ public class ServerVer2 implements Runnable {
 		}
 
 	}
+	
+
 
 	private void connectClient() {
-		// TODO Auto-generated method stub
 		System.out.println("Waiting for new client");
 		Socket link = null;
 		try {
 
 			link = serverSocket.accept();
 			System.out.println("ClientConnected");
-			Thread newClient = new Thread(this);
-			newClient.start();
+			;
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -87,7 +85,6 @@ public class ServerVer2 implements Runnable {
 			try {
 				msg = input.readLine();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			String[] commandUserPass = msg.split(",");
@@ -254,4 +251,5 @@ public class ServerVer2 implements Runnable {
 	public static synchronized void printActiveUsers() {
 		ServerGUI.printArea();
 	}
+
 }

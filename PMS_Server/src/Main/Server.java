@@ -42,8 +42,9 @@ public class Server extends Thread {
 
 			link = serverSocket.accept();
 			System.out.println("ClientConnected");
-			Thread newClient = new Thread(this);
-			newClient.start();
+			ServerGUI.createNewConnection();
+//			Thread newClient = new Thread(this);
+//			newClient.start();
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
