@@ -25,51 +25,12 @@ public class Server extends Thread {
 
 	Server() {
 
-		operation = 0;
-		operationThread = new Thread(this);
-		operationThread.start();
 		onlineUsers = new ConcurrentHashMap<String, Socket>();
 		try {
 			serverSocket = new ServerSocket(port);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-	}
-
-	private void pickOperation(int i) {
-		switch (i) {
-		case 0:
-			operation = 1;
-			order = "Sleep";
-			waitForOperations();
-			break;
-		case 1:
-			connectClient();
-			break;
-		}
-	}
-
-	static void waitForOperations() {
-
-		int i = 0;
-		do {
-
-			System.err.println(i++);
-			if (order.equals("Sleep")) {
-				try {
-					sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			if (order.equals("Print")) {
-				printActiveUsers();
-				order = "Sleep";
-			}
-
-		} while (true);
 
 	}
 
@@ -89,9 +50,9 @@ public class Server extends Thread {
 			e.printStackTrace();
 		}
 
-		authentication(link);
+		String username = authentication(link);
 		syncClientWithServerDB();
-		handleClient(link);
+		handleClient(link,username);
 
 	}
 
@@ -103,7 +64,7 @@ public class Server extends Thread {
 
 	}
 
-	private void authentication(Socket link) {
+	private String authentication(Socket link) {
 		BufferedReader input = null;
 		PrintWriter output = null;
 		try {
@@ -152,7 +113,7 @@ public class Server extends Thread {
 						login(username, db, link, output);
 						System.out.println("tuk 3");
 						db.closeConnection();
-						break;
+						return username;
 					}
 				}
 
@@ -271,7 +232,7 @@ public class Server extends Thread {
 
 	}
 
-	private void handleClient(Socket link) {
+	private void handleClient(Socket link, String username) {
 		BufferedReader input = null;
 		PrintWriter output = null;
 		try {
@@ -284,6 +245,9 @@ public class Server extends Thread {
 		do {
 			try {
 				String entry = input.readLine();
+				messageType(entry,username,link,output);
+					
+				
 				output.println("off be");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -291,52 +255,26 @@ public class Server extends Thread {
 			}
 		} while (true);
 
-//		do {
-//			try {
-//
-//				input = new BufferedReader(new InputStreamReader(link.getInputStream()));
-//				String update = input.readLine();
-//				String[] data = update.split(",");
-//				updateServerDB(data[0], data[1]);
-//
-//			} catch (IOException e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			} finally {
-//				break;
-//			}
-//		} while (true);
-//
-//		try {
-//
-//			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
-//			PrintWriter output = new PrintWriter(link.getOutputStream(), true);
-//			int numMessages = 0;
-//
-//			String message = input.readLine();
-//			while (!message.equals("*CLOSE*")) {
-//				handleMessage(message);
-//
-//				System.out.println("\nMessage received...");
-//				numMessages++;
-//				output.println("Message" + numMessages + ": " + message);
-//				message = input.readLine();
-//			}
-//			output.println("Messages received: " + numMessages);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} finally {
-//			System.out.println("\nClose connection...");
-//
-//			try {
-//				input.close();
-//				link.close();
-//			} catch (IOException e) {
-//				System.out.println("\nUnable to close...");
-//				System.exit(1);
-//			}
-//		}
 
+	}
+	
+	private void messageType(String entry, String username,Socket link, PrintWriter output) {
+		switch(entry) {
+		case "Error": break;
+		case "Data":handleDataMessage(entry,username,link, output); break;
+		case "Text": break;
+		case "Image": break;
+		}
+	}
+	
+	public void handleDataMessage(String entry, String username,Socket link, PrintWriter output){
+		String[] array = entry.split(",");
+		for (String string : array) {
+			// selectni klient s username " username " 
+			// promeni tablica users, aditional info s array[2]Key i array[3]Value
+		}
+		sendMessage("Confirmation message", link, output); // dabavi i message type cum sendMessage
+		//Confirmation message... ooo stana... ooo ne stana opitai pak...
 	}
 
 	private void updateServerDB(String updateType, String string2) {
