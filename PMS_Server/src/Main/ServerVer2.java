@@ -9,12 +9,12 @@ import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerVer2 implements Runnable {
-	
+
 	public static final int PORT = 1337;
 	public static ServerSocket serverSocket;
 	public static ConcurrentHashMap<String, Socket> onlineUsers;
 	public static ServerGUI serverGUI;
-	
+
 	private Socket link;
 	private PrintWriter output;
 	private BufferedReader input;
@@ -23,6 +23,9 @@ public class ServerVer2 implements Runnable {
 
 	ServerVer2() {
 		Initialize();
+	}
+	ServerVer2(String empty){
+		
 	}
 
 	public static void serverDefaultSettings(ServerGUI gui) {
@@ -37,37 +40,39 @@ public class ServerVer2 implements Runnable {
 	}
 
 	private void Initialize() {
-
 		try {
 			link = serverSocket.accept();
 			output = new PrintWriter(link.getOutputStream(), true);
 			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
+			try {
+				input.close();
+				output.close();
+				link.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			e1.printStackTrace();
 		}
 
 	}
-	
-
 
 	private void connectClient() {
-		System.out.println("Waiting for new client");
-		Socket link = null;
 		try {
-
-			link = serverSocket.accept();
+			
 			System.out.println("ClientConnected");
-			;
+			authentication();
+			// syncClientWithServerDB();
+			handleClient();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			try {
+				link.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 		}
-
-		authentication();
-		//syncClientWithServerDB();
-		handleClient(link, username);
 
 	}
 
@@ -80,14 +85,17 @@ public class ServerVer2 implements Runnable {
 
 	private void authentication() {
 		while (true) {
+			System.out.println("samnitelna rabota");
 			ServerSideDB db = new ServerSideDB();
+			String[] commandUserPass;
 			String msg = "";
 			try {
 				msg = input.readLine();
-			} catch (IOException e1) {
-				e1.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			String[] commandUserPass = msg.split(",");
+			commandUserPass = msg.split(",");
+
 			try {
 				username = commandUserPass[1];
 			} catch (ArrayIndexOutOfBoundsException e) {
@@ -109,15 +117,14 @@ public class ServerVer2 implements Runnable {
 					if (correctLoginInfo(db)) {
 						login(db);
 						db.closeConnection();
-
+						break;
 					}
 				}
 
 			} else {
-				 try {
+				try {
 					createAccount(db);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -149,7 +156,6 @@ public class ServerVer2 implements Runnable {
 	}
 
 	private void login(ServerSideDB db) {
-		// TODO Auto-generated method stub
 		String msg = "LoginSuccess" + "," + "Succesfully logged in!";
 		System.out.println("vliza li v login?");
 		sendMessage(msg);
@@ -158,7 +164,6 @@ public class ServerVer2 implements Runnable {
 	}
 
 	private void createAccount(ServerSideDB db) throws IOException {
-		// TODO Auto-generated method stub
 		do {
 			System.out.println("Write username for new account: ");
 			String username = input.readLine();
@@ -193,7 +198,7 @@ public class ServerVer2 implements Runnable {
 		}
 		if (userData.length() > i) {
 			String msg = "LenghtError" + "," + dataType + "," + "Is too long!";
-			// sendMessage(msg, link);
+			sendMessage(msg);
 			return false;
 		}
 		String[] forbbidenSymbols = { "#", "$", ",", "%", "!", "@", "^", "*", "(", ")", "+", "{", "}", "[", "]", "'",
@@ -203,7 +208,7 @@ public class ServerVer2 implements Runnable {
 			if (userData.contains(string)) {
 				String msg = "ForbidenSymbolRegister" + "," + dataType + "," + "Contrains forbidden symbol!" + ","
 						+ string;
-				sendMessage("ForbidenSymbolRegister",msg);
+				sendMessage(msg);
 				return false;
 			}
 		}
@@ -211,40 +216,34 @@ public class ServerVer2 implements Runnable {
 		return true;
 	}
 
-	private void handleClient(Socket link, String username) {
-		BufferedReader input = null;
-		PrintWriter output = null;
-		try {
-			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
-			output = new PrintWriter(link.getOutputStream(), true);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	private void handleClient() throws IOException {
+		String msg = "";
+		PrintWriter writeTo = null;
 		do {
-			try {
-				String entry = input.readLine();
-				messageType(entry, username, link, output);
 
-				output.println("off be");
+			try {
+				
+				msg = input.readLine();
+				String[] userMsg = msg.split(",");
+				Socket friend = onlineUsers.get(userMsg[1]);
+			
+				writeTo = new PrintWriter(friend.getOutputStream(),true);
+				writeTo.println(userMsg[0]);
+				//sendMessage(msg);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		} while (true);
+		} while (!msg.contains("ExitClient"));
+
+		output.close();
+		input.close();
+		link.close();
 
 	}
 
-	
-	private void sendMessage(String MessageType, String msg) {
+	private void sendMessage(String msg) {
 
-		try {
-			output = new PrintWriter(link.getOutputStream(), true);
-			output.println(msg);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		output.println(msg);
 
 	}
 

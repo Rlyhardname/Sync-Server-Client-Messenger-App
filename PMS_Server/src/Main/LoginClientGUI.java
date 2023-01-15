@@ -32,6 +32,7 @@ public class LoginClientGUI {
 			public void run() {
 				try {
 					LoginClientGUI window = new LoginClientGUI();
+					ServerGUI.createNewConnection();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();

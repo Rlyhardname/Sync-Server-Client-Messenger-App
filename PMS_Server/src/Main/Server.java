@@ -293,9 +293,6 @@ public class Server extends Thread {
 		// between those 2 dates
 	}
 
-	private void handleMessage(String message) {
-
-	}
 
 	private void handleMessageTrash(String message) {
 		// TODO Auto-generated method stub

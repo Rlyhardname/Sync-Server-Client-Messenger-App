@@ -41,13 +41,16 @@ public class ServerGUI {
 	 */
 	public ServerGUI() {
 		initialize();
-		server = new Server();
-		server.start();
-		
+//		server = new Server();
+//		server.start();
+		ServerVer2 trash = new ServerVer2("empty");
+		ServerVer2.serverDefaultSettings(this);
+		createNewConnection();
 //		server2 = new ServerVer2();
-//		ServerVer2.serverDefaultSettings(this);
 //		Thread serverTwoThread = new Thread(server2);
 //		serverTwoThread.start();
+		
+		
 	}
 
 	/**
@@ -76,11 +79,11 @@ public class ServerGUI {
 
 			@Override
 			public void run() {
-//				ServerVer2 newServerClient = new ServerVer2();
-//				Thread serverTwoThread = new Thread(newServerClient);
-//				serverTwoThread.start();
-				Server server1 = new Server();
-				server1.start();
+				ServerVer2 newServerClient = new ServerVer2();
+				Thread serverTwoThread = new Thread(newServerClient);
+				serverTwoThread.start();
+//				Server server1 = new Server();
+//				server1.start();
 			}
 			
 		});
