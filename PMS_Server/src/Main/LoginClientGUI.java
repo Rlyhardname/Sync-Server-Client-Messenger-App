@@ -45,7 +45,8 @@ public class LoginClientGUI {
 	 */
 	public LoginClientGUI() {
 		initialize();
-		
+		client = new ClientLogic();
+		client.start();
 		
 	}
 
@@ -76,8 +77,7 @@ public class LoginClientGUI {
 
 	private Object selectionButtonPressed() {
 
-		client = new ClientLogic();
-		client.start();
+	
 		String user = username.getText();
 		String pass = password.getText().toString();
 		client.setUsername(user);

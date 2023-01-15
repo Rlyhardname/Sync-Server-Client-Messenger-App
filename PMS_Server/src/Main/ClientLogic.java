@@ -19,22 +19,7 @@ public class ClientLogic extends Thread {
 	private String password;
 	private BufferedReader input;
 	private PrintWriter output;
-	public BufferedReader getInput() {
-		return input;
-	}
-
-	public void setInput(BufferedReader input) {
-		this.input = input;
-	}
-
-	public PrintWriter getOutput() {
-		return output;
-	}
-
-	public void setOutput(PrintWriter output) {
-		this.output = output;
-	}
-
+	private ClientGUI clientGUI;
 	private Socket link;
 	private LoginClientGUI login;
 	private int operation;
@@ -46,7 +31,7 @@ public class ClientLogic extends Thread {
 			try {
 				operationThread = new Thread(this);
 				operationThread.start();
-				operation = -1;
+				operation = 0;
 				operationIsTrue = false;
 				host = InetAddress.getLocalHost();
 				link = new Socket(host, PORT);
@@ -63,6 +48,36 @@ public class ClientLogic extends Thread {
 	@Override
 	public void run() {
 		// process();
+
+	}
+
+	public void runHandleServer() {
+		Thread handle = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				handleServer();
+
+			}
+
+		});
+		handle.start();
+
+	}
+
+	public void handleServer() {
+//		operation = 1;
+
+		do {
+			try {
+				String msgIN = input.readLine();
+				clientGUI.concattArea(msgIN);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		} while (true);
 	}
 
 	public void process() {
@@ -214,6 +229,30 @@ public class ClientLogic extends Thread {
 
 	public void setOperationIsTrue(boolean operationIsTrue) {
 		this.operationIsTrue = operationIsTrue;
+	}
+
+	public ClientGUI getGui() {
+		return clientGUI;
+	}
+
+	public void setGui(ClientGUI gui) {
+		this.clientGUI = gui;
+	}
+
+	public BufferedReader getInput() {
+		return input;
+	}
+
+	public void setInput(BufferedReader input) {
+		this.input = input;
+	}
+
+	public PrintWriter getOutput() {
+		return output;
+	}
+
+	public void setOutput(PrintWriter output) {
+		this.output = output;
 	}
 
 }
