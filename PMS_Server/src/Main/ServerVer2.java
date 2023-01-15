@@ -20,12 +20,15 @@ public class ServerVer2 implements Runnable {
 	private BufferedReader input;
 	private String username;
 	private String password;
+	private String trash;
 
 	ServerVer2() {
 		Initialize();
 	}
-	ServerVer2(String empty){
-		
+
+	ServerVer2(ServerGUI GUI) {
+		serverDefaultSettings(GUI);
+
 	}
 
 	public static void serverDefaultSettings(ServerGUI gui) {
@@ -41,6 +44,7 @@ public class ServerVer2 implements Runnable {
 
 	private void Initialize() {
 		try {
+			trash = "go";
 			link = serverSocket.accept();
 			output = new PrintWriter(link.getOutputStream(), true);
 			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
@@ -57,9 +61,9 @@ public class ServerVer2 implements Runnable {
 
 	}
 
-	private void connectClient() {
+	void connectClient() {
 		try {
-			
+
 			System.out.println("ClientConnected");
 			authentication();
 			// syncClientWithServerDB();
@@ -79,7 +83,9 @@ public class ServerVer2 implements Runnable {
 	@Override
 	public void run() {
 
-		connectClient();
+		do{
+			
+		}while(true);
 
 	}
 
@@ -222,15 +228,18 @@ public class ServerVer2 implements Runnable {
 		do {
 
 			try {
-				
+
 				msg = input.readLine();
 				String[] userMsg = msg.split(",");
+				if (userMsg[0].equals("ClosingClient"))
+					break;
 				Socket friend = onlineUsers.get(userMsg[1]);
-			
-				writeTo = new PrintWriter(friend.getOutputStream(),true);
+
+				writeTo = new PrintWriter(friend.getOutputStream(), true);
 				writeTo.println(userMsg[0]);
-				//sendMessage(msg);
+				// sendMessage(msg);
 			} catch (IOException e) {
+				System.out.println("sopa");
 				e.printStackTrace();
 			}
 		} while (!msg.contains("ExitClient"));

@@ -43,8 +43,10 @@ public class ServerGUI {
 		initialize();
 //		server = new Server();
 //		server.start();
-		ServerVer2 trash = new ServerVer2("empty");
-		ServerVer2.serverDefaultSettings(this);
+
+		ServerVer2 trash = new ServerVer2(this);
+		Thread trash1 = new Thread(trash);
+		trash1.start();
 		createNewConnection();
 //		server2 = new ServerVer2();
 //		Thread serverTwoThread = new Thread(server2);
@@ -80,6 +82,7 @@ public class ServerGUI {
 			@Override
 			public void run() {
 				ServerVer2 newServerClient = new ServerVer2();
+				newServerClient.connectClient();
 				Thread serverTwoThread = new Thread(newServerClient);
 				serverTwoThread.start();
 //				Server server1 = new Server();
@@ -96,16 +99,23 @@ public class ServerGUI {
 	}
 
 	static void printArea() {
+		System.out.println("aaaa");
 		StringBuffer concat = new StringBuffer();
-		Server.order = "Print";
-		new StringBuffer();
+		//Server.order = "Print";
+		//new StringBuffer();
 		try {
-			Server.onlineUsers.forEach((key, value) -> concat
-					.append("Active UserName: :" + key + "Active user password: " + value + "\n"));
-		} catch (ConcurrentModificationException e) {
-			System.err.println("Nishkite neshto ne se razbraha!");
+			if(!ServerVer2.onlineUsers.isEmpty()){
+				ServerVer2.onlineUsers.forEach((key, value) -> concat
+						.append("Active UserName: :" + key + "Active user password: " + value + "\n"));
+			}
+			
+		} catch (ConcurrentModificationException | NullPointerException e) {
+			System.err.println("Всички спят...");
 		}
-		textArea.setText(concat.toString());
+		if(!concat.equals("")) {
+			textArea.setText(concat.toString());
+		}
+		
 	}
 
 }
