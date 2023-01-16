@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -57,7 +58,7 @@ public class LoginClientGUI {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(new FlowLayout());
 		username = new JTextField();
 		username.setPreferredSize(new Dimension(200, 50));
@@ -71,6 +72,22 @@ public class LoginClientGUI {
 		frame.getContentPane().add(password);
 		frame.getContentPane().add(login);
 		frame.getContentPane().add(signUp);
+		
+		Thread tr = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				frame.addWindowListener(new java.awt.event.WindowAdapter() {
+					public void windowClosing(WindowEvent winEvt) {
+	
+						
+					}
+				});
+				
+			}
+			
+		});
+		tr.start();
 
 		login.addActionListener(e -> selectionButtonPressed());
 

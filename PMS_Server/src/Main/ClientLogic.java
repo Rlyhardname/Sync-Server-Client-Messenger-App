@@ -47,7 +47,7 @@ public class ClientLogic extends Thread {
 				output = new PrintWriter(link.getOutputStream(), true);
 			} catch (IOException e) {
 				System.out.println("Host ID not found");
-				System.exit(1);
+				//System.exit(1);
 			}
 
 		}

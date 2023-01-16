@@ -17,6 +17,7 @@ import javax.swing.JTextArea;
 public class ServerGUI {
 
 	JFrame frame;
+	JButton newClientLogin;
 	static JTextArea textArea;
 	Server server;
 	ServerVer2 server2;
@@ -68,17 +69,24 @@ public class ServerGUI {
 		JPanel buttons = new JPanel();
 		JPanel outputArea = new JPanel();
 		JButton print = new JButton("PRINT USERS");
+		newClientLogin = new JButton("NEW CLIENT LOGIN");
 		textArea = new JTextArea();
 		outputArea.setPreferredSize(new Dimension(750, 500));
 		textArea.setPreferredSize(new Dimension(750, 500));
 		outputArea.add(textArea);
 		buttons.add(print);
+		buttons.add(newClientLogin);
 		frame.add(outputArea);
 		frame.add(buttons);
 
 		print.addActionListener(e -> selectionButtonPressed());
+		newClientLogin.addActionListener(e -> selectionButtonPressed1());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
+	
+	
+	
+
 	public static void createNewConnection() {
 		Thread newClient = new Thread(new Runnable() {
 
@@ -100,7 +108,15 @@ public class ServerGUI {
 		printArea();
 		return null;
 	}
+	
+	private Object selectionButtonPressed1() {
+		// TODO Auto-generated method stub
+		LoginClientGUI.startGUI();
+		return null;
+	}
 
+	
+	
 	static void printArea() {
 		System.out.println("aaaa");
 		StringBuffer concat = new StringBuffer();
