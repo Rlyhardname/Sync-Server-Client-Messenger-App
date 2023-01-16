@@ -122,8 +122,13 @@ public class ClientGUI {
 				frame.addWindowListener(new java.awt.event.WindowAdapter() {
 					public void windowClosing(WindowEvent winEvt) {
 						client.sendMessage("ClosingClient");
-//							client.getOutput().close();
-//							client.getInput().close();
+							client.getOutput().close();
+							try {
+								client.getInput().close();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						if(!ServerSettings.onlineUsers.isEmpty()) {
 							ServerSettings.onlineUsers.remove(client.getUsername());
 						}

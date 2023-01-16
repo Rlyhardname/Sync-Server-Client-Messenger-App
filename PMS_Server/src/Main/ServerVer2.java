@@ -44,7 +44,6 @@ public class ServerVer2 implements Runnable {
 
 	private void Initialize() {
 		try {
-			trash = "go";
 			link = ServerSettings.serverSocket.accept();
 			output = new PrintWriter(link.getOutputStream(), true);
 			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
@@ -69,12 +68,10 @@ public class ServerVer2 implements Runnable {
 			// syncClientWithServerDB();
 			handleClient();
 
+		} catch(NullPointerException e1) {
+			
 		} catch (IOException e) {
-			try {
-				link.close();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -94,14 +91,16 @@ public class ServerVer2 implements Runnable {
 			String msg = "";
 			try {
 				msg = input.readLine();
-			} catch (IOException e) {
+			} catch (IOException  e) {
 				e.printStackTrace();
+			}catch(NullPointerException e1) {
+				break;
 			}
 			commandUserPass = msg.split(",");
 
 			try {
 				username = commandUserPass[1];
-			} catch (ArrayIndexOutOfBoundsException e) {
+			} catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
 				continue;
 			}
 
@@ -127,7 +126,7 @@ public class ServerVer2 implements Runnable {
 			} else {
 				try {
 					createAccount(db);
-				} catch (IOException e) {
+				} catch (IOException | NullPointerException e) {
 					e.printStackTrace();
 				}
 
@@ -235,9 +234,11 @@ public class ServerVer2 implements Runnable {
 				writeTo = new PrintWriter(friend.getOutputStream(), true);
 				writeTo.println(userMsg[0]);
 				// sendMessage(msg);
-			} catch (IOException e) {
+			} catch (IOException  e) {
 				System.out.println("sopa");
 				e.printStackTrace();
+			} catch(NullPointerException e1) {
+				msg = "ExitClient";
 			}
 		} while (!msg.contains("ExitClient"));
 

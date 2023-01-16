@@ -88,8 +88,19 @@ public class LoginClientGUI {
 			
 		});
 		tr.start();
+		
+		Thread tr1 = new Thread(new Runnable() {
 
-		login.addActionListener(e -> selectionButtonPressed());
+			@Override
+			public void run() {
+				login.addActionListener(e -> selectionButtonPressed());			
+			}
+			
+		});
+		tr1.start();
+
+		
+		
 
 	}
 

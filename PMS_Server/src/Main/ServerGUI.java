@@ -89,19 +89,21 @@ public class ServerGUI {
 
 	public static void createNewConnection() {
 		Thread newClient = new Thread(new Runnable() {
-
+			ServerVer2 newServerClient = null;
 			@Override
 			public void run() {
-				ServerVer2 newServerClient = new ServerVer2();
-				newServerClient.connectClient();
+				newServerClient = new ServerVer2();
+	
 				Thread serverTwoThread = new Thread(newServerClient);
 				serverTwoThread.start();
+				newServerClient.connectClient();
 //				Server server1 = new Server();
 //				server1.start();
 			}
 			
 		});
 		newClient.start();
+		
 	}
 
 	private Object selectionButtonPressed() {
