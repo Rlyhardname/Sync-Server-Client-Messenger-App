@@ -21,33 +21,17 @@ public class ClientLogic extends Thread {
 	private PrintWriter output;
 	private ClientOperationGUI clientGUI;
 	private Socket link;
-	public Socket getLink() {
-		return link;
-	}
-
-	public void setLink(Socket link) {
-		this.link = link;
-	}
-
 	private ClientLoginGUI login;
-	private int operation;
-	private boolean operationIsTrue;
-	public Thread operationThread;
 
 	ClientLogic() {
 		{
 			try {
-				operationThread = new Thread(this);
-				operationThread.start();
-				operation = 0;
-				operationIsTrue = false;
 				host = InetAddress.getLocalHost();
 				link = new Socket(host, PORT);
 				input = new BufferedReader(new InputStreamReader(link.getInputStream()));
 				output = new PrintWriter(link.getOutputStream(), true);
 			} catch (IOException e) {
 				System.out.println("Host ID not found");
-				//System.exit(1);
 			}
 
 		}
@@ -55,20 +39,17 @@ public class ClientLogic extends Thread {
 
 	@Override
 	public void run() {
-		// process();
-
 	}
 
 	public void runHandleServer() {
-		
+
 		Thread handle = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				if(!ServerSettings.onlineUsers.isEmpty()){
+				if (!ServerSettings.onlineUsers.isEmpty()) {
 					handleServer();
 				}
-				
 
 			}
 
@@ -78,39 +59,22 @@ public class ClientLogic extends Thread {
 	}
 
 	public void handleServer() {
-//		operation = 1;
-
 		do {
 			try {
-				
+
 				String msgIN = input.readLine();
-				if(msgIN == null) {
+				if (msgIN == null) {
 					break;
 				}
 				clientGUI.concattArea(msgIN);
 			} catch (IOException e) {
 				break;
-			} catch(NullPointerException e1) {
+			} catch (NullPointerException e1) {
 				break;
 			}
 
 		} while (true);
 	}
-
-//	public void process() {
-//		do {
-//			System.out.println(operation);
-//			if (operation == 1) {
-//				if (accessServer()) {
-//					operation = -2;
-//				} else {
-//					operation = -3;
-//				}
-//
-//			}
-//
-//		} while (operation != 1337);
-//	}
 
 	boolean accessServer(String string) {
 		loginMessage(string, username, password);
@@ -136,7 +100,6 @@ public class ClientLogic extends Thread {
 		try {
 			msg = input.readLine();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return msg;
@@ -186,13 +149,11 @@ public class ClientLogic extends Thread {
 
 	public void loginMessage(String option, String user, String pass) {
 		String msg = concatStrings(user, pass).toString();
-		if(option.equals("login")) {
+		if (option.equals("login")) {
 			output.println("LOGIN" + "," + msg);
-		}
-		else if(option.equals("signup")) {
+		} else if (option.equals("signup")) {
 			output.println("SIGN UP" + "," + msg);
 		}
-		
 
 	}
 
@@ -238,22 +199,6 @@ public class ClientLogic extends Thread {
 		this.login = login;
 	}
 
-	public int getOperation() {
-		return operation;
-	}
-
-	public void setOperation(int operation) {
-		this.operation = operation;
-	}
-
-	public boolean isOperationIsTrue() {
-		return operationIsTrue;
-	}
-
-	public void setOperationIsTrue(boolean operationIsTrue) {
-		this.operationIsTrue = operationIsTrue;
-	}
-
 	public ClientOperationGUI getGui() {
 		return clientGUI;
 	}
@@ -276,6 +221,14 @@ public class ClientLogic extends Thread {
 
 	public void setOutput(PrintWriter output) {
 		this.output = output;
+	}
+
+	public Socket getLink() {
+		return link;
+	}
+
+	public void setLink(Socket link) {
+		this.link = link;
 	}
 
 }

@@ -10,11 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerVer2 implements Runnable {
 
-//	public static final int PORT = 1337;
-//	public static ServerSocket serverSocket;
-//	public static ConcurrentHashMap<String, Socket> onlineUsers;
-//	public static ServerGUI serverGUI;
-
 	private Socket link;
 	private PrintWriter output;
 	private BufferedReader input;
@@ -31,17 +26,6 @@ public class ServerVer2 implements Runnable {
 
 	}
 
-//	public static void serverDefaultSettings(ServerGUI gui) {
-//
-//		try {
-//			serverGUI = gui;
-//			serverSocket = new ServerSocket(PORT);
-//			onlineUsers = new ConcurrentHashMap<String, Socket>();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
-
 	private void Initialize() {
 		try {
 			link = ServerSettings.serverSocket.accept();
@@ -53,9 +37,9 @@ public class ServerVer2 implements Runnable {
 				output.close();
 				link.close();
 			} catch (IOException | NullPointerException e) {
-				//e.printStackTrace();
+				e.printStackTrace();
 			}
-			//e1.printStackTrace();
+			e1.printStackTrace();
 		}
 
 	}
@@ -71,7 +55,6 @@ public class ServerVer2 implements Runnable {
 		} catch(NullPointerException e1) {
 			System.err.println("tuka moje bi??ASDSAD");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -167,12 +150,9 @@ public class ServerVer2 implements Runnable {
 
 	private void createAccount(DbServer db) throws IOException {
 		do {
-//			System.out.println("Write username for new account: ");
-//			String username = input.readLine();
 			if (userDataIsValid(20)) {
 				if (!db.isRegisteredUser(this.username)) {
 					System.out.println("Write password for new account");
-//					String password = input.readLine();
 					if (userDataIsValid(32)) {
 						if (db.createUser(username, password)) {
 							String msg = "AccountCreated" + "," + "Account Succesfully created!";

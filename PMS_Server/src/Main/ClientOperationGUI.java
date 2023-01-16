@@ -144,10 +144,6 @@ public class ClientOperationGUI {
 		});
 		tr.start();
 			
-		
-		
-		
-
 	}
 
 	private Object selectionButtonPressed1() {

@@ -117,7 +117,6 @@ public class ClientLoginGUI {
 		client.setUsername(user);
 		client.setPassword(pass);
 		signUp.setText("LOGIN FAILED");
-		// client.setOperation(1);
 		try {
 			if (client.accessServer("login")) {
 				ClientOperationGUI.startClientGUI(client);

@@ -19,7 +19,6 @@ public class ServerGUI {
 	JFrame frame;
 	JButton newClientLogin;
 	static JTextArea textArea;
-	Server server;
 	ServerVer2 server2;
 	ServerSettings settings;
 
@@ -44,18 +43,16 @@ public class ServerGUI {
 	 */
 	public ServerGUI() {
 		initialize();
-//		server = new Server();
-//		server.start();
-
 		settings = new ServerSettings();
 		ServerVer2 trash = new ServerVer2(this);
 		Thread trash1 = new Thread(trash);
 		trash1.start();
+		createNewConnection();
 //		server2 = new ServerVer2(this);
 //		Thread serverTwoThread = new Thread(server2);
 //		serverTwoThread.start();
 		
-		createNewConnection();
+	
 	
 		
 	}
@@ -93,13 +90,10 @@ public class ServerGUI {
 			ServerVer2 newServerClient = null;
 			@Override
 			public void run() {
-				newServerClient = new ServerVer2();
-	
+				newServerClient = new ServerVer2();	
 				Thread serverTwoThread = new Thread(newServerClient);
 				serverTwoThread.start();
 				newServerClient.connectClient();
-//				Server server1 = new Server();
-//				server1.start();
 			}
 			
 		});

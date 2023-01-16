@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Server extends Thread {
+public class UnusedServerVer1 extends Thread {
 
 	public static int port = 1337;
 	public static ServerSocket serverSocket;
@@ -23,7 +23,7 @@ public class Server extends Thread {
 	public Thread operationThread;
 	public static String order;
 
-	Server() {
+	UnusedServerVer1() {
 
 		onlineUsers = new ConcurrentHashMap<String, Socket>();
 		try {
