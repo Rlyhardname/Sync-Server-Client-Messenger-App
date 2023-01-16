@@ -1,14 +1,8 @@
 package Main;
 
-import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.TextField;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.InetAddress;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -18,17 +12,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 
-//import com.mysql.cj.xdevapi.Client;
-
 public class ClientOperationGUI {
-
-	private static InetAddress host;
-	private static int PORT = 1337;
 	private ClientLogic client;
 	private JFrame frame;
 	private JTextArea textArea;
@@ -69,9 +55,9 @@ public class ClientOperationGUI {
 		this.client = client1;
 		client.setGui(this);
 		client.runHandleServer();
-		if(client.getUsername().equals("account1")) {
+		if (client.getUsername().equals("account1")) {
 			empty.setText("account2");
-		}else if(client.getUsername().equals("account2")) {
+		} else if (client.getUsername().equals("account2")) {
 			empty.setText("account1");
 		}
 
@@ -88,16 +74,14 @@ public class ClientOperationGUI {
 		frame.setBounds(2000, 100, 600, 300);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout());
-		
-		
 
 		header = new JPanel();
-		frame.getContentPane().add(header,BorderLayout.NORTH);
-		
+		frame.getContentPane().add(header, BorderLayout.NORTH);
+
 		textArea = new JTextArea(10, 10);
 		scrollPane = new JScrollPane(textArea);
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
-	
+
 		textField = new JTextField(30);
 		send = new JButton("SEND");
 		newClient = new JButton("NEW CLIENT");
@@ -106,15 +90,15 @@ public class ClientOperationGUI {
 		panel.add(send);
 		panel.add(newClient);
 		frame.getContentPane().add(panel, BorderLayout.SOUTH);
-		
+
 		friendList = new JPanel();
 		empty = new JLabel("Asdadsdsadad");
 		friendList.add(empty);
-		frame.getContentPane().add(friendList,BorderLayout.EAST);
-	
-		send.addActionListener(e->selectionButtonPressed());
-		newClient.addActionListener(e->selectionButtonPressed1());
-		
+		frame.getContentPane().add(friendList, BorderLayout.EAST);
+
+		send.addActionListener(e -> selectionButtonPressed());
+		newClient.addActionListener(e -> selectionButtonPressed1());
+
 		Thread tr = new Thread(new Runnable() {
 
 			@Override
@@ -122,28 +106,24 @@ public class ClientOperationGUI {
 				frame.addWindowListener(new java.awt.event.WindowAdapter() {
 					public void windowClosing(WindowEvent winEvt) {
 						client.sendMessage("ClosingClient");
-							client.getOutput().close();
-							try {
-								client.getInput().close();
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						if(!ServerSettings.onlineUsers.isEmpty()) {
+						client.getOutput().close();
+						try {
+							client.getInput().close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						if (!ServerSettings.onlineUsers.isEmpty()) {
 							ServerSettings.onlineUsers.remove(client.getUsername());
 						}
-					
-						
-						
-						
+
 					}
 				});
-				
+
 			}
-			
+
 		});
 		tr.start();
-			
+
 	}
 
 	private Object selectionButtonPressed1() {
@@ -152,11 +132,11 @@ public class ClientOperationGUI {
 	}
 
 	private Object selectionButtonPressed() {
-		String msg = textField.getText().toString()+","+empty.getText().toString();
+		String msg = textField.getText().toString() + "," + empty.getText().toString();
 		System.out.println(msg);
 		client.sendMessage(msg);
 		textField.setText("");
-		
+
 		return null;
 	}
 

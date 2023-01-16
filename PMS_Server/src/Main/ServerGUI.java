@@ -3,10 +3,6 @@ package Main;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.TextArea;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.ConcurrentModificationException;
 
 import javax.swing.JButton;
@@ -19,7 +15,6 @@ public class ServerGUI {
 	JFrame frame;
 	JButton newClientLogin;
 	static JTextArea textArea;
-	ServerVer2 server2;
 	ServerSettings settings;
 
 	/**
@@ -51,10 +46,7 @@ public class ServerGUI {
 //		server2 = new ServerVer2(this);
 //		Thread serverTwoThread = new Thread(server2);
 //		serverTwoThread.start();
-		
-	
-	
-		
+
 	}
 
 	/**
@@ -77,60 +69,75 @@ public class ServerGUI {
 		frame.add(outputArea);
 		frame.add(buttons);
 
-		print.addActionListener(e -> selectionButtonPressed());
-		newClientLogin.addActionListener(e -> selectionButtonPressed1());
+		Thread printThread = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				print.addActionListener(e -> selectionButtonPressed());
+				
+			}
+			
+		});
+		
+		Thread openNewClientWindow = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				newClientLogin.addActionListener(e -> selectionButtonPressed1());
+				
+			}
+			
+		});
+		
+		printThread.start();
+		openNewClientWindow.start();
+		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-	
-	
-	
 
 	public static void createNewConnection() {
 		Thread newClient = new Thread(new Runnable() {
-			ServerVer2 newServerClient = null;
 			@Override
 			public void run() {
-				newServerClient = new ServerVer2();	
+				ServerVer2 newServerClient = new ServerVer2();
 				Thread serverTwoThread = new Thread(newServerClient);
 				serverTwoThread.start();
 				newServerClient.connectClient();
 			}
-			
+
 		});
 		newClient.start();
-		
+
 	}
 
 	private Object selectionButtonPressed() {
 		printArea();
 		return null;
 	}
-	
+
 	private Object selectionButtonPressed1() {
 		ClientLoginGUI.startGUI();
 		return null;
 	}
 
-	
-	
 	static void printArea() {
-		System.out.println("aaaa");
+		System.out.println("printAreaMethod");
 		StringBuffer concat = new StringBuffer();
 		try {
-			if(!ServerSettings.onlineUsers.isEmpty()){
-				System.out.println("bbbb");
+			if (!ServerSettings.onlineUsers.isEmpty()) {
+				System.out.println("Printing Online Users");
 				ServerSettings.onlineUsers.forEach((key, value) -> concat
 						.append("Active UserName: :" + key + "Active user password: " + value + "\n"));
-				
+
 			}
-			
+
 		} catch (ConcurrentModificationException | NullPointerException e) {
 			System.err.println("Всички спят...");
 		}
-		if(!concat.equals("")) {
+		if (!concat.equals("")) {
 			textArea.setText(concat.toString());
 		}
-		
+
 	}
 
 }

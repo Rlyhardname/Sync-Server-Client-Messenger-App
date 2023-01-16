@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerVer2 implements Runnable {
 
@@ -15,7 +13,6 @@ public class ServerVer2 implements Runnable {
 	private BufferedReader input;
 	private String username;
 	private String password;
-	private String trash;
 
 	ServerVer2() {
 		Initialize();
