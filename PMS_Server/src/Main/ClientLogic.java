@@ -21,6 +21,14 @@ public class ClientLogic extends Thread {
 	private PrintWriter output;
 	private ClientGUI clientGUI;
 	private Socket link;
+	public Socket getLink() {
+		return link;
+	}
+
+	public void setLink(Socket link) {
+		this.link = link;
+	}
+
 	private LoginClientGUI login;
 	private int operation;
 	private boolean operationIsTrue;
@@ -52,11 +60,15 @@ public class ClientLogic extends Thread {
 	}
 
 	public void runHandleServer() {
+		
 		Thread handle = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				handleServer();
+				if(ServerSettings.onlineUsers.isEmpty()){
+					handleServer();
+				}
+				
 
 			}
 

@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.ConcurrentModificationException;
 
 import javax.swing.JButton;
@@ -19,6 +20,7 @@ public class ServerGUI {
 	static JTextArea textArea;
 	Server server;
 	ServerVer2 server2;
+	ServerSettings settings;
 
 	/**
 	 * Launch the application.
@@ -44,6 +46,7 @@ public class ServerGUI {
 //		server = new Server();
 //		server.start();
 
+		settings = new ServerSettings();
 		ServerVer2 trash = new ServerVer2(this);
 		Thread trash1 = new Thread(trash);
 		trash1.start();
@@ -104,9 +107,11 @@ public class ServerGUI {
 		//Server.order = "Print";
 		//new StringBuffer();
 		try {
-			if(!ServerVer2.onlineUsers.isEmpty()){
-				ServerVer2.onlineUsers.forEach((key, value) -> concat
+			if(!ServerSettings.onlineUsers.isEmpty()){
+				System.out.println("bbbb");
+				ServerSettings.onlineUsers.forEach((key, value) -> concat
 						.append("Active UserName: :" + key + "Active user password: " + value + "\n"));
+				
 			}
 			
 		} catch (ConcurrentModificationException | NullPointerException e) {

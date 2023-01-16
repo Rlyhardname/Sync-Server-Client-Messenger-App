@@ -114,12 +114,33 @@ public class ClientGUI {
 	
 		send.addActionListener(e->selectionButtonPressed());
 		newClient.addActionListener(e->selectionButtonPressed1());
-		frame.addWindowListener(new java.awt.event.WindowAdapter() {
-			public void windowClosing(WindowEvent winEvt) {
-				ServerVer2.onlineUsers.remove(client.getUsername());
-				client.sendMessage("ClosingClient");
+		
+		Thread tr = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				frame.addWindowListener(new java.awt.event.WindowAdapter() {
+					public void windowClosing(WindowEvent winEvt) {
+						client.sendMessage("ClosingClient");
+//							client.getOutput().close();
+//							client.getInput().close();
+						if(!ServerSettings.onlineUsers.isEmpty()) {
+							ServerSettings.onlineUsers.remove(client.getUsername());
+						}
+					
+						
+						
+						
+					}
+				});
+				
 			}
+			
 		});
+		tr.start();
+			
+		
+		
 		
 
 	}

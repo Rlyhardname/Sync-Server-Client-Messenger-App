@@ -10,10 +10,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerVer2 implements Runnable {
 
-	public static final int PORT = 1337;
-	public static ServerSocket serverSocket;
-	public static ConcurrentHashMap<String, Socket> onlineUsers;
-	public static ServerGUI serverGUI;
+//	public static final int PORT = 1337;
+//	public static ServerSocket serverSocket;
+//	public static ConcurrentHashMap<String, Socket> onlineUsers;
+//	public static ServerGUI serverGUI;
 
 	private Socket link;
 	private PrintWriter output;
@@ -27,36 +27,36 @@ public class ServerVer2 implements Runnable {
 	}
 
 	ServerVer2(ServerGUI GUI) {
-		serverDefaultSettings(GUI);
+		ServerSettings.serverDefaultSettings(GUI);
 
 	}
 
-	public static void serverDefaultSettings(ServerGUI gui) {
-
-		try {
-			serverGUI = gui;
-			serverSocket = new ServerSocket(PORT);
-			onlineUsers = new ConcurrentHashMap<String, Socket>();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+//	public static void serverDefaultSettings(ServerGUI gui) {
+//
+//		try {
+//			serverGUI = gui;
+//			serverSocket = new ServerSocket(PORT);
+//			onlineUsers = new ConcurrentHashMap<String, Socket>();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	private void Initialize() {
 		try {
 			trash = "go";
-			link = serverSocket.accept();
+			link = ServerSettings.serverSocket.accept();
 			output = new PrintWriter(link.getOutputStream(), true);
 			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
-		} catch (IOException e1) {
+		} catch (IOException | NullPointerException e1) {
 			try {
 				input.close();
 				output.close();
 				link.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+			} catch (IOException | NullPointerException e) {
+				//e.printStackTrace();
 			}
-			e1.printStackTrace();
+			//e1.printStackTrace();
 		}
 
 	}
@@ -83,9 +83,6 @@ public class ServerVer2 implements Runnable {
 	@Override
 	public void run() {
 
-		do{
-			
-		}while(true);
 
 	}
 
@@ -165,7 +162,7 @@ public class ServerVer2 implements Runnable {
 		String msg = "LoginSuccess" + "," + "Succesfully logged in!";
 		System.out.println("vliza li v login?");
 		sendMessage(msg);
-		onlineUsers.put(username, link);
+		ServerSettings.onlineUsers.put(username, link);
 		db.loginTime(username);
 	}
 
@@ -233,7 +230,7 @@ public class ServerVer2 implements Runnable {
 				String[] userMsg = msg.split(",");
 				if (userMsg[0].equals("ClosingClient"))
 					break;
-				Socket friend = onlineUsers.get(userMsg[1]);
+				Socket friend = ServerSettings.onlineUsers.get(userMsg[1]);
 
 				writeTo = new PrintWriter(friend.getOutputStream(), true);
 				writeTo.println(userMsg[0]);
@@ -247,6 +244,9 @@ public class ServerVer2 implements Runnable {
 		output.close();
 		input.close();
 		link.close();
+		if(ServerSettings.onlineUsers.isEmpty()) {
+			ServerSettings.serverSocket.close();
+		}
 
 	}
 
