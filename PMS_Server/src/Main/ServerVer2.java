@@ -245,9 +245,6 @@ public class ServerVer2 implements Runnable {
 		output.close();
 		input.close();
 		link.close();
-		if(ServerSettings.onlineUsers.isEmpty()) {
-			ServerSettings.serverSocket.close();
-		}
 
 	}
 

@@ -51,11 +51,12 @@ public class ServerGUI {
 		ServerVer2 trash = new ServerVer2(this);
 		Thread trash1 = new Thread(trash);
 		trash1.start();
-		createNewConnection();
-//		server2 = new ServerVer2();
+//		server2 = new ServerVer2(this);
 //		Thread serverTwoThread = new Thread(server2);
 //		serverTwoThread.start();
 		
+		createNewConnection();
+	
 		
 	}
 
@@ -112,7 +113,6 @@ public class ServerGUI {
 	}
 	
 	private Object selectionButtonPressed1() {
-		// TODO Auto-generated method stub
 		LoginClientGUI.startGUI();
 		return null;
 	}
@@ -122,8 +122,6 @@ public class ServerGUI {
 	static void printArea() {
 		System.out.println("aaaa");
 		StringBuffer concat = new StringBuffer();
-		//Server.order = "Print";
-		//new StringBuffer();
 		try {
 			if(!ServerSettings.onlineUsers.isEmpty()){
 				System.out.println("bbbb");
