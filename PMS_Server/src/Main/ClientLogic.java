@@ -82,11 +82,16 @@ public class ClientLogic extends Thread {
 
 		do {
 			try {
+				
 				String msgIN = input.readLine();
+				if(msgIN == null) {
+					break;
+				}
 				clientGUI.concattArea(msgIN);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				break;
+			} catch(NullPointerException e1) {
+				break;
 			}
 
 		} while (true);

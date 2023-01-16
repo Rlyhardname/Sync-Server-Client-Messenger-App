@@ -69,7 +69,7 @@ public class ServerVer2 implements Runnable {
 			handleClient();
 
 		} catch(NullPointerException e1) {
-			
+			System.err.println("tuka moje bi??ASDSAD");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -238,6 +238,7 @@ public class ServerVer2 implements Runnable {
 				System.out.println("sopa");
 				e.printStackTrace();
 			} catch(NullPointerException e1) {
+				System.out.println("tuka li e be?/?");
 				msg = "ExitClient";
 			}
 		} while (!msg.contains("ExitClient"));
