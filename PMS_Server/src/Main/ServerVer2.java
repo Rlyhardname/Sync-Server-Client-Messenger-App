@@ -193,18 +193,25 @@ public class ServerVer2 implements Runnable {
 
 	private void handleClient() throws IOException {
 		String msg = "";
+		//PrintWriter onlineUserOutput = null;
 		do {
 
 			try {
 
 				msg = input.readLine();
-				String[] userMsg = msg.split(",");
-//				if (userMsg[0].equals("ClosingClient"))
-//					break;				
+				if (msg != null) {
+					String[] userMsg = msg.split(",");
+					if(!msg.startsWith(",")) {
+						sendMessage(userMsg[0]);
+					}
+					
+					if (userMsg[0].equals("ClosingClient"))
+						break;
+				}
+
 //				Socket friend = ServerSettings.onlineUsers.get(userMsg[1]);
 //				onlineUserOutput = new PrintWriter(friend.getOutputStream(), true);
 //				onlineUserOutput.println(userMsg[0]);
-				 sendMessage(msg);
 			} catch (IOException e) {
 				System.out.println("sopa");
 				e.printStackTrace();
@@ -212,7 +219,7 @@ public class ServerVer2 implements Runnable {
 				e1.printStackTrace();
 				// msg = "ExitClient";
 			}
-		} while (!msg.contains("ExitClient"));
+		} while (true);
 
 		output.close();
 		input.close();

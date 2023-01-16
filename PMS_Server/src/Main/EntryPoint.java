@@ -7,8 +7,12 @@ public class EntryPoint {
 	}
 
 	public static void main(String[] args) {
-		ServerGUI.startGUI();
-		ClientLoginGUI.startGUI();
+//		DbServer db = new DbServer();
+//		if(DbServer.createTableChatRoomWarehouse()) {
+//			System.out.println("yes");
+//		};
+//		ServerGUI.startGUI();
+//		ClientLoginGUI.startGUI();
 		
 		
 

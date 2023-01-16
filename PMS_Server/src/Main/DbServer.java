@@ -16,7 +16,7 @@ public class DbServer {
 	static final String USER = "root";
 	static final String PASS = "dCBZXTf49PcL3L97lWXP";
 	Connection conn;
-	Statement stmt;
+	static Statement stmt;
 	PreparedStatement prep;
 	Enum task;
 	String[] args;
@@ -227,18 +227,56 @@ public class DbServer {
 
 	}
 
-	private void createTableChatRoom() {
+	static boolean createTableChatRoom() {
+		String sql = "CREATE TABLE Chat_Room" + 
+				"(chat_room_id int NOT NULL AUTO_INCREMENT," + 
+				"room_name VARCHAR(25)," +
+				"PRIMARY KEY (chat_room_id))";
+		try {
+			if (stmt.execute(sql)) {
+				return true;
+			}
 
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
-	private void createTableChatRoomWarehouse() {
+	static boolean createTableChatRoomWarehouse() {
+		String sql = "CREATE TABLE Chat_Room_Warehouse" + 
+				"(chat_room_id int NOT NULL," + 
+				"Username VARCHAR(25) NOT NULL,"+
+				"FOREIGN KEY (chat_room_id) REFERENCES Chat_Room(chat_room_id) )";
+		try {
+			if (stmt.execute(sql)) {
+				return true;
+			}
 
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
-	private void createTableMessageData() {
-		// my conflict 
-		// Test conflict 2
-		// bullshit commit 
+	boolean createTableMessageData() {
+		String sql = "CREATE TABLE Message_Data" + 
+				"(chat_room_id int NOT NULL," + 
+				"Username VARCHAR(25) NOT NULL,"+
+				"message_text VARCHAR(25),"+
+				"FOREIGN KEY (chat_room_id) REFERENCES Chat_Room(chat_room_id) )";
+		try {
+			if (stmt.execute(sql)) {
+				return true;
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	public void loginTime(String username) {
