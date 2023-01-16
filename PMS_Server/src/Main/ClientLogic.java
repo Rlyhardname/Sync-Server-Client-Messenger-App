@@ -65,7 +65,7 @@ public class ClientLogic extends Thread {
 
 			@Override
 			public void run() {
-				if(ServerSettings.onlineUsers.isEmpty()){
+				if(!ServerSettings.onlineUsers.isEmpty()){
 					handleServer();
 				}
 				

@@ -120,6 +120,7 @@ public class LoginClientGUI {
 				frame.dispose();
 			}
 		}catch(RuntimeException e) {
+			System.out.println("NIDEI BEEEE");
 			frame.dispose();
 		}
 		
