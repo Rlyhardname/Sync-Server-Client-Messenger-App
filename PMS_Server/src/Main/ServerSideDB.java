@@ -171,7 +171,8 @@ public class ServerSideDB {
 			prep = conn.prepareStatement(sql);
 			prep.setString(1, username);
 			prep.setString(2, password);
-			prep.execute();
+			prep.executeUpdate();
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

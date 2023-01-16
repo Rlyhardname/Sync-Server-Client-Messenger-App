@@ -106,7 +106,7 @@ public class ServerVer2 implements Runnable {
 
 			System.out.println("Client returned username : " + username);
 
-			if (!username.equals("create")) {
+			if (!commandUserPass[0].equals("SIGN UP")) {
 
 				try {
 					password = commandUserPass[2];
@@ -123,7 +123,7 @@ public class ServerVer2 implements Runnable {
 					}
 				}
 
-			} else {
+			} else if(commandUserPass[0].equals("SIGN UP")){
 				try {
 					createAccount(db);
 				} catch (IOException | NullPointerException e) {
@@ -167,13 +167,13 @@ public class ServerVer2 implements Runnable {
 
 	private void createAccount(ServerSideDB db) throws IOException {
 		do {
-			System.out.println("Write username for new account: ");
-			String username = input.readLine();
-			if (userDataIsValid(username, 20)) {
-				if (!db.isRegisteredUser(username)) {
+//			System.out.println("Write username for new account: ");
+//			String username = input.readLine();
+			if (userDataIsValid(20)) {
+				if (!db.isRegisteredUser(this.username)) {
 					System.out.println("Write password for new account");
-					String password = input.readLine();
-					if (userDataIsValid(password, 32)) {
+//					String password = input.readLine();
+					if (userDataIsValid(32)) {
 						if (db.createUser(username, password)) {
 							String msg = "AccountCreated" + "," + "Account Succesfully created!";
 							sendMessage(msg);
@@ -191,14 +191,14 @@ public class ServerVer2 implements Runnable {
 
 	}
 
-	private boolean userDataIsValid(String userData, int i) {
-		String dataType = null;
+	private boolean userDataIsValid(int i) {
+		String dataType = "";
 		if (i == 20) {
 			dataType = "username";
 		} else if (i == 32) {
 			dataType = "password";
 		}
-		if (userData.length() > i) {
+		if (dataType.length() > i) {
 			String msg = "LenghtError" + "," + dataType + "," + "Is too long!";
 			sendMessage(msg);
 			return false;
@@ -207,7 +207,7 @@ public class ServerVer2 implements Runnable {
 				"\"", " Insert ", " Update ", " Delete " };
 
 		for (String string : forbbidenSymbols) {
-			if (userData.contains(string)) {
+			if (dataType.contains(string)) {
 				String msg = "ForbidenSymbolRegister" + "," + dataType + "," + "Contrains forbidden symbol!" + ","
 						+ string;
 				sendMessage(msg);

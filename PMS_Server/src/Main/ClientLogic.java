@@ -97,23 +97,23 @@ public class ClientLogic extends Thread {
 		} while (true);
 	}
 
-	public void process() {
-		do {
-			System.out.println(operation);
-			if (operation == 1) {
-				if (accessServer()) {
-					operation = -2;
-				} else {
-					operation = -3;
-				}
+//	public void process() {
+//		do {
+//			System.out.println(operation);
+//			if (operation == 1) {
+//				if (accessServer()) {
+//					operation = -2;
+//				} else {
+//					operation = -3;
+//				}
+//
+//			}
+//
+//		} while (operation != 1337);
+//	}
 
-			}
-
-		} while (operation != 1337);
-	}
-
-	boolean accessServer() {
-		loginMessage(username, password);
+	boolean accessServer(String string) {
+		loginMessage(string, username, password);
 		if (isLoginSuccess()) {
 
 			return true;
@@ -184,9 +184,15 @@ public class ClientLogic extends Thread {
 		return concat;
 	}
 
-	public void loginMessage(String user, String pass) {
+	public void loginMessage(String option, String user, String pass) {
 		String msg = concatStrings(user, pass).toString();
-		output.println("LOGIN" + "," + msg);
+		if(option.equals("login")) {
+			output.println("LOGIN" + "," + msg);
+		}
+		else if(option.equals("signup")) {
+			output.println("SIGN UP" + "," + msg);
+		}
+		
 
 	}
 
