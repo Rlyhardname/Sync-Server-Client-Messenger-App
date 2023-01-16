@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class ServerSideDB {
+public class DbServer {
 
 	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 	static final String DB_URL = "jdbc:mysql://localhost/girrafe";
@@ -21,7 +21,7 @@ public class ServerSideDB {
 	Enum task;
 	String[] args;
 
-	ServerSideDB() {
+	DbServer() {
 		conn = null;
 		stmt = null;
 		prep = null;

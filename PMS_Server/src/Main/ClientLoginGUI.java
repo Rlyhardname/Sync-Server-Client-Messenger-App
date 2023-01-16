@@ -14,14 +14,14 @@ import javax.swing.JTextField;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
-public class LoginClientGUI {
+public class ClientLoginGUI {
 
 	private JFrame frame;
 	private JTextField username;
 	private JTextField password;
 	private ClientLogic client;
 	private JButton signUp;
-	private LoginClientGUI window;
+	private ClientLoginGUI window;
 	private JButton login;
 	private Thread tr;
 
@@ -32,7 +32,7 @@ public class LoginClientGUI {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					LoginClientGUI window = new LoginClientGUI();
+					ClientLoginGUI window = new ClientLoginGUI();
 					ServerGUI.createNewConnection();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
@@ -45,7 +45,7 @@ public class LoginClientGUI {
 	/**
 	 * Create the application.
 	 */
-	public LoginClientGUI() {
+	public ClientLoginGUI() {
 		initialize();
 		client = new ClientLogic();
 		client.start();
@@ -120,7 +120,7 @@ public class LoginClientGUI {
 		// client.setOperation(1);
 		try {
 			if (client.accessServer("login")) {
-				ClientGUI.startClientGUI(client);
+				ClientOperationGUI.startClientGUI(client);
 				System.out.println("vliza li 1??");
 				frame.dispose();
 			}
@@ -140,7 +140,7 @@ public class LoginClientGUI {
 		
 		try {
 			if (client.accessServer("signup")) {
-				ClientGUI.startClientGUI(client);
+				ClientOperationGUI.startClientGUI(client);
 				System.out.println("vliza li 1??");
 				frame.dispose();
 			}

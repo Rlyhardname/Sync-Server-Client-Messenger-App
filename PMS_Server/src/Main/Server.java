@@ -74,7 +74,7 @@ public class Server extends Thread {
 			e.printStackTrace();
 		}
 		while (true) {
-			ServerSideDB db = new ServerSideDB();
+			DbServer db = new DbServer();
 
 			// sendMessage("Username", link);
 			// System.out.println("Enter username: ");
@@ -132,7 +132,7 @@ public class Server extends Thread {
 		return entries;
 	}
 
-	private void login(String username, ServerSideDB db, Socket link, PrintWriter output) {
+	private void login(String username, DbServer db, Socket link, PrintWriter output) {
 		// TODO Auto-generated method stub
 		String msg = "LoginSuccess" + "," + "Succesfully logged in!";
 		System.out.println("vliza li v login?");
@@ -199,7 +199,7 @@ public class Server extends Thread {
 		return true;
 	}
 
-	private boolean loginUserExists(String username, ServerSideDB db, Socket link, PrintWriter output) {
+	private boolean loginUserExists(String username, DbServer db, Socket link, PrintWriter output) {
 
 		boolean condition = db.isRegisteredUser(username);
 		if (condition == false) {
@@ -212,7 +212,7 @@ public class Server extends Thread {
 		return true;
 	}
 
-	private boolean correctLoginInfo(String username, String password, ServerSideDB db, Socket link, PrintWriter output) {
+	private boolean correctLoginInfo(String username, String password, DbServer db, Socket link, PrintWriter output) {
 		if (db.passwordIsCorrect(username, password) == false) {
 			String msg = "PasswordError" + "," + "Password doesn't match for username " + username;
 			sendMessage(msg, link,output);
@@ -325,7 +325,7 @@ public class Server extends Thread {
 
 	}
 
-	private void updateUser(ServerSideDB db, String user) {
+	private void updateUser(DbServer db, String user) {
 		// TODO Auto-generated method stub
 		// fetch user socket from map and send message to " USER "
 
@@ -344,7 +344,7 @@ public class Server extends Thread {
 	}
 
 	public void createTable() {
-		ServerSideDB db = new ServerSideDB();
+		DbServer db = new DbServer();
 		if (db.createTableUser()) {
 			System.out.println("DB succesfully created!");
 		}

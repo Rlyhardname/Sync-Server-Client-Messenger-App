@@ -2,7 +2,7 @@ package Main;
 
 import java.util.Iterator;
 
-public class StartClients {
+public class TestClientsConsole {
 
 	// Static test for loggin of multiple clients at the same time;
 //	StartClients() {

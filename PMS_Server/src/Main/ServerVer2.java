@@ -86,7 +86,7 @@ public class ServerVer2 implements Runnable {
 	private void authentication() {
 		while (true) {
 			System.out.println("samnitelna rabota");
-			ServerSideDB db = new ServerSideDB();
+			DbServer db = new DbServer();
 			String[] commandUserPass;
 			String msg = "";
 			try {
@@ -135,7 +135,7 @@ public class ServerVer2 implements Runnable {
 
 	}
 
-	private boolean loginUserExists(ServerSideDB db) {
+	private boolean loginUserExists(DbServer db) {
 
 		boolean condition = db.isRegisteredUser(username);
 		if (condition == false) {
@@ -148,7 +148,7 @@ public class ServerVer2 implements Runnable {
 		return true;
 	}
 
-	private boolean correctLoginInfo(ServerSideDB db) {
+	private boolean correctLoginInfo(DbServer db) {
 		if (db.passwordIsCorrect(username, password) == false) {
 			String msg = "PasswordError" + "," + "Password doesn't match for username " + username;
 			sendMessage(msg);
@@ -157,7 +157,7 @@ public class ServerVer2 implements Runnable {
 		return true;
 	}
 
-	private void login(ServerSideDB db) {
+	private void login(DbServer db) {
 		String msg = "LoginSuccess" + "," + "Succesfully logged in!";
 		System.out.println("vliza li v login?");
 		sendMessage(msg);
@@ -165,7 +165,7 @@ public class ServerVer2 implements Runnable {
 		db.loginTime(username);
 	}
 
-	private void createAccount(ServerSideDB db) throws IOException {
+	private void createAccount(DbServer db) throws IOException {
 		do {
 //			System.out.println("Write username for new account: ");
 //			String username = input.readLine();

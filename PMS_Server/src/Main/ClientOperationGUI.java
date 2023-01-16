@@ -25,7 +25,7 @@ import javax.swing.JLabel;
 
 //import com.mysql.cj.xdevapi.Client;
 
-public class ClientGUI {
+public class ClientOperationGUI {
 
 	private static InetAddress host;
 	private static int PORT = 1337;
@@ -50,7 +50,7 @@ public class ClientGUI {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ClientGUI window = new ClientGUI(client);
+					ClientOperationGUI window = new ClientOperationGUI(client);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -64,7 +64,7 @@ public class ClientGUI {
 	 * 
 	 * @param tr
 	 */
-	public ClientGUI(ClientLogic client1) {
+	public ClientOperationGUI(ClientLogic client1) {
 		initialize();
 		this.client = client1;
 		client.setGui(this);
@@ -151,7 +151,7 @@ public class ClientGUI {
 	}
 
 	private Object selectionButtonPressed1() {
-		LoginClientGUI.startGUI();
+		ClientLoginGUI.startGUI();
 		return null;
 	}
 

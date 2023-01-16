@@ -113,7 +113,7 @@ public class ServerGUI {
 	}
 	
 	private Object selectionButtonPressed1() {
-		LoginClientGUI.startGUI();
+		ClientLoginGUI.startGUI();
 		return null;
 	}
 

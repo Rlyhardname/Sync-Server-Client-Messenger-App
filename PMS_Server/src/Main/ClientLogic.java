@@ -19,7 +19,7 @@ public class ClientLogic extends Thread {
 	private String password;
 	private BufferedReader input;
 	private PrintWriter output;
-	private ClientGUI clientGUI;
+	private ClientOperationGUI clientGUI;
 	private Socket link;
 	public Socket getLink() {
 		return link;
@@ -29,7 +29,7 @@ public class ClientLogic extends Thread {
 		this.link = link;
 	}
 
-	private LoginClientGUI login;
+	private ClientLoginGUI login;
 	private int operation;
 	private boolean operationIsTrue;
 	public Thread operationThread;
@@ -230,11 +230,11 @@ public class ClientLogic extends Thread {
 		return PORT;
 	}
 
-	public LoginClientGUI getLogin() {
+	public ClientLoginGUI getLogin() {
 		return login;
 	}
 
-	public void setLogin(LoginClientGUI login) {
+	public void setLogin(ClientLoginGUI login) {
 		this.login = login;
 	}
 
@@ -254,11 +254,11 @@ public class ClientLogic extends Thread {
 		this.operationIsTrue = operationIsTrue;
 	}
 
-	public ClientGUI getGui() {
+	public ClientOperationGUI getGui() {
 		return clientGUI;
 	}
 
-	public void setGui(ClientGUI gui) {
+	public void setGui(ClientOperationGUI gui) {
 		this.clientGUI = gui;
 	}
 
