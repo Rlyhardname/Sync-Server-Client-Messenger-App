@@ -239,7 +239,7 @@ public class ServerVer2 implements Runnable {
 				e.printStackTrace();
 			} catch(NullPointerException e1) {
 				System.out.println("tuka li e be?/?");
-				msg = "ExitClient";
+				//msg = "ExitClient";
 			}
 		} while (!msg.contains("ExitClient"));
 
