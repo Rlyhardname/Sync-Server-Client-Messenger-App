@@ -54,7 +54,6 @@ public class ClientOperationGUI {
 		initialize();
 		this.client = client1;
 		client.setGui(this);
-		client.runHandleServer();
 		if (client.getUsername().equals("account1")) {
 			empty.setText("account2");
 		} else if (client.getUsername().equals("account2")) {
@@ -96,9 +95,29 @@ public class ClientOperationGUI {
 		friendList.add(empty);
 		frame.getContentPane().add(friendList, BorderLayout.EAST);
 
-		send.addActionListener(e -> selectionButtonPressed());
-		newClient.addActionListener(e -> selectionButtonPressed1());
+		
+		
 
+		Thread tr1 = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				send.addActionListener(e -> selectionButtonPressed());
+			}
+
+		});
+		tr1.start();
+		
+		Thread tr2 = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				newClient.addActionListener(e -> selectionButtonPressed1());
+			}
+
+		});
+		tr2.start();
+		
 		Thread tr = new Thread(new Runnable() {
 
 			@Override
@@ -133,7 +152,6 @@ public class ClientOperationGUI {
 
 	private Object selectionButtonPressed() {
 		String msg = textField.getText().toString() + "," + empty.getText().toString();
-		System.out.println(msg);
 		client.sendMessage(msg);
 		textField.setText("");
 

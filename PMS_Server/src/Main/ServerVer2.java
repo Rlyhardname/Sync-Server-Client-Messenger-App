@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ConcurrentModificationException;
 
 public class ServerVer2 implements Runnable {
 
@@ -28,12 +29,9 @@ public class ServerVer2 implements Runnable {
 			link = ServerSettings.serverSocket.accept();
 			output = new PrintWriter(link.getOutputStream(), true);
 			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
-		} catch (IOException | NullPointerException e1) {
+		} catch (IOException e1) {
 			try {
-				input.close();
-				output.close();
-				link.close();
-			} catch (IOException | NullPointerException e) {
+			} catch (NullPointerException e) {
 				e.printStackTrace();
 			}
 			e1.printStackTrace();
@@ -49,8 +47,8 @@ public class ServerVer2 implements Runnable {
 			// syncClientWithServerDB();
 			handleClient();
 
-		} catch(NullPointerException e1) {
-			System.err.println("tuka moje bi??ASDSAD");
+		} catch (NullPointerException e1) {
+			e1.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -60,20 +58,18 @@ public class ServerVer2 implements Runnable {
 	@Override
 	public void run() {
 
-
 	}
 
 	private void authentication() {
 		while (true) {
-			System.out.println("samnitelna rabota");
 			DbServer db = new DbServer();
 			String[] commandUserPass;
 			String msg = "";
 			try {
 				msg = input.readLine();
-			} catch (IOException  e) {
+			} catch (IOException e) {
 				e.printStackTrace();
-			}catch(NullPointerException e1) {
+			} catch (NullPointerException e1) {
 				break;
 			}
 			commandUserPass = msg.split(",");
@@ -103,7 +99,7 @@ public class ServerVer2 implements Runnable {
 					}
 				}
 
-			} else if(commandUserPass[0].equals("SIGN UP")){
+			} else if (commandUserPass[0].equals("SIGN UP")) {
 				try {
 					createAccount(db);
 				} catch (IOException | NullPointerException e) {
@@ -197,26 +193,24 @@ public class ServerVer2 implements Runnable {
 
 	private void handleClient() throws IOException {
 		String msg = "";
-		PrintWriter writeTo = null;
 		do {
 
 			try {
 
 				msg = input.readLine();
 				String[] userMsg = msg.split(",");
-				if (userMsg[0].equals("ClosingClient"))
-					break;
-				Socket friend = ServerSettings.onlineUsers.get(userMsg[1]);
-
-				writeTo = new PrintWriter(friend.getOutputStream(), true);
-				writeTo.println(userMsg[0]);
-				// sendMessage(msg);
-			} catch (IOException  e) {
+//				if (userMsg[0].equals("ClosingClient"))
+//					break;				
+//				Socket friend = ServerSettings.onlineUsers.get(userMsg[1]);
+//				onlineUserOutput = new PrintWriter(friend.getOutputStream(), true);
+//				onlineUserOutput.println(userMsg[0]);
+				 sendMessage(msg);
+			} catch (IOException e) {
 				System.out.println("sopa");
 				e.printStackTrace();
-			} catch(NullPointerException e1) {
-				System.out.println("tuka li e be?/?");
-				//msg = "ExitClient";
+			} catch (NullPointerException e1) {
+				e1.printStackTrace();
+				// msg = "ExitClient";
 			}
 		} while (!msg.contains("ExitClient"));
 

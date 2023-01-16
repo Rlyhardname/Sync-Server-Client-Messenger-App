@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import javax.swing.JFrame;
@@ -22,10 +21,12 @@ public class ClientLogic extends Thread {
 	private ClientOperationGUI clientGUI;
 	private Socket link;
 	private ClientLoginGUI login;
+	private boolean started;
 
 	ClientLogic() {
 		{
 			try {
+				setStarted(false);
 				host = InetAddress.getLocalHost();
 				link = new Socket(host, PORT);
 				input = new BufferedReader(new InputStreamReader(link.getInputStream()));
@@ -42,7 +43,7 @@ public class ClientLogic extends Thread {
 	}
 
 	public void runHandleServer() {
-
+		setStarted(true);
 		Thread handle = new Thread(new Runnable() {
 
 			@Override
@@ -50,6 +51,7 @@ public class ClientLogic extends Thread {
 				if (!ServerSettings.onlineUsers.isEmpty()) {
 					handleServer();
 				}
+				setStarted(false);
 
 			}
 
@@ -229,6 +231,14 @@ public class ClientLogic extends Thread {
 
 	public void setLink(Socket link) {
 		this.link = link;
+	}
+
+	public boolean isStarted() {
+		return started;
+	}
+
+	public void setStarted(boolean started) {
+		this.started = started;
 	}
 
 }

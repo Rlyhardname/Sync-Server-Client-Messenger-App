@@ -3,27 +3,19 @@ package Main;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-
 public class ClientLoginGUI {
 
 	private JFrame frame;
+	private ClientLogic client;
 	private JTextField username;
 	private JTextField password;
-	private ClientLogic client;
 	private JButton signUp;
-	private ClientLoginGUI window;
 	private JButton login;
-	private Thread tr;
 
 	/**
 	 * Launch the application.
@@ -119,8 +111,11 @@ public class ClientLoginGUI {
 		signUp.setText("LOGIN FAILED");
 		try {
 			if (client.accessServer("login")) {
+				if (!client.isStarted()) {
+					client.runHandleServer();
+				}
+				System.out.println("Client: " + client.getUsername() + " has logged in!");
 				ClientOperationGUI.startClientGUI(client);
-				System.out.println("vliza li 1??");
 				frame.dispose();
 			}
 		} catch (RuntimeException e) {
@@ -136,18 +131,19 @@ public class ClientLoginGUI {
 		String pass = password.getText().toString();
 		client.setUsername(user);
 		client.setPassword(pass);
-		
+
 		try {
 			if (client.accessServer("signup")) {
-				ClientOperationGUI.startClientGUI(client);
-				System.out.println("vliza li 1??");
+				System.out.println("Succesful registration of:" + client.getUsername());
+				if (!client.isStarted()) {
+					client.runHandleServer();
+				}
 				frame.dispose();
 			}
 		} catch (RuntimeException e) {
 			System.out.println("NIDEI BEEEE");
 			frame.dispose();
 		}
-
 
 		return null;
 	}
