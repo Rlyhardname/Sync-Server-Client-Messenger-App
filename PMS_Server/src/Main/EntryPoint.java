@@ -9,6 +9,7 @@ public class EntryPoint {
 	public static void main(String[] args) {
 
 //		DbServer db = new DbServer();
+//		db.dropTable();
 //		db.createTableMessageData();
 //		if(DbServer.createTableChatRoomWarehouse()) {
 //			System.out.println("yes");

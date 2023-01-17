@@ -353,7 +353,7 @@ public class DbServer {
 	}
 	
 	public void dropTable() {
-		String sql = "DROP TABLE message_data";
+		String sql = "DROP TABLE students";
 		try {
 			stmt.execute(sql);
 		} catch (SQLException e) {
