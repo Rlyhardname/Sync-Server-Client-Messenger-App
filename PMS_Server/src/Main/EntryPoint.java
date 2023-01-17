@@ -16,7 +16,7 @@ public class EntryPoint {
 		ServerGUI.startGUI();
 		ClientLoginGUI.startGUI();
 		
-		
+		//Test Eror;
 
 		// FOR TESTING MULTIPLE CLIENTS
 		// new StartClients();
