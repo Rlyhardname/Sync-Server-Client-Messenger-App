@@ -281,7 +281,7 @@ public class DbServer {
 		return false;
 	}
 	
-	public void createChatRoom() {
+	public void addChatRoom() {
 		String sql = "INSERT INTO chat_room "
 				+ "(room_name) "
 				+ "VALUES(?)";
