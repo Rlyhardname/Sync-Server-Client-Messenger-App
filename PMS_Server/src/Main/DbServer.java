@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DbServer {
 
@@ -266,6 +267,7 @@ public class DbServer {
 				"(chat_room_id int NOT NULL," + 
 				"Username VARCHAR(25) NOT NULL,"+
 				"message_text VARCHAR(25),"+
+				"timeLOG DATETIME DEFAULT CURRENT_TIMESTAMP," +
 				"FOREIGN KEY (chat_room_id) REFERENCES Chat_Room(chat_room_id) )";
 		try {
 			if (stmt.execute(sql)) {
@@ -278,10 +280,86 @@ public class DbServer {
 		}
 		return false;
 	}
+	
+	public void createChatRoom() {
+		String sql = "INSERT INTO chat_room "
+				+ "(room_name) "
+				+ "VALUES(?)";
+
+		String room = "Account1AndAccount2Room";
+		try {
+			prep = conn.prepareStatement(sql);
+			prep.setString(1, room);
+			prep.executeUpdate();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void fillRoom() {
+		String sql = "INSERT INTO chat_room_warehouse "
+				+ "VALUES(?,?)";
+
+		int room = 1;
+		String user = "account2";
+		try {
+			prep = conn.prepareStatement(sql);
+			prep.setInt(1, room);
+			prep.setString(2, user);
+			prep.executeUpdate();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void storeMessage(String user,String msg) {
+		String sql = "INSERT INTO Message_data "
+				+"(chat_room_id,username,message_text)"
+				+ "VALUES(?,?,?)";
+
+		int room = 1;
+
+		try {
+			prep = conn.prepareStatement(sql);
+			prep.setInt(1, room);
+			prep.setString(2, user);
+			prep.setString(3, msg);
+			prep.executeUpdate();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	public void loginTime(String username) {
 		// TODO Auto-generated method stub
 		// LocalDateTime.now() insert into user_log where username = username;
+	}
+	
+	public void alterTable() {
+		String sql = "ALTER TABLE message_data"+
+				"ADD timeLOG DATETIME";
+		try {
+			stmt.execute(sql);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void dropTable() {
+		String sql = "DROP TABLE message_data";
+		try {
+			stmt.execute(sql);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public Enum getTask() {
@@ -298,5 +376,40 @@ public class DbServer {
 
 	public void setArgs(String[] args) {
 		this.args = args;
+	}
+
+	public boolean checkIfRoomUsersOnline(String string) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	public String[] getRoomUsers(int i) {
+		String sql = "SELECT Username"+
+				"FROM chat_room_warehouse" +
+				"WHERE chat_room_id=?";
+		ResultSet rs = null;
+		ArrayList<String> list = new ArrayList<String>();
+		try {
+			prep = conn.prepareStatement(sql);
+			prep.setInt(1, i);
+			rs = prep.executeQuery();
+			while(rs.next()) {
+				list.add(rs.getString(2));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			try {
+				rs.close();
+				prep.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		return (String[]) list.toArray();
 	}
 }

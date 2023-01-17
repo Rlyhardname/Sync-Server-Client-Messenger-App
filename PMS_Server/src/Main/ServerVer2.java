@@ -202,7 +202,34 @@ public class ServerVer2 implements Runnable {
 				if (msg != null) {
 					String[] userMsg = msg.split(",");
 					if(!msg.startsWith(",")) {
-						sendMessage(userMsg[0]);
+						DbServer db = new DbServer();
+						db.storeMessage(userMsg[1], userMsg[0]);
+						
+						new Thread(new Runnable() {
+
+							@Override
+							public void run() {
+								String[] users = db.getRoomUsers(1); // room_ID
+								for (String string : users) {
+									if(db.checkIfRoomUsersOnline(string)) {
+										Socket userSocket= ServerSettings.onlineUsers.get(string);
+										PrintWriter distribute;
+										try {
+											distribute = new PrintWriter(userSocket.getOutputStream(),true);
+											distribute.println(userMsg[0]);
+										} catch (IOException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+										
+									};
+								}
+								
+								db.closeConnection();
+							}
+							
+						}).start();
+						//sendMessage(userMsg[0]);
 					}
 					
 					if (userMsg[0].equals("ClosingClient"))
