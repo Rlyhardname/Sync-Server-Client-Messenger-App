@@ -70,7 +70,7 @@ public class ClientOperationGUI {
 	private void initialize() {
 
 		frame = new JFrame();
-		frame.setBounds(2000, 100, 600, 300);
+		frame.setBounds(3200, 100, 600, 300);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout());
 
