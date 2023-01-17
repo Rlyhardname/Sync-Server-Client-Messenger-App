@@ -204,14 +204,14 @@ public class ServerVer2 implements Runnable {
 					if(!msg.startsWith(",")) {
 						DbServer db = new DbServer();
 						db.storeMessage(userMsg[1], userMsg[0]);
-						
 						new Thread(new Runnable() {
 
 							@Override
 							public void run() {
 								String[] users = db.getRoomUsers(1); // room_ID
 								for (String string : users) {
-									if(db.checkIfRoomUsersOnline(string)) {
+									if(ServerSettings.onlineUsers.get(string) != null) { //db.checkIfRoomUsersOnline(string)
+										
 										Socket userSocket= ServerSettings.onlineUsers.get(string);
 										PrintWriter distribute;
 										try {

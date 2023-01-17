@@ -379,22 +379,22 @@ public class DbServer {
 	}
 
 	public boolean checkIfRoomUsersOnline(String string) {
-		// TODO Auto-generated method stub
+		
 		return true;
 	}
 
 	public String[] getRoomUsers(int i) {
-		String sql = "SELECT Username"+
-				"FROM chat_room_warehouse" +
+		String sql = "SELECT Username "+
+				"FROM chat_room_warehouse " +
 				"WHERE chat_room_id=?";
 		ResultSet rs = null;
 		ArrayList<String> list = new ArrayList<String>();
 		try {
 			prep = conn.prepareStatement(sql);
-			prep.setInt(1, i);
+			prep.setInt(1, 1);
 			rs = prep.executeQuery();
 			while(rs.next()) {
-				list.add(rs.getString(2));
+				list.add(rs.getString(1));
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -409,7 +409,7 @@ public class DbServer {
 			}
 			
 		}
-		
-		return (String[]) list.toArray();
+		String [] yes = (String[]) list.toArray(new String[0]);
+		return yes;
 	}
 }

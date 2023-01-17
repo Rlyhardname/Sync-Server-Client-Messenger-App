@@ -1,6 +1,8 @@
 package Main;
 
 import java.awt.EventQueue;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 
@@ -16,7 +18,7 @@ import javax.swing.JLabel;
 
 public class ClientOperationGUI {
 	private ClientLogic client;
-	private JFrame frame;
+	JFrame frame;
 	private JTextArea textArea;
 	private JButton newClient;
 	private JButton send;
@@ -25,7 +27,11 @@ public class ClientOperationGUI {
 	private JPanel friendList;
 	private JPanel header;
 	private JTextField textField;
-	private JLabel empty;
+	JLabel friendOne;
+	JLabel friendTwo;
+	JLabel friendThree;
+	JLabel friendFour;
+	JLabel friendFive;
 
 	/**
 	 * Launch the application.
@@ -54,11 +60,6 @@ public class ClientOperationGUI {
 		initialize();
 		this.client = client1;
 		client.setGui(this);
-		if (client.getUsername().equals("account1")) {
-			empty.setText("account2");
-		} else if (client.getUsername().equals("account2")) {
-			empty.setText("account1");
-		}
 
 	}
 
@@ -73,6 +74,7 @@ public class ClientOperationGUI {
 		frame.setBounds(3200, 100, 600, 300);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout());
+		frame.setTitle("frame2");
 
 		header = new JPanel();
 		frame.getContentPane().add(header, BorderLayout.NORTH);
@@ -91,23 +93,57 @@ public class ClientOperationGUI {
 		frame.getContentPane().add(panel, BorderLayout.SOUTH);
 
 		friendList = new JPanel();
-		empty = new JLabel("Asdadsdsadad");
-		friendList.add(empty);
+		friendOne = new JLabel("account1");
+		friendTwo = new JLabel("account2");
+		friendThree = new JLabel("account3");
+		friendFour = new JLabel("account4");
+		friendFive = new JLabel("account5");
+		friendList.add(friendOne);
+		friendList.add(friendTwo);
+		friendList.add(friendThree);
+		friendList.add(friendFour);
+		friendList.add(friendFive);
 		frame.getContentPane().add(friendList, BorderLayout.EAST);
 
-		
-		
+		ComponentListenerCustom listen = new ComponentListenerCustom(this);
+		friendOne.addMouseListener(listen);
+		friendTwo.addMouseListener(listen);
+		friendThree.addMouseListener(listen);
+		friendFour.addMouseListener(listen);
+		friendFive.addMouseListener(listen);
+//		friendOne.addMouseListener(new MouseAdapter() {
+//			public void mouseClicked(MouseEvent e) {
+//				JLabel obj = (JLabel) e.getComponent();
+//
+//				if (obj.equals(friendOne)) {
+//					frame.setTitle("account1");
+//				} else if (obj == friendTwo) {
+//					frame.setTitle("account2");
+//				} else if (obj == friendThree) {
+//					frame.setTitle("account3");
+//				} else if (obj == friendFour) {
+//					frame.setTitle("account4");
+//				} else if (obj == friendFive) {
+//					frame.setTitle("account5");
+//				}
+//			}
+//		});
 
 		Thread tr1 = new Thread(new Runnable() {
-
 			@Override
 			public void run() {
 				send.addActionListener(e -> selectionButtonPressed());
+
+			}
+
+			private Object selectionLabelPressed() {
+				// TODO Auto-generated method stub
+				return null;
 			}
 
 		});
 		tr1.start();
-		
+
 		Thread tr2 = new Thread(new Runnable() {
 
 			@Override
@@ -117,7 +153,7 @@ public class ClientOperationGUI {
 
 		});
 		tr2.start();
-		
+
 		Thread tr = new Thread(new Runnable() {
 
 			@Override
@@ -151,7 +187,7 @@ public class ClientOperationGUI {
 	}
 
 	private Object selectionButtonPressed() {
-		String msg = textField.getText().toString() + "," + empty.getText().toString();
+		String msg = textField.getText().toString() + "," + client.getUsername();
 		client.sendMessage(msg);
 		textField.setText("");
 
