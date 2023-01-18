@@ -230,6 +230,7 @@ public class ServerVer2 implements Runnable {
 							break;
 						DbServer db = new DbServer();
 						if (userMsg[3].equals("sendFile")) {
+							receiveFile("NewFile2.txt");
 							// poqsneniq
 							// userMsg[0] - message // userMsg[1] - username // userMsg[2] - Chat_room_ID //
 							// userMsg[3] = "sendFile "

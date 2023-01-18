@@ -15,6 +15,8 @@ import javax.swing.JTextArea;
 
 import java.awt.BorderLayout;
 import javax.swing.JLabel;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class ClientOperationGUI {
 	private ClientLogic client;
@@ -32,6 +34,7 @@ public class ClientOperationGUI {
 	JLabel friendThree;
 	JLabel friendFour;
 	JLabel friendFive;
+	private JButton btnSendFile;
 	// pICK FILE BUTTON
 
 	/**
@@ -101,6 +104,14 @@ public class ClientOperationGUI {
 		panel.add(send);
 		panel.add(newClient);
 		frame.getContentPane().add(panel, BorderLayout.SOUTH);
+		
+		btnSendFile = new JButton("Send File");
+		btnSendFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				client.sendFile("E:\\TestFile1.txt");
+			}
+		});
+		panel.add(btnSendFile);
 
 		friendList = new JPanel();
 		friendOne = new JLabel("account1");

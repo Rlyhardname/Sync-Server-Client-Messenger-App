@@ -1,6 +1,12 @@
 package Main;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -22,7 +28,8 @@ public class ClientLogic extends Thread {
 	private Socket link;
 	private ClientLoginGUI login;
 	private boolean started;
-	
+	private DataOutputStream outputFile;
+    private DataInputStream inputFile;
 
 	ClientLogic() {
 		{
@@ -32,6 +39,8 @@ public class ClientLogic extends Thread {
 				link = new Socket(host, PORT);
 				input = new BufferedReader(new InputStreamReader(link.getInputStream()));
 				output = new PrintWriter(link.getOutputStream(), true);
+				outputFile = new DataOutputStream(link.getOutputStream());
+				inputFile =  new DataInputStream(link.getInputStream());
 			} catch (IOException e) {
 				System.out.println("Host ID not found");
 			}
@@ -159,6 +168,78 @@ public class ClientLogic extends Thread {
 		}
 
 	}
+	
+	
+	public void sendFile(String path)
+    
+    {
+        int bytes = 0;
+        // Open the File where he located in your pc
+        File file = new File(path);
+        FileInputStream fileInputStream = null;
+		try {
+			fileInputStream = new FileInputStream(file);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+ 
+        // send the File
+		try {
+			outputFile.writeLong(file.length());
+        // break file into chunks
+        byte[] buffer = new byte[4 * 1024];
+        while ((bytes = fileInputStream.read(buffer))
+               != -1) {
+          // Send the file to Server Socket 
+        	outputFile.write(buffer, 0, bytes);
+        	outputFile.flush();
+        }
+        // close the file here
+        fileInputStream.close();
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    
+    
+    
+    private void receiveFile(String fileName)
+    		
+    {
+        int bytes = 0;
+        FileOutputStream fileOutputStream = null;
+		try {
+			fileOutputStream = new FileOutputStream(fileName);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+ 
+		try {
+        long size
+            = inputFile.readLong(); // read file size
+        byte[] buffer = new byte[4 * 1024];
+        while (size > 0
+               && (bytes = inputFile.read(
+                       buffer, 0,
+                       (int)Math.min(buffer.length, size)))
+                      != -1) {
+            // write the file using write method
+            fileOutputStream.write(buffer, 0, bytes);
+            size -= bytes; // read upto file size
+        }
+        
+        System.out.println("File is Received");
+        fileOutputStream.close();
+		}catch(IOException e) {
+			e.printStackTrace();
+		}
+    }
+	
+	
 
 	public void sendMessage(String msg) {
 
