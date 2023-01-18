@@ -489,4 +489,35 @@ public class DbServer {
 		String [] yes = (String[]) list.toArray(new String[0]);
 		return yes;
 	}
+
+	public void insertUserLogLogin(String username) {
+		String sql = "INSERT INTO user_log "+
+				"(username,login_time) "+
+				"VALUES(?,NOW())";
+		try {
+			prep = conn.prepareStatement(sql);
+			prep.setString(1,username);
+			prep.executeLargeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	public void insertUserLogout(String username) {
+		String sql = "INSERT INTO user_log "+
+				"(username,logout_time) "+
+				"VALUES(?,NOW())";
+		try {
+			prep = conn.prepareStatement(sql);
+			prep.setString(1,username);
+			prep.executeLargeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 }

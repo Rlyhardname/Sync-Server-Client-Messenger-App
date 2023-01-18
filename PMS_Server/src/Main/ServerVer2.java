@@ -44,6 +44,7 @@ public class ServerVer2 implements Runnable {
 
 			System.out.println("ClientConnected");
 			authentication();
+			
 			// syncClientWithServerDB();
 			handleClient();
 
@@ -94,6 +95,7 @@ public class ServerVer2 implements Runnable {
 				if (loginUserExists(db)) {
 					if (correctLoginInfo(db)) {
 						login(db);
+						db.insertUserLogLogin(username);
 						db.closeConnection();
 						break;
 					}
@@ -202,6 +204,8 @@ public class ServerVer2 implements Runnable {
 				if (msg != null) {
 					String[] userMsg = msg.split(",");
 					if(!msg.startsWith(",")) {
+						if (userMsg[0].equals("ClosingClient"))
+							break;
 						DbServer db = new DbServer();
 						db.storeMessage(userMsg[1], userMsg[0], Integer.parseInt(userMsg[2]));
 						new Thread(new Runnable() {
@@ -230,11 +234,9 @@ public class ServerVer2 implements Runnable {
 							}
 							
 						}).start();
-						//sendMessage(userMsg[0]);
 					}
 					
-					if (userMsg[0].equals("ClosingClient"))
-						break;
+					
 				}
 
 //				Socket friend = ServerSettings.onlineUsers.get(userMsg[1]);
@@ -248,7 +250,9 @@ public class ServerVer2 implements Runnable {
 				// msg = "ExitClient";
 			}
 		} while (true);
-
+		DbServer db = new DbServer();
+		db.insertUserLogout(username);
+		db.closeConnection();
 		output.close();
 		input.close();
 		link.close();
