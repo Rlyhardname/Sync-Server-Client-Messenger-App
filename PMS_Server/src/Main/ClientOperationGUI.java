@@ -63,6 +63,14 @@ public class ClientOperationGUI {
 
 	}
 
+	public JFrame getFrame() {
+		return frame;
+	}
+
+	public void setFrame(JFrame frame) {
+		this.frame = frame;
+	}
+
 	/**
 	 * Initialize the contents of the frame.
 	 * 
@@ -111,36 +119,12 @@ public class ClientOperationGUI {
 		friendThree.addMouseListener(listen);
 		friendFour.addMouseListener(listen);
 		friendFive.addMouseListener(listen);
-//		friendOne.addMouseListener(new MouseAdapter() {
-//			public void mouseClicked(MouseEvent e) {
-//				JLabel obj = (JLabel) e.getComponent();
-//
-//				if (obj.equals(friendOne)) {
-//					frame.setTitle("account1");
-//				} else if (obj == friendTwo) {
-//					frame.setTitle("account2");
-//				} else if (obj == friendThree) {
-//					frame.setTitle("account3");
-//				} else if (obj == friendFour) {
-//					frame.setTitle("account4");
-//				} else if (obj == friendFive) {
-//					frame.setTitle("account5");
-//				}
-//			}
-//		});
-
 		Thread tr1 = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				send.addActionListener(e -> selectionButtonPressed());
 
 			}
-
-			private Object selectionLabelPressed() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
 		});
 		tr1.start();
 
@@ -160,7 +144,7 @@ public class ClientOperationGUI {
 			public void run() {
 				frame.addWindowListener(new java.awt.event.WindowAdapter() {
 					public void windowClosing(WindowEvent winEvt) {
-						client.sendMessage("ClosingClient");
+						client.sendMessage("ClosingClient" +"," + client.getUsername());
 						client.getOutput().close();
 						try {
 							client.getInput().close();
@@ -187,7 +171,9 @@ public class ClientOperationGUI {
 	}
 
 	private Object selectionButtonPressed() {
-		String msg = textField.getText().toString() + "," + client.getUsername();
+		String title = frame.getTitle();
+		int room = Character.getNumericValue(title.charAt(title.length()-2));
+		String msg = textField.getText().toString() + "," + client.getUsername() + "," + room;
 		client.sendMessage(msg);
 		textField.setText("");
 

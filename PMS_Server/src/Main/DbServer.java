@@ -316,12 +316,11 @@ public class DbServer {
 		}
 	}
 	
-	public void storeMessage(String user,String msg) {
+	public void storeMessage(String user,String msg, int room) {
 		String sql = "INSERT INTO Message_data "
 				+"(chat_room_id,username,message_text)"
 				+ "VALUES(?,?,?)";
 
-		int room = 1;
 
 		try {
 			prep = conn.prepareStatement(sql);
@@ -386,13 +385,16 @@ public class DbServer {
 	public String[] getRoomUsers(int i) {
 		String sql = "SELECT Username "+
 				"FROM chat_room_warehouse " +
-				"WHERE chat_room_id=?";
+				"WHERE chat_room_warehouse.chat_room_id=?";
 		ResultSet rs = null;
 		ArrayList<String> list = new ArrayList<String>();
 		try {
+
 			prep = conn.prepareStatement(sql);
-			prep.setInt(1, 1);
-			rs = prep.executeQuery();
+			prep.setInt(1, i);
+			if(prep.execute()) {
+				rs = prep.executeQuery();
+			}
 			while(rs.next()) {
 				list.add(rs.getString(1));
 			}

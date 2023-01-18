@@ -203,12 +203,13 @@ public class ServerVer2 implements Runnable {
 					String[] userMsg = msg.split(",");
 					if(!msg.startsWith(",")) {
 						DbServer db = new DbServer();
-						db.storeMessage(userMsg[1], userMsg[0]);
+						db.storeMessage(userMsg[1], userMsg[0], Integer.parseInt(userMsg[2]));
 						new Thread(new Runnable() {
 
 							@Override
 							public void run() {
-								String[] users = db.getRoomUsers(1); // room_ID
+								System.out.println(userMsg[2]);
+								String[] users = db.getRoomUsers(Integer.parseInt(userMsg[2])); // room_ID
 								for (String string : users) {
 									if(ServerSettings.onlineUsers.get(string) != null) { //db.checkIfRoomUsersOnline(string)
 										

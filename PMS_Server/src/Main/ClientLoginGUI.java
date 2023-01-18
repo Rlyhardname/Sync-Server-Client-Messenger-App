@@ -59,7 +59,7 @@ public class ClientLoginGUI {
 		login = new JButton("LOGIN");
 		signUp = new JButton("SIGN UP");
 		username.setText("account1");
-		password.setText("password");
+		password.setText("a");
 		frame.getContentPane().add(username);
 		frame.getContentPane().add(password);
 		frame.getContentPane().add(login);
@@ -134,7 +134,7 @@ public class ClientLoginGUI {
 
 		try {
 			if (client.accessServer("signup")) {
-				System.out.println("Succesful registration of:" + client.getUsername());
+				System.out.println("Succesful registration of:" + client.getUsername() +"," + frame.getTitle());
 				if (!client.isStarted()) {
 					client.runHandleServer();
 				}
