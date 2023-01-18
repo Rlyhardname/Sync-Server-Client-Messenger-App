@@ -8,8 +8,8 @@ public class EntryPoint {
 
 	public static void main(String[] args) {
 
-		DbServer db = new DbServer();
-		db.alterTable();
+//		DbServer db = new DbServer();
+//		db.alterTable();
 //		DbServer.createTableUserLog();
 //		DbServer.createTableChatRoomWarehouse();
 //		db.createTableMessageData();
@@ -17,8 +17,8 @@ public class EntryPoint {
 //		if(DbServer.createTableChatRoomWarehouse()) {
 //			System.out.println("yes");
 //		};
-//		ServerGUI.startGUI();
-//		ClientLoginGUI.startGUI();
+		ServerGUI.startGUI();
+		ClientLoginGUI.startGUI();
 //		
 		//Test Eror;
 		

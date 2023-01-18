@@ -221,7 +221,7 @@ public class ServerVer2 implements Runnable {
 							// db.StoreFile(userMsg[0],userMsg[1],userMsg[2], file); // dobavi i faila koito
 							// shte se slaga v bazata kato parametur
 
-						} else if (userMsg[3].equals("textMessage")) {
+						} if (userMsg[3].equals("TextMessage")) {
 							db.storeMessage(userMsg[1], userMsg[0], Integer.parseInt(userMsg[2]));
 							new Thread(new Runnable() {
 
