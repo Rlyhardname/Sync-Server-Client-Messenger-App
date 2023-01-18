@@ -402,13 +402,10 @@ public class DbServer {
 		}
 	}
 	
-	public void storeMessage(String user,String msg) {
+	public void storeMessage(String user,String msg,int room) {
 		String sql = "INSERT INTO Message_data "
 				+"(chat_room_id,username,message_text)"
 				+ "VALUES(?,?,?)";
-
-		int room = 1;
-
 		try {
 			prep = conn.prepareStatement(sql);
 			prep.setInt(1, room);

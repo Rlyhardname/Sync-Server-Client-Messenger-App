@@ -54,7 +54,7 @@ public class ServerGUI {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(2200, 100, 1000, 650);
+		frame.setBounds(200, 100, 1000, 650);
 		frame.setLayout(new FlowLayout());
 		JPanel buttons = new JPanel();
 		JPanel outputArea = new JPanel();
