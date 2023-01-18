@@ -233,6 +233,7 @@ public class ServerVer2 implements Runnable {
 							//receiveFile("NewFile2.txt");
 							Socket onlineUser = ServerSettings.onlineUsers.get("account2");
 							PrintWriter resend = new PrintWriter(onlineUser.getOutputStream(), true); 
+							resend.println("ReceiveFile" + "," + "Spi mi sa");
 							sendFile(onlineUser);
 							
 							// poqsneniq
