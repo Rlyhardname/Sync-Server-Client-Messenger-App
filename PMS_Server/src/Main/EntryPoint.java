@@ -9,8 +9,10 @@ public class EntryPoint {
 	public static void main(String[] args) {
 
 //		DbServer db = new DbServer();
-//		db.dropTable();
+//		DbServer.createTableChatRoom();
+//		DbServer.createTableChatRoomWarehouse();
 //		db.createTableMessageData();
+// 		db.createTableMessageData();
 //		if(DbServer.createTableChatRoomWarehouse()) {
 //			System.out.println("yes");
 //		};
@@ -18,6 +20,7 @@ public class EntryPoint {
 		ClientLoginGUI.startGUI();
 		
 		//Test Eror;
+		
 
 		// FOR TESTING MULTIPLE CLIENTS
 		// new StartClients();

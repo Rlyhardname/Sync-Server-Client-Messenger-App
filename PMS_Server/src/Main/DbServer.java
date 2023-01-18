@@ -205,9 +205,13 @@ public class DbServer {
 
 	}
 
-	boolean createTableUser() {
-		String sql = "CREATE TABLE User" + "(Username VARCHAR(25)," + "Password VARCHAR(32),"
-				+ "PRIMARY KEY (Username))";
+	static boolean createTableUser() {
+		String sql = "CREATE TABLE `user` (\n"
+				+ "  `username` varchar(25) NOT NULL,\n"
+				+ "  `password` varchar(32) NOT NULL,\n"
+				+ "  PRIMARY KEY (`username`),\n"
+				+ "  UNIQUE KEY `username_UNIQUE` (`username`)\n"
+				+ ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
 		try {
 			if (stmt.execute(sql)) {
 				return true;
@@ -220,19 +224,83 @@ public class DbServer {
 		return false;
 	}
 
-	private void createTableUserLog() {
+	
+	static boolean createTableUserAdditionalInfo() {
+		String sql = "CREATE TABLE `user_additional_info` (\n"
+				+ "  `username` varchar(25) NOT NULL,\n"
+				+ "  `avatar` blob,\n"
+				+ "  `bio` varchar(200) DEFAULT NULL,\n"
+				+ "  KEY `username_idx` (`username`),\n"
+				+ "  CONSTRAINT `user_additional_info_username_fk` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE CASCADE ON UPDATE CASCADE\n"
+				+ ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
+		try {
+			if (stmt.execute(sql)) {
+				return true;
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 
 	}
+	
+	
+	static boolean createTableUserLog() {
+		String sql = "CREATE TABLE `user_log` (\n"
+				+ "  `username` varchar(25) NOT NULL,\n"
+				+ "  `login_time` datetime DEFAULT NULL,\n"
+				+ "  `logout_time` datetime DEFAULT NULL,\n"
+				+ "  KEY `user_log_username_fk_idx` (`username`),\n"
+				+ "  CONSTRAINT `user_log_username_fk` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE CASCADE ON UPDATE CASCADE\n"
+				+ ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
+		try {
+			if (stmt.execute(sql)) {
+				return true;
+			}
 
-	private void createTableUserAdditionalInfo() {
-
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+		
 	}
+
+	
+	
+	static boolean createTableFriends() {
+		String sql = "CREATE TABLE `friends` (\n"
+				+ "  `username` varchar(25) NOT NULL,\n"
+				+ "  `friend` int NOT NULL,\n"
+				+ "  KEY `friends_username_idx` (`username`),\n"
+				+ "  CONSTRAINT `friends_username` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE CASCADE ON UPDATE CASCADE\n"
+				+ ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
+		try {
+			if (stmt.execute(sql)) {
+				return true;
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+		
+	}
+	
+	
+	
 
 	static boolean createTableChatRoom() {
-		String sql = "CREATE TABLE Chat_Room" + 
-				"(chat_room_id int NOT NULL AUTO_INCREMENT," + 
-				"room_name VARCHAR(25)," +
-				"PRIMARY KEY (chat_room_id))";
+		String sql = "CREATE TABLE `chat_room` (\n"
+				+ "  `chat_room_id` int NOT NULL AUTO_INCREMENT,\n"
+				+ "  `room_name` varchar(45) DEFAULT 'New_Room',\n"
+				+ "  `room_theme` blob,\n"
+				+ "  PRIMARY KEY (`chat_room_id`),\n"
+				+ "  UNIQUE KEY `chat_room_id_UNIQUE` (`chat_room_id`)\n"
+				+ ") ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
 		try {
 			if (stmt.execute(sql)) {
 				return true;
@@ -246,10 +314,14 @@ public class DbServer {
 	}
 
 	static boolean createTableChatRoomWarehouse() {
-		String sql = "CREATE TABLE Chat_Room_Warehouse" + 
-				"(chat_room_id int NOT NULL," + 
-				"Username VARCHAR(25) NOT NULL,"+
-				"FOREIGN KEY (chat_room_id) REFERENCES Chat_Room(chat_room_id) )";
+		String sql = "CREATE TABLE `chat_room_warehouse` (\n"
+				+ "  `chat_room_id` int NOT NULL,\n"
+				+ "  `username` varchar(25) NOT NULL,\n"
+				+ "  KEY `chat_room_warehouse_chat_room_id_fk_idx` (`chat_room_id`),\n"
+				+ "  KEY `chat_room_warehouse_username_fk_idx` (`username`),\n"
+				+ "  CONSTRAINT `chat_room_warehouse_chat_room_id_fk` FOREIGN KEY (`chat_room_id`) REFERENCES `chat_room` (`chat_room_id`) ON DELETE CASCADE ON UPDATE CASCADE,\n"
+				+ "  CONSTRAINT `chat_room_warehouse_username_fk` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE CASCADE ON UPDATE CASCADE\n"
+				+ ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
 		try {
 			if (stmt.execute(sql)) {
 				return true;
@@ -262,13 +334,22 @@ public class DbServer {
 		return false;
 	}
 
-	boolean createTableMessageData() {
-		String sql = "CREATE TABLE Message_Data" + 
-				"(chat_room_id int NOT NULL," + 
-				"Username VARCHAR(25) NOT NULL,"+
-				"message_text VARCHAR(25),"+
-				"timeLOG DATETIME DEFAULT CURRENT_TIMESTAMP," +
-				"FOREIGN KEY (chat_room_id) REFERENCES Chat_Room(chat_room_id) )";
+	static boolean createTableMessageData() {
+		String sql = "CREATE TABLE `message_data` (\n"
+				+ "  `message_id` int NOT NULL AUTO_INCREMENT,\n"
+				+ "  `username` varchar(25) NOT NULL,\n"
+				+ "  `chat_room_id` int NOT NULL,\n"
+				+ "  `message_text` varchar(500) DEFAULT NULL,\n"
+				+ "  `message_image` blob,\n"
+				+ "  `time_log` datetime DEFAULT NULL,\n"
+				+ "  `user_state` int DEFAULT NULL,\n"
+				+ "  PRIMARY KEY (`message_id`),\n"
+				+ "  UNIQUE KEY `message_id_UNIQUE` (`message_id`),\n"
+				+ "  KEY `message_data_username_fk_idx` (`username`),\n"
+				+ "  KEY `message_data_chat_room_id_fk_idx` (`chat_room_id`),\n"
+				+ "  CONSTRAINT `message_data_chat_room_id_fk` FOREIGN KEY (`chat_room_id`) REFERENCES `chat_room` (`chat_room_id`) ON DELETE CASCADE ON UPDATE CASCADE,\n"
+				+ "  CONSTRAINT `message_data_username_fk` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE CASCADE ON UPDATE CASCADE\n"
+				+ ") ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
 		try {
 			if (stmt.execute(sql)) {
 				return true;
@@ -280,6 +361,11 @@ public class DbServer {
 		}
 		return false;
 	}
+	
+	
+	
+	
+	
 	
 	public void addChatRoom() {
 		String sql = "INSERT INTO chat_room "
@@ -316,11 +402,12 @@ public class DbServer {
 		}
 	}
 	
-	public void storeMessage(String user,String msg, int room) {
+	public void storeMessage(String user,String msg) {
 		String sql = "INSERT INTO Message_data "
 				+"(chat_room_id,username,message_text)"
 				+ "VALUES(?,?,?)";
 
+		int room = 1;
 
 		try {
 			prep = conn.prepareStatement(sql);
@@ -385,16 +472,13 @@ public class DbServer {
 	public String[] getRoomUsers(int i) {
 		String sql = "SELECT Username "+
 				"FROM chat_room_warehouse " +
-				"WHERE chat_room_warehouse.chat_room_id=?";
+				"WHERE chat_room_id=?";
 		ResultSet rs = null;
 		ArrayList<String> list = new ArrayList<String>();
 		try {
-
 			prep = conn.prepareStatement(sql);
-			prep.setInt(1, i);
-			if(prep.execute()) {
-				rs = prep.executeQuery();
-			}
+			prep.setInt(1, 1);
+			rs = prep.executeQuery();
 			while(rs.next()) {
 				list.add(rs.getString(1));
 			}
