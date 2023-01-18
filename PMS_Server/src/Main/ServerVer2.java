@@ -20,8 +20,8 @@ public class ServerVer2 implements Runnable {
 	private BufferedReader input;
 	private String username;
 	private String password;
-	private DataOutputStream outputFile = null;
-    private DataInputStream inputFile = null;
+	private DataOutputStream outputFile;
+    private DataInputStream inputFile;
     
 	// datainputstream
 	ServerVer2() {
@@ -307,7 +307,7 @@ public class ServerVer2 implements Runnable {
 
 	
 	
-	private static void sendFile(String path)
+	private void sendFile(String path)
 	        
 	    {
 	        int bytes = 0;
@@ -323,14 +323,14 @@ public class ServerVer2 implements Runnable {
 	 
 	        // send the File
 			try {
-	        dataOutputStream.writeLong(file.length());
+				outputFile.writeLong(file.length());
 	        // break file into chunks
 	        byte[] buffer = new byte[4 * 1024];
 	        while ((bytes = fileInputStream.read(buffer))
 	               != -1) {
 	          // Send the file to Server Socket 
-	          dataOutputStream.write(buffer, 0, bytes);
-	            dataOutputStream.flush();
+	        	outputFile.write(buffer, 0, bytes);
+	        	outputFile.flush();
 	        }
 	        // close the file here
 	        fileInputStream.close();
@@ -343,7 +343,7 @@ public class ServerVer2 implements Runnable {
 	    
 	    
 	    
-	    private static void receiveFile(String fileName)
+	    private void receiveFile(String fileName)
 	    		
 	    {
 	        int bytes = 0;
@@ -357,10 +357,10 @@ public class ServerVer2 implements Runnable {
 	 
 			try {
 	        long size
-	            = dataInputStream.readLong(); // read file size
+	            = inputFile.readLong(); // read file size
 	        byte[] buffer = new byte[4 * 1024];
 	        while (size > 0
-	               && (bytes = dataInputStream.read(
+	               && (bytes = inputFile.read(
 	                       buffer, 0,
 	                       (int)Math.min(buffer.length, size)))
 	                      != -1) {
