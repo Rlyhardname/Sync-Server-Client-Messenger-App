@@ -232,7 +232,7 @@ public class ServerVer2 implements Runnable {
 						if (userMsg[3].equals("sendFile")) {
 							//receiveFile("NewFile2.txt");
 							Socket onlineUser = ServerSettings.onlineUsers.get("account2");
-							
+							PrintWriter resend = new PrintWriter(onlineUser.getOutputStream(), true); 
 							sendFile(onlineUser);
 							
 							// poqsneniq

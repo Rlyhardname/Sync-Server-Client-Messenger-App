@@ -75,8 +75,13 @@ public class ClientLogic extends Thread {
 			try {
 
 				String msgIN = input.readLine();
-			
-				
+			String [] splitMessage = msgIN.split(",") ;
+				if(splitMessage[0].equals("ReceiveFile"))
+				{
+					
+					receiveFile("E:\\New folder\\NewFile1.txt");
+					
+				}
 				if (msgIN == null) {
 					break;
 				}

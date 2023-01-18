@@ -108,8 +108,9 @@ public class ClientOperationGUI {
 		btnSendFile = new JButton("Send File");
 		btnSendFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				client.getOutput().println("Zdr"+","+client.getUsername()+","+ 1+"," + "sendFile");
 				client.sendFile("E:\\TestFile1.txt");
+				System.out.print("Sending File...");
 				
 			}
 		});
