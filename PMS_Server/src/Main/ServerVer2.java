@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -305,15 +306,21 @@ public class ServerVer2 implements Runnable {
 	
 	
 	private static void sendFile(String path)
-	        throws Exception
+	        
 	    {
 	        int bytes = 0;
 	        // Open the File where he located in your pc
 	        File file = new File(path);
-	        FileInputStream fileInputStream
-	            = new FileInputStream(file);
+	        FileInputStream fileInputStream = null;
+			try {
+				fileInputStream = new FileInputStream(file);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	 
 	        // send the File
+			try {
 	        dataOutputStream.writeLong(file.length());
 	        // break file into chunks
 	        byte[] buffer = new byte[4 * 1024];
@@ -325,17 +332,26 @@ public class ServerVer2 implements Runnable {
 	        }
 	        // close the file here
 	        fileInputStream.close();
+			}
+			catch(IOException e) {
+				e.printStackTrace();
+			}
 	    }
 	    
 	    
 	    
 	    
 	    private static void receiveFile(String fileName)
-	        throws Exception
+	    		throws Exception;
 	    {
 	        int bytes = 0;
-	        FileOutputStream fileOutputStream
-	            = new FileOutputStream(fileName);
+	        FileOutputStream fileOutputStream;
+			try {
+				fileOutputStream = new FileOutputStream(fileName);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	 
 	        long size
 	            = dataInputStream.readLong(); // read file size
