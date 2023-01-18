@@ -220,36 +220,39 @@ public class ServerVer2 implements Runnable {
 							//FileInputStream file - файлът - obrabotkata tuka i puskash v dolnata funkciq
 							//db.StoreFile(userMsg[0],userMsg[1],userMsg[2], file); // dobavi i faila koito shte se slaga v bazata kato parametur
 						
-						}
+						} else if(userMsg[3].equals("textMessage")) {
+							db.storeMessage(userMsg[1], userMsg[0], Integer.parseInt(userMsg[2]));
+							new Thread(new Runnable() {
 
-						db.storeMessage(userMsg[1], userMsg[0], Integer.parseInt(userMsg[2]));
-						new Thread(new Runnable() {
+								@Override
+								public void run() {
+									System.out.println(userMsg[2]);
+									String[] users = db.getRoomUsers(Integer.parseInt(userMsg[2])); // room_ID
+									for (String string : users) {
+										if (ServerSettings.onlineUsers.get(string) != null) { // db.checkIfRoomUsersOnline(string)
 
-							@Override
-							public void run() {
-								System.out.println(userMsg[2]);
-								String[] users = db.getRoomUsers(Integer.parseInt(userMsg[2])); // room_ID
-								for (String string : users) {
-									if (ServerSettings.onlineUsers.get(string) != null) { // db.checkIfRoomUsersOnline(string)
+											Socket userSocket = ServerSettings.onlineUsers.get(string);
+											PrintWriter distribute;
+											try {
+												distribute = new PrintWriter(userSocket.getOutputStream(), true);
+												distribute.println(userMsg[0]);
+											} catch (IOException e) {
+												// TODO Auto-generated catch block
+												e.printStackTrace();
+											}
 
-										Socket userSocket = ServerSettings.onlineUsers.get(string);
-										PrintWriter distribute;
-										try {
-											distribute = new PrintWriter(userSocket.getOutputStream(), true);
-											distribute.println(userMsg[0]);
-										} catch (IOException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
 										}
-
+										;
 									}
-									;
+
+									db.closeConnection();
 								}
 
-								db.closeConnection();
-							}
+							}).start();
+						}
 
-						}).start();
+						
+						
 					}
 
 				}

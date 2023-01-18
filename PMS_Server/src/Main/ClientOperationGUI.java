@@ -175,7 +175,7 @@ public class ClientOperationGUI {
 	private Object selectionButtonPressed() {
 		String title = frame.getTitle();
 		int room = Character.getNumericValue(title.charAt(title.length()-2));
-		String msg = textField.getText().toString() + "," + client.getUsername() + "," + room;
+		String msg = textField.getText().toString() + "," + client.getUsername() + "," + room + ","+ "TextMessage";
 		client.sendMessage(msg);
 		textField.setText("");
 
