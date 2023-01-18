@@ -75,6 +75,8 @@ public class ClientLogic extends Thread {
 			try {
 
 				String msgIN = input.readLine();
+			
+				
 				if (msgIN == null) {
 					break;
 				}

@@ -108,7 +108,9 @@ public class ClientOperationGUI {
 		btnSendFile = new JButton("Send File");
 		btnSendFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
 				client.sendFile("E:\\TestFile1.txt");
+				
 			}
 		});
 		panel.add(btnSendFile);

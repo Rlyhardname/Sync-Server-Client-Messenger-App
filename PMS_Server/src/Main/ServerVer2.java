@@ -230,7 +230,11 @@ public class ServerVer2 implements Runnable {
 							break;
 						DbServer db = new DbServer();
 						if (userMsg[3].equals("sendFile")) {
-							receiveFile("NewFile2.txt");
+							//receiveFile("NewFile2.txt");
+							Socket onlineUser = ServerSettings.onlineUsers.get("account2");
+							
+							sendFile(onlineUser);
+							
 							// poqsneniq
 							// userMsg[0] - message // userMsg[1] - username // userMsg[2] - Chat_room_ID //
 							// userMsg[3] = "sendFile "
@@ -308,33 +312,40 @@ public class ServerVer2 implements Runnable {
 
 	
 	
-	private void sendFile(String path)
+	private void sendFile(Socket onlineUser)
 	        
 	    {
 	        int bytes = 0;
-	        // Open the File where he located in your pc
-	        File file = new File(path);
-	        FileInputStream fileInputStream = null;
-			try {
-				fileInputStream = new FileInputStream(file);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//	        // Open the File where he located in your pc
+//	        File file = new File(path);
+//	        FileInputStream fileInputStream = null;
+//			try {
+//				fileInputStream = new FileInputStream(file);
+//			} catch (FileNotFoundException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 	 
 	        // send the File
+	        try {
+				outputFile = new DataOutputStream(onlineUser.getOutputStream());
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+	        
 			try {
-				outputFile.writeLong(file.length());
+				//outputFile.writeLong(inputFile.length());
 	        // break file into chunks
 	        byte[] buffer = new byte[4 * 1024];
-	        while ((bytes = fileInputStream.read(buffer))
+	        while ((bytes = inputFile.read(buffer))
 	               != -1) {
 	          // Send the file to Server Socket 
 	        	outputFile.write(buffer, 0, bytes);
 	        	outputFile.flush();
 	        }
 	        // close the file here
-	        fileInputStream.close();
+	        inputFile.close();
 			}
 			catch(IOException e) {
 				e.printStackTrace();
@@ -347,34 +358,40 @@ public class ServerVer2 implements Runnable {
 	    private void receiveFile(String fileName)
 	    		
 	    {
-	        int bytes = 0;
-	        FileOutputStream fileOutputStream = null;
-			try {
-				fileOutputStream = new FileOutputStream(fileName);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//	        int bytes = 0;
+//	        FileOutputStream fileOutputStream = null;
+//			try {
+//				fileOutputStream = new FileOutputStream(fileName);
+//			} catch (FileNotFoundException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 	 
-			try {
-	        long size
-	            = inputFile.readLong(); // read file size
-	        byte[] buffer = new byte[4 * 1024];
-	        while (size > 0
-	               && (bytes = inputFile.read(
-	                       buffer, 0,
-	                       (int)Math.min(buffer.length, size)))
-	                      != -1) {
-	            // write the file using write method
-	            fileOutputStream.write(buffer, 0, bytes);
-	            size -= bytes; // read upto file size
-	        }
-	        
-	        System.out.println("File is Received");
-	        fileOutputStream.close();
-			}catch(IOException e) {
-				e.printStackTrace();
-			}
+//			try {
+//	        long size
+//	            = inputFile.readLong(); // read file size
+//	        byte[] buffer = new byte[4 * 1024];
+//	        while (size > 0
+//	               && (bytes = inputFile.read(
+//	                       buffer, 0,
+//	                       (int)Math.min(buffer.length, size)))
+//	                      != -1) {
+//	            // write the file using write method
+//	            fileOutputStream.write(buffer, 0, bytes);
+//	            size -= bytes; // read upto file size
+//	        }
+//	        
+//	        System.out.println("File is Received");
+//	        fileOutputStream.close();
+//			}catch(IOException e) {
+//				e.printStackTrace();
+//			}
+	    }
+	    
+	    private void resendFile2(String fileName) 
+	    {
+	    	
+	    	
 	    }
 	    
 	
