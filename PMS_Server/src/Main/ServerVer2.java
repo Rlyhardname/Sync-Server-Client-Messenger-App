@@ -1,6 +1,7 @@
 package Main;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -14,7 +15,8 @@ public class ServerVer2 implements Runnable {
 	private BufferedReader input;
 	private String username;
 	private String password;
-	//datainputstream
+
+	// datainputstream
 	ServerVer2() {
 		Initialize();
 	}
@@ -45,7 +47,7 @@ public class ServerVer2 implements Runnable {
 
 			System.out.println("ClientConnected");
 			authentication();
-			
+
 			// syncClientWithServerDB();
 			handleClient();
 
@@ -196,21 +198,28 @@ public class ServerVer2 implements Runnable {
 
 	private void handleClient() throws IOException {
 		String msg = "";
-		//PrintWriter onlineUserOutput = null;
+		// PrintWriter onlineUserOutput = null;
 		do {
 
 			try {
 
 				msg = input.readLine();
 				if (msg != null) {
+
 					String[] userMsg = msg.split(",");
-					if(!msg.startsWith(",")) {
+					if (!msg.startsWith(",")) {
 						if (userMsg[0].equals("ClosingClient"))
 							break;
-						 else if (userMsg[0].equals("sendFile")) {
-							// receive file
-						 }
 						DbServer db = new DbServer();
+						if (userMsg[3].equals("sendFile")) {
+							// receive file + obrabotki
+
+							// userMsg[0] - message //   userMsg[1] - username  // userMsg[2] - Chat_room_ID // userMsg[3] = "sendFile " 
+							//FileInputStream file - файлът - obrabotkata tuka i puskash v dolnata funkciq
+							//db.StoreFile(userMsg[0],userMsg[1],userMsg[2], file); // dobavi i faila koito shte se slaga v bazata kato parametur
+							// sled kato si napravil obrabotkite
+						}
+
 						db.storeMessage(userMsg[1], userMsg[0], Integer.parseInt(userMsg[2]));
 						new Thread(new Runnable() {
 
@@ -219,28 +228,28 @@ public class ServerVer2 implements Runnable {
 								System.out.println(userMsg[2]);
 								String[] users = db.getRoomUsers(Integer.parseInt(userMsg[2])); // room_ID
 								for (String string : users) {
-									if(ServerSettings.onlineUsers.get(string) != null) { //db.checkIfRoomUsersOnline(string)
-										
-										Socket userSocket= ServerSettings.onlineUsers.get(string);
+									if (ServerSettings.onlineUsers.get(string) != null) { // db.checkIfRoomUsersOnline(string)
+
+										Socket userSocket = ServerSettings.onlineUsers.get(string);
 										PrintWriter distribute;
 										try {
-											distribute = new PrintWriter(userSocket.getOutputStream(),true);
+											distribute = new PrintWriter(userSocket.getOutputStream(), true);
 											distribute.println(userMsg[0]);
 										} catch (IOException e) {
 											// TODO Auto-generated catch block
 											e.printStackTrace();
 										}
-										
-									};
+
+									}
+									;
 								}
-								
+
 								db.closeConnection();
 							}
-							
+
 						}).start();
 					}
-					
-					
+
 				}
 
 //				Socket friend = ServerSettings.onlineUsers.get(userMsg[1]);
@@ -272,6 +281,5 @@ public class ServerVer2 implements Runnable {
 	public static synchronized void printActiveUsers() {
 		ServerGUI.printArea();
 	}
-	
 
 }

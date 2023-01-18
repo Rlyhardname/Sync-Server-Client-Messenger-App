@@ -1,5 +1,8 @@
 package Main;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -427,8 +430,8 @@ public class DbServer {
 	}
 	
 	public void alterTable() {
-		String sql = "ALTER TABLE message_data"+
-				"ADD timeLOG DATETIME";
+		String sql = "ALTER TABLE message_data "+
+				"ADD file BLOB DEFAULT NULL";
 		try {
 			stmt.execute(sql);
 		} catch (SQLException e) {
@@ -520,4 +523,28 @@ public class DbServer {
 		}
 		
 	}
+
+	public void StoreFile(String message,  String username, int roomID, FileInputStream file) {
+		// TODO Auto-generated method stub
+		
+		String sql = "INSERT INTO message_data "+
+				"(message,username) "+
+				"VALUES(?,NOW())";
+		try {
+			prep = conn.prepareStatement(sql);
+			prep.setString(1,message);
+			prep.setString(2, username);
+			prep.setInt(3, roomID);
+			prep.setBinaryStream(4, file);
+			prep.executeLargeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	
 }
