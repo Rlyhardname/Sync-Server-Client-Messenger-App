@@ -213,14 +213,15 @@ public class ServerVer2 implements Runnable {
 						DbServer db = new DbServer();
 						if (userMsg[3].equals("sendFile")) {
 							// poqsneniq
-							// userMsg[0] - message //   userMsg[1] - username  // userMsg[2] - Chat_room_ID // userMsg[3] = "sendFile " 
+							// userMsg[0] - message // userMsg[1] - username // userMsg[2] - Chat_room_ID //
+							// userMsg[3] = "sendFile "
 							// receive file + obrabotki
 
-							
-							//FileInputStream file - файлът - obrabotkata tuka i puskash v dolnata funkciq
-							//db.StoreFile(userMsg[0],userMsg[1],userMsg[2], file); // dobavi i faila koito shte se slaga v bazata kato parametur
-						
-						} else if(userMsg[3].equals("textMessage")) {
+							// FileInputStream file - файлът - obrabotkata tuka i puskash v dolnata funkciq
+							// db.StoreFile(userMsg[0],userMsg[1],userMsg[2], file); // dobavi i faila koito
+							// shte se slaga v bazata kato parametur
+
+						} else if (userMsg[3].equals("textMessage")) {
 							db.storeMessage(userMsg[1], userMsg[0], Integer.parseInt(userMsg[2]));
 							new Thread(new Runnable() {
 
@@ -251,8 +252,6 @@ public class ServerVer2 implements Runnable {
 							}).start();
 						}
 
-						
-						
 					}
 
 				}
