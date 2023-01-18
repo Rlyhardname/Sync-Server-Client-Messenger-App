@@ -22,6 +22,7 @@ public class ClientLogic extends Thread {
 	private Socket link;
 	private ClientLoginGUI login;
 	private boolean started;
+	
 
 	ClientLogic() {
 		{

@@ -14,7 +14,7 @@ public class ServerVer2 implements Runnable {
 	private BufferedReader input;
 	private String username;
 	private String password;
-
+	//datainputstream
 	ServerVer2() {
 		Initialize();
 	}
@@ -29,6 +29,7 @@ public class ServerVer2 implements Runnable {
 			link = ServerSettings.serverSocket.accept();
 			output = new PrintWriter(link.getOutputStream(), true);
 			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
+			// datainputstream
 		} catch (IOException e1) {
 			try {
 			} catch (NullPointerException e) {
@@ -206,6 +207,9 @@ public class ServerVer2 implements Runnable {
 					if(!msg.startsWith(",")) {
 						if (userMsg[0].equals("ClosingClient"))
 							break;
+						 else if (userMsg[0].equals("sendFile")) {
+							// receive file
+						 }
 						DbServer db = new DbServer();
 						db.storeMessage(userMsg[1], userMsg[0], Integer.parseInt(userMsg[2]));
 						new Thread(new Runnable() {
@@ -268,5 +272,6 @@ public class ServerVer2 implements Runnable {
 	public static synchronized void printActiveUsers() {
 		ServerGUI.printArea();
 	}
+	
 
 }

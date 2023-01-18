@@ -32,6 +32,7 @@ public class ClientOperationGUI {
 	JLabel friendThree;
 	JLabel friendFour;
 	JLabel friendFive;
+	// pICK FILE BUTTON
 
 	/**
 	 * Launch the application.
@@ -94,6 +95,7 @@ public class ClientOperationGUI {
 		textField = new JTextField(30);
 		send = new JButton("SEND");
 		newClient = new JButton("NEW CLIENT");
+		// pravish buttona i go vkarvash v panel
 		panel = new JPanel();
 		panel.add(textField);
 		panel.add(send);
@@ -182,5 +184,10 @@ public class ClientOperationGUI {
 
 	public void concattArea(String msg) {
 		textArea.append((msg + "\n"));
+	}
+	
+	public void sendFile() {
+		// logika za prashtane
+		// message = "sendFile,разширение,
 	}
 }
