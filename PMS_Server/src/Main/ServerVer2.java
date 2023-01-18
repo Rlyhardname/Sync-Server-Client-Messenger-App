@@ -21,8 +21,8 @@ public class ServerVer2 implements Runnable {
 	private String username;
 	private String password;
 	private DataOutputStream outputFile;
-    private DataInputStream inputFile;
-    
+	private DataInputStream inputFile;
+
 	// datainputstream
 	ServerVer2() {
 		Initialize();
@@ -39,7 +39,7 @@ public class ServerVer2 implements Runnable {
 			output = new PrintWriter(link.getOutputStream(), true);
 			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
 			outputFile = new DataOutputStream(link.getOutputStream());
-			inputFile =  new DataInputStream(link.getInputStream());
+			inputFile = new DataInputStream(link.getInputStream());
 			// datainputstream
 		} catch (IOException e1) {
 			try {
@@ -56,7 +56,8 @@ public class ServerVer2 implements Runnable {
 
 			System.out.println("ClientConnected");
 			authentication();
-		//	syncClientWithServerDB(); // razpishi tqlo za prashtane na batch file s izpusnati saobshteniq
+			// syncClientWithServerDB(); // razpishi tqlo za prashtane na batch file s
+			// izpusnati saobshteniq
 			handleClient();
 
 		} catch (NullPointerException e1) {
@@ -129,7 +130,8 @@ public class ServerVer2 implements Runnable {
 		String[] batch = db.getUnsendMessages(username);
 		if (ServerSettings.onlineUsers.get(username) != null) {
 			// PRATI PO FAIL SYSTEMATA KATO TEKSTOV FILE
-			// i poiskai potvurjdenie 4e faila e praten uspeshno, ako e praten uspeshno promeni vsi4ki stari logouti na 
+			// i poiskai potvurjdenie 4e faila e praten uspeshno, ako e praten uspeshno
+			// promeni vsi4ki stari logouti na
 			// na pole user_log logout_time na 0
 		}
 	}
@@ -230,12 +232,12 @@ public class ServerVer2 implements Runnable {
 							break;
 						DbServer db = new DbServer();
 						if (userMsg[3].equals("sendFile")) {
-							//receiveFile("NewFile2.txt");
+							// receiveFile("NewFile2.txt");
 							Socket onlineUser = ServerSettings.onlineUsers.get("account2");
-							PrintWriter resend = new PrintWriter(onlineUser.getOutputStream(), true); 
+							PrintWriter resend = new PrintWriter(onlineUser.getOutputStream(), true);
 							resend.println("ReceiveFile" + "," + "Spi mi sa");
 							sendFile(onlineUser);
-							
+
 							// poqsneniq
 							// userMsg[0] - message // userMsg[1] - username // userMsg[2] - Chat_room_ID //
 							// userMsg[3] = "sendFile "
@@ -247,34 +249,37 @@ public class ServerVer2 implements Runnable {
 
 						}
 						if (userMsg[3].equals("TextMessage")) {
-							db.storeMessage(userMsg[1], userMsg[0], Integer.parseInt(userMsg[2]));
-							new Thread(new Runnable() {
+							boolean condition = db.storeMessage(userMsg[1], userMsg[0], Integer.parseInt(userMsg[2]));
+							if (condition) {
 
-								@Override
-								public void run() {
-									System.out.println(userMsg[2]);
-									String[] users = db.getRoomUsers(Integer.parseInt(userMsg[2])); // room_ID
-									for (String string : users) {
-										if (ServerSettings.onlineUsers.get(string) != null) { // db.checkIfRoomUsersOnline(string)
+								new Thread(new Runnable() {
 
-											Socket userSocket = ServerSettings.onlineUsers.get(string);
-											PrintWriter distribute;
-											try {
-												distribute = new PrintWriter(userSocket.getOutputStream(), true);
-												distribute.println(userMsg[0]);
-											} catch (IOException e) {
-												// TODO Auto-generated catch block
-												e.printStackTrace();
+									@Override
+									public void run() {
+										System.out.println(userMsg[2]);
+										String[] users = db.getRoomUsers(Integer.parseInt(userMsg[2])); // room_ID
+										for (String string : users) {
+											if (ServerSettings.onlineUsers.get(string) != null) { // db.checkIfRoomUsersOnline(string)
+
+												Socket userSocket = ServerSettings.onlineUsers.get(string);
+												PrintWriter distribute;
+												try {
+													distribute = new PrintWriter(userSocket.getOutputStream(), true);
+													distribute.println(userMsg[0]);
+												} catch (IOException e) {
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}
+
 											}
-
+											;
 										}
-										;
+
+										db.closeConnection();
 									}
 
-									db.closeConnection();
-								}
-
-							}).start();
+								}).start();
+							}
 						}
 
 					}
@@ -311,12 +316,10 @@ public class ServerVer2 implements Runnable {
 		ServerGUI.printArea();
 	}
 
-	
-	
 	private void sendFile(Socket onlineUser)
-	        
-	    {
-	        int bytes = 0;
+
+	{
+		int bytes = 0;
 //	        // Open the File where he located in your pc
 //	        File file = new File(path);
 //	        FileInputStream fileInputStream = null;
@@ -326,39 +329,34 @@ public class ServerVer2 implements Runnable {
 //				// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			}
-	 
-	        // send the File
-	        try {
-				outputFile = new DataOutputStream(onlineUser.getOutputStream());
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+
+		// send the File
+		try {
+			outputFile = new DataOutputStream(onlineUser.getOutputStream());
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		try {
+			// outputFile.writeLong(inputFile.length());
+			// break file into chunks
+			byte[] buffer = new byte[4 * 1024];
+			while ((bytes = inputFile.read(buffer)) != -1) {
+				// Send the file to Server Socket
+				outputFile.write(buffer, 0, bytes);
+				outputFile.flush();
 			}
-	        
-			try {
-				//outputFile.writeLong(inputFile.length());
-	        // break file into chunks
-	        byte[] buffer = new byte[4 * 1024];
-	        while ((bytes = inputFile.read(buffer))
-	               != -1) {
-	          // Send the file to Server Socket 
-	        	outputFile.write(buffer, 0, bytes);
-	        	outputFile.flush();
-	        }
-	        // close the file here
-	        inputFile.close();
-			}
-			catch(IOException e) {
-				e.printStackTrace();
-			}
-	    }
-	    
-	    
-	    
-	    
-	    private void receiveFile(String fileName)
-	    		
-	    {
+			// close the file here
+			inputFile.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void receiveFile(String fileName)
+
+	{
 //	        int bytes = 0;
 //	        FileOutputStream fileOutputStream = null;
 //			try {
@@ -367,7 +365,7 @@ public class ServerVer2 implements Runnable {
 //				// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			}
-	 
+
 //			try {
 //	        long size
 //	            = inputFile.readLong(); // read file size
@@ -387,15 +385,10 @@ public class ServerVer2 implements Runnable {
 //			}catch(IOException e) {
 //				e.printStackTrace();
 //			}
-	    }
-	    
-	    private void resendFile2(String fileName) 
-	    {
-	    	
-	    	
-	    }
-	    
-	
-	
-	
+	}
+
+	private void resendFile2(String fileName) {
+
+	}
+
 }

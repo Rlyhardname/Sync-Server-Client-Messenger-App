@@ -8,9 +8,9 @@ public class EntryPoint {
 
 	public static void main(String[] args) {
 
-		DbServer db = new DbServer();
+//		DbServer db = new DbServer();
 //		db.alterTable();
-		db.fillRoom();
+//		db.fillRoom();
 //		DbServer.createTableUserLog();
 //		DbServer.createTableChatRoomWarehouse();
 //		db.createTableMessageData();
