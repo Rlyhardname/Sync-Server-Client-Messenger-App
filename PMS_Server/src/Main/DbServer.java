@@ -248,13 +248,15 @@ public class DbServer {
 	
 	
 	static boolean createTableUserLog() {
-		String sql = "CREATE TABLE `user_log` (\n"
-				+ "  `username` varchar(25) NOT NULL,\n"
-				+ "  `login_time` datetime DEFAULT NULL,\n"
-				+ "  `logout_time` datetime DEFAULT NULL,\n"
-				+ "  KEY `user_log_username_fk_idx` (`username`),\n"
-				+ "  CONSTRAINT `user_log_username_fk` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE CASCADE ON UPDATE CASCADE\n"
-				+ ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
+		String sql = "CREATE TABLE user_log"
+				+ "(username VARCHAR(25) NOT NULL,"
+				+ "login_time datetime DEFAULT NULL,"
+				+ "logout_time datetime DEFAULT NULL,"
+				+ "allMessagesSent TINYINT DEFAULT 1,"
+				+ "FOREIGN KEY (username) REFERENCES user(username))";
+//				+ "  KEY `user_log_username_fk_idx` (`username`),\n"
+//				+ "  CONSTRAINT `user_log_username_fk` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE CASCADE ON UPDATE CASCADE\n"
+//				+ ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
 		try {
 			if (stmt.execute(sql)) {
 				return true;
@@ -436,21 +438,13 @@ public class DbServer {
 	}
 	
 	public void dropTable() {
-		String sql = "DROP TABLE students";
+		String sql = "DROP TABLE User_Log";
 		try {
 			stmt.execute(sql);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-
-	public Enum getTask() {
-		return task;
-	}
-
-	public void setTask(Enum task) {
-		this.task = task;
 	}
 
 	public String[] getArgs() {
