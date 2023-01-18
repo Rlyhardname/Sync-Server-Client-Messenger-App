@@ -20,8 +20,8 @@ public class ServerVer2 implements Runnable {
 	private BufferedReader input;
 	private String username;
 	private String password;
-	private static DataOutputStream dataOutputStream = null;
-    private static DataInputStream dataInputStream = null;
+	private DataOutputStream outputFile = null;
+    private DataInputStream inputFile = null;
     
 	// datainputstream
 	ServerVer2() {
@@ -38,6 +38,8 @@ public class ServerVer2 implements Runnable {
 			link = ServerSettings.serverSocket.accept();
 			output = new PrintWriter(link.getOutputStream(), true);
 			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
+			outputFile = new DataOutputStream(link.getOutputStream());
+			inputFile =  new DataInputStream(link.getInputStream());
 			// datainputstream
 		} catch (IOException e1) {
 			try {
