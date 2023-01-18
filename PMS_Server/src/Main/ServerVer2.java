@@ -1,7 +1,11 @@
 package Main;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -15,7 +19,9 @@ public class ServerVer2 implements Runnable {
 	private BufferedReader input;
 	private String username;
 	private String password;
-
+	private static DataOutputStream dataOutputStream = null;
+    private static DataInputStream dataInputStream = null;
+    
 	// datainputstream
 	ServerVer2() {
 		Initialize();
@@ -296,4 +302,59 @@ public class ServerVer2 implements Runnable {
 		ServerGUI.printArea();
 	}
 
+	
+	
+	private static void sendFile(String path)
+	        throws Exception
+	    {
+	        int bytes = 0;
+	        // Open the File where he located in your pc
+	        File file = new File(path);
+	        FileInputStream fileInputStream
+	            = new FileInputStream(file);
+	 
+	        // send the File
+	        dataOutputStream.writeLong(file.length());
+	        // break file into chunks
+	        byte[] buffer = new byte[4 * 1024];
+	        while ((bytes = fileInputStream.read(buffer))
+	               != -1) {
+	          // Send the file to Server Socket 
+	          dataOutputStream.write(buffer, 0, bytes);
+	            dataOutputStream.flush();
+	        }
+	        // close the file here
+	        fileInputStream.close();
+	    }
+	    
+	    
+	    
+	    
+	    private static void receiveFile(String fileName)
+	        throws Exception
+	    {
+	        int bytes = 0;
+	        FileOutputStream fileOutputStream
+	            = new FileOutputStream(fileName);
+	 
+	        long size
+	            = dataInputStream.readLong(); // read file size
+	        byte[] buffer = new byte[4 * 1024];
+	        while (size > 0
+	               && (bytes = dataInputStream.read(
+	                       buffer, 0,
+	                       (int)Math.min(buffer.length, size)))
+	                      != -1) {
+	            // write the file using write method
+	            fileOutputStream.write(buffer, 0, bytes);
+	            size -= bytes; // read upto file size
+	        }
+	        
+	        System.out.println("File is Received");
+	        fileOutputStream.close();
+	    }
+	    
+	
+	
+	
 }
