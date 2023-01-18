@@ -342,10 +342,10 @@ public class ServerVer2 implements Runnable {
 	    
 	    
 	    private static void receiveFile(String fileName)
-	    		throws Exception;
+	    		
 	    {
 	        int bytes = 0;
-	        FileOutputStream fileOutputStream;
+	        FileOutputStream fileOutputStream = null;
 			try {
 				fileOutputStream = new FileOutputStream(fileName);
 			} catch (FileNotFoundException e) {
@@ -353,6 +353,7 @@ public class ServerVer2 implements Runnable {
 				e.printStackTrace();
 			}
 	 
+			try {
 	        long size
 	            = dataInputStream.readLong(); // read file size
 	        byte[] buffer = new byte[4 * 1024];
@@ -368,6 +369,9 @@ public class ServerVer2 implements Runnable {
 	        
 	        System.out.println("File is Received");
 	        fileOutputStream.close();
+			}catch(IOException e) {
+				e.printStackTrace();
+			}
 	    }
 	    
 	
