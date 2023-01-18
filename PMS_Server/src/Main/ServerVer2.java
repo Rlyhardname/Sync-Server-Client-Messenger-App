@@ -47,8 +47,7 @@ public class ServerVer2 implements Runnable {
 
 			System.out.println("ClientConnected");
 			authentication();
-
-			// syncClientWithServerDB();
+		//	syncClientWithServerDB(); // razpishi tqlo za prashtane na batch file s izpusnati saobshteniq
 			handleClient();
 
 		} catch (NullPointerException e1) {
@@ -114,6 +113,16 @@ public class ServerVer2 implements Runnable {
 			}
 		}
 
+	}
+
+	private void syncClientWithServerDB() {
+		DbServer db = new DbServer();
+		String[] batch = db.getUnsendMessages(username);
+		if (ServerSettings.onlineUsers.get(username) != null) {
+			// PRATI PO FAIL SYSTEMATA KATO TEKSTOV FILE
+			// i poiskai potvurjdenie 4e faila e praten uspeshno, ako e praten uspeshno promeni vsi4ki stari logouti na 
+			// na pole user_log logout_time na 0
+		}
 	}
 
 	private boolean loginUserExists(DbServer db) {
@@ -221,7 +230,8 @@ public class ServerVer2 implements Runnable {
 							// db.StoreFile(userMsg[0],userMsg[1],userMsg[2], file); // dobavi i faila koito
 							// shte se slaga v bazata kato parametur
 
-						} if (userMsg[3].equals("TextMessage")) {
+						}
+						if (userMsg[3].equals("TextMessage")) {
 							db.storeMessage(userMsg[1], userMsg[0], Integer.parseInt(userMsg[2]));
 							new Thread(new Runnable() {
 

@@ -545,6 +545,34 @@ public class DbServer {
 		
 		
 	}
+
+	public String[] getUnsendMessages(String username) {
+		// TODO Auto-generated method stub
+		String sql = "SELECT message,username,room_id "+
+		"FROM message_data "+
+		"(username) "+
+		"VALUES(?) "+
+	//	"WHERE time_log " 
+		ArrayList<String> messages = new ArrayList<String>();
+		try {
+			prep = conn.prepareStatement(sql);
+			prep.setString(2, username);
+			ResultSet rs = prep.executeQuery();
+			while(rs.next()) {
+			String message = rs.getString(1);
+			String user = rs.getString(2);
+			int room = rs.getInt(3);
+			messages.add(message+","+user+","+room);
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String [] batch = messages.toArray(new String[0]);
+		return batch;
+		
+	}
 	
 	
 }
