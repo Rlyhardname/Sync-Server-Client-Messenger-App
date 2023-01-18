@@ -79,7 +79,7 @@ public class ClientLogic extends Thread {
 				if(splitMessage[0].equals("ReceiveFile"))
 				{
 					
-					receiveFile("E:\\New folder\\NewFile1.txt");
+					receiveFile("E:\\New folder\\2.jpg");
 					
 				}
 				if (msgIN == null) {

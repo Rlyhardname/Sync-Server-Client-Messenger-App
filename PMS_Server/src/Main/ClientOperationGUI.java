@@ -109,7 +109,7 @@ public class ClientOperationGUI {
 		btnSendFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				client.getOutput().println("Zdr"+","+client.getUsername()+","+ 1+"," + "sendFile");
-				client.sendFile("E:\\TestFile1.txt");
+				client.sendFile("E:\\Triangle.jpg");
 				System.out.print("Sending File...");
 				
 			}
