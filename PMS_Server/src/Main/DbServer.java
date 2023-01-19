@@ -330,10 +330,10 @@ public class DbServer {
 		return false;
 	}
 
-	public void addChatRoom() {
+	public void addChatRoom(String room) {
 		String sql = "INSERT INTO chat_room " + "(room_name) " + "VALUES(?)";
 
-		String room = "Account1AndAccount2Room";
+
 		try {
 			prep = conn.prepareStatement(sql);
 			prep.setString(1, room);
@@ -345,11 +345,10 @@ public class DbServer {
 		}
 	}
 
-	public void fillRoom() {
+	public void fillRoom(int room, String user) {
 		String sql = "INSERT INTO chat_room_warehouse " + "VALUES(?,?)";
 
-		int room = 1;
-		String user = "account4";
+
 		try {
 			prep = conn.prepareStatement(sql);
 			prep.setInt(1, room);
@@ -538,6 +537,17 @@ public class DbServer {
 		String [] batch = messages.toArray(new String[0]);
 		return batch;
 		
+	}
+	
+	public void deleteEntry() {
+		String sql = "DELETE FROM chat_room_warehouse "+
+				"WHERE chat_room_id=1";
+		try {
+			stmt.executeUpdate(sql);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

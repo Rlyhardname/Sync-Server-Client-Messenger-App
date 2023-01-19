@@ -3,6 +3,7 @@ package Main;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.util.ConcurrentModificationException;
 
 import javax.swing.JButton;
@@ -15,23 +16,42 @@ public class ServerGUI {
 	JFrame frame;
 	JButton newClientLogin;
 	static JTextArea textArea;
+	private static ServerGUI serverGUIstatic;
 	ServerSettings settings;
+	
+
+	public static ServerGUI getThisFrame() {
+		return serverGUIstatic;
+	}
+
+	public static void setThisFrame(ServerGUI window) {
+		ServerGUI.serverGUIstatic = window;
+	}
 
 	/**
 	 * Launch the application.
 	 */
 	public static void startGUI() {
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					ServerGUI window = new ServerGUI();
 					window.frame.setVisible(true);
+					setThisFrame(window);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+		
 	}
+	
+	 void kill() {
+		frame.dispose();
+	}
+	
+
 
 	/**
 	 * Create the application.
@@ -144,5 +164,6 @@ public class ServerGUI {
 		}
 
 	}
+
 
 }
