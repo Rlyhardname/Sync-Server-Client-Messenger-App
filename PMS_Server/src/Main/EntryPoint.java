@@ -24,7 +24,7 @@ public class EntryPoint {
 			ClientLoginGUI.startGUImany(xStart,j);
 			xStart+=450;
 		}
-		
+		//
 		
 //		
 		//Test Eror;
