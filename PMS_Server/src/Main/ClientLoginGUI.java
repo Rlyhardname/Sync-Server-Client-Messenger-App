@@ -56,17 +56,6 @@ public class ClientLoginGUI {
 
 	}
 
-	public JTextField getUsername() {
-		return username;
-	}
-
-	public void setUsername(JTextField username) {
-		this.username = username;
-	}
-
-	public static void startManyGUI(int NumOfClients, int xAxis, String... clientNames) {
-
-	}
 
 	/**
 	 * Create the application.
@@ -83,7 +72,7 @@ public class ClientLoginGUI {
 		initialize(xAxis);
 		client = new ClientLogic();
 		client.start();
-		this.username.setText(clientNames);
+		username.setText(clientNames);
 
 		Thread user = new Thread(new Runnable() {
 
@@ -95,6 +84,7 @@ public class ClientLoginGUI {
 
 		});
 		user.start();
+
 
 	}
 
@@ -155,7 +145,8 @@ public class ClientLoginGUI {
 
 		});
 		tr2.start();
-
+		
+	
 	}
 
 	private Object selectionButtonPressed() {
@@ -178,6 +169,29 @@ public class ClientLoginGUI {
 			frame.dispose();
 		}
 		return null;
+	}
+	
+	private void startManyUsers(String user1, String pass1) {
+
+		String user = user1;
+		String pass = pass1;
+		client.setUsername(user);
+		client.setPassword(pass);
+		
+
+		try {
+			if (client.accessServer("login")) {
+				if (!client.isStarted()) {
+					client.runHandleServer();
+				}
+				System.out.println("Client: " + client.getUsername() + " has logged in!");
+				ClientOperationGUI.startClientGUI(client);
+				frame.dispose();
+			}
+		} catch (RuntimeException e) {
+			frame.dispose();
+		}
+
 	}
 
 	private Object selectionButtonPressed1() {
@@ -202,26 +216,14 @@ public class ClientLoginGUI {
 		return null;
 	}
 
-	private synchronized void startManyUsers(String user1, String pass1) {
 
-		String user = user1;
-		String pass = pass1;
-		client.setUsername(user);
-		client.setPassword(pass);
-
-		System.out.println(client.getUsername());
-		try {
-			if (client.accessServer("signup")) {
-				System.out.println("Succesful registration of:" + client.getUsername() + "," + frame.getTitle());
-				if (!client.isStarted()) {
-					client.runHandleServer();
-				}
-				frame.dispose();
-			}
-		} catch (RuntimeException e) {
-			frame.dispose();
-		}
-
+	public JTextField getUsername() {
+		return username;
 	}
+
+	public void setUsername(JTextField username) {
+		this.username = username;
+	}
+
 
 }

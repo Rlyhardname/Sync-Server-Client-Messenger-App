@@ -21,7 +21,7 @@ public class ClientLogic extends Thread {
 
 	private InetAddress host;
 	private final int PORT = 1337;
-	private String username;
+	String username;
 	private String password;
 	private BufferedReader input;
 	private PrintWriter output;

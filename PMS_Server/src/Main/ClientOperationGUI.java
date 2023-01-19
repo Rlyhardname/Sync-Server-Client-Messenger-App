@@ -72,6 +72,10 @@ public class ClientOperationGUI {
 		initialize();
 		this.client = client1;
 		client.setGui(this);
+		String concatThis = Character.toString(this.client.username.charAt(7));
+		System.out.println(concatThis);
+		String title = "account"+concatThis+"(room ID: "+concatThis+")";
+		frame.setTitle(title);
 
 	}
 
@@ -192,6 +196,7 @@ public class ClientOperationGUI {
 
 		});
 		tr.start();
+	
 
 		frame.pack();
 	}
