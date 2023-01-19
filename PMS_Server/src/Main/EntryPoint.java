@@ -21,7 +21,7 @@ public class EntryPoint {
 		ServerGUI.startGUI();
 		int xStart = 450;
 		for (int j = 0; j < 4; j++) {
-			ClientLoginGUI.startGUI(xStart,j);
+			ClientLoginGUI.startGUImany(xStart,j);
 			xStart+=450;
 		}
 		

@@ -23,6 +23,7 @@ public class DbServer {
 	static Statement stmt;
 	PreparedStatement prep;
 	String[] args;
+	Enum task;
 
 	DbServer() {
 		conn = null;
@@ -62,13 +63,6 @@ public class DbServer {
 
 	}
 
-	private void doSomething() {
-
-		if (task.ordinal() == 2) {
-			// some other code until we do all cases
-		}
-
-	}
 
 	// returns resultSet with all user_ID's that equal the args[0]
 	public ArrayList<String> selectRoomUsers() throws SQLException {

@@ -22,20 +22,22 @@ public class ClientLoginGUI {
 	/**
 	 * Launch the application.
 	 */
-	public static void startGUI(int xAxis, int clock) {
-//		if (numClients == 1) {
-//
-//			EventQueue.invokeLater(new Runnable() {
-//				public void run() {
-//					try {
-//						ClientLoginGUI window = new ClientLoginGUI();
-//						ServerGUI.createNewConnection();
-//						window.frame.setVisible(true);
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//					}
-//				}
-//			});
+	public static void startGUI() {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ClientLoginGUI window = new ClientLoginGUI();
+					ServerGUI.createNewConnection();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+	}
+
+	public static void startGUImany(int xAxis, int clock) {
 
 		final String[] accounts = { "account1", "account2", "account3", "account4" };
 		final int z = clock;
@@ -43,7 +45,7 @@ public class ClientLoginGUI {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ClientLoginGUI window = new ClientLoginGUI(x,accounts[z]);
+					ClientLoginGUI window = new ClientLoginGUI(x, accounts[z]);
 					ServerGUI.createNewConnection();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
@@ -200,13 +202,14 @@ public class ClientLoginGUI {
 		return null;
 	}
 
-	private void startManyUsers(String user1, String pass1) {
+	private synchronized void startManyUsers(String user1, String pass1) {
 
 		String user = user1;
 		String pass = pass1;
 		client.setUsername(user);
 		client.setPassword(pass);
 
+		System.out.println(client.getUsername());
 		try {
 			if (client.accessServer("signup")) {
 				System.out.println("Succesful registration of:" + client.getUsername() + "," + frame.getTitle());
