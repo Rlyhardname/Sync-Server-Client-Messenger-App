@@ -17,6 +17,12 @@ import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.GridLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import javax.swing.BoxLayout;
+import javax.swing.SwingConstants;
 
 public class ClientOperationGUI {
 	private ClientLogic client;
@@ -116,25 +122,32 @@ public class ClientOperationGUI {
 		});
 		panel.add(btnSendFile);
 
+		ComponentListenerCustom listen = new ComponentListenerCustom(this);
 		friendList = new JPanel();
-		friendOne = new JLabel("account1");
-		friendTwo = new JLabel("account2");
-		friendThree = new JLabel("account3");
-		friendFour = new JLabel("account4");
-		friendFive = new JLabel("account5");
+		friendList.setLayout(new GridLayout(5, 1, 0, 0));
+		friendOne = new JLabel("Friend 1: room1 - Acc 1-2   ");
+		friendOne.setHorizontalAlignment(SwingConstants.CENTER);
 		friendList.add(friendOne);
+		friendOne.addMouseListener(listen);
+		friendTwo = new JLabel("Friend 2: room2 - Acc 1-3   ");
+		friendTwo.setHorizontalAlignment(SwingConstants.CENTER);
 		friendList.add(friendTwo);
+		friendTwo.addMouseListener(listen);
+		friendThree = new JLabel("Friend 3: room3 - Acc 1-4   ");
+		friendThree.setHorizontalAlignment(SwingConstants.CENTER);
 		friendList.add(friendThree);
+		friendThree.addMouseListener(listen);
+		friendFour = new JLabel("Group chat 1: room4 - Acc 1-2-3");
+		friendFour.setHorizontalAlignment(SwingConstants.CENTER);
 		friendList.add(friendFour);
+		friendFour.addMouseListener(listen);
+		friendFive = new JLabel("Group chat 2: room5 Acc 1-2-4-5");
+		friendFive.setHorizontalAlignment(SwingConstants.CENTER);
 		friendList.add(friendFive);
+		friendFive.addMouseListener(listen);
 		frame.getContentPane().add(friendList, BorderLayout.EAST);
 
-		ComponentListenerCustom listen = new ComponentListenerCustom(this);
-		friendOne.addMouseListener(listen);
-		friendTwo.addMouseListener(listen);
-		friendThree.addMouseListener(listen);
-		friendFour.addMouseListener(listen);
-		friendFive.addMouseListener(listen);
+		
 		Thread tr1 = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -178,7 +191,8 @@ public class ClientOperationGUI {
 
 		});
 		tr.start();
-
+		
+		frame.pack();
 	}
 
 	private Object selectionButtonPressed1() {

@@ -23,7 +23,6 @@ public class ServerVer2 implements Runnable {
 	private DataOutputStream outputFile;
 	private DataInputStream inputFile;
 
-	// datainputstream
 	ServerVer2() {
 		Initialize();
 	}
@@ -38,9 +37,7 @@ public class ServerVer2 implements Runnable {
 			link = ServerSettings.serverSocket.accept();
 			output = new PrintWriter(link.getOutputStream(), true);
 			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
-			outputFile = new DataOutputStream(link.getOutputStream());
 			inputFile = new DataInputStream(link.getInputStream());
-			// datainputstream
 		} catch (IOException e1) {
 			try {
 			} catch (NullPointerException e) {
@@ -320,75 +317,23 @@ public class ServerVer2 implements Runnable {
 
 	{
 		int bytes = 0;
-//	        // Open the File where he located in your pc
-//	        File file = new File(path);
-//	        FileInputStream fileInputStream = null;
-//			try {
-//				fileInputStream = new FileInputStream(file);
-//			} catch (FileNotFoundException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
 
-		// send the File
 		try {
 			outputFile = new DataOutputStream(onlineUser.getOutputStream());
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
 		try {
-			// outputFile.writeLong(inputFile.length());
-			// break file into chunks
 			byte[] buffer = new byte[4 * 1024];
 			while ((bytes = inputFile.read(buffer)) != -1) {
-				// Send the file to Server Socket
 				outputFile.write(buffer, 0, bytes);
 				outputFile.flush();
 			}
-			// close the file here
 			inputFile.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private void receiveFile(String fileName)
-
-	{
-//	        int bytes = 0;
-//	        FileOutputStream fileOutputStream = null;
-//			try {
-//				fileOutputStream = new FileOutputStream(fileName);
-//			} catch (FileNotFoundException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-
-//			try {
-//	        long size
-//	            = inputFile.readLong(); // read file size
-//	        byte[] buffer = new byte[4 * 1024];
-//	        while (size > 0
-//	               && (bytes = inputFile.read(
-//	                       buffer, 0,
-//	                       (int)Math.min(buffer.length, size)))
-//	                      != -1) {
-//	            // write the file using write method
-//	            fileOutputStream.write(buffer, 0, bytes);
-//	            size -= bytes; // read upto file size
-//	        }
-//	        
-//	        System.out.println("File is Received");
-//	        fileOutputStream.close();
-//			}catch(IOException e) {
-//				e.printStackTrace();
-//			}
-	}
-
-	private void resendFile2(String fileName) {
-
 	}
 
 }
