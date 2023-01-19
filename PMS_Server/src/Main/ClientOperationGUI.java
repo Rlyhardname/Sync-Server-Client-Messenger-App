@@ -7,6 +7,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -23,6 +24,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.BoxLayout;
 import javax.swing.SwingConstants;
+import javax.swing.filechooser.FileSystemView;
 
 public class ClientOperationGUI {
 	private ClientLogic client;
@@ -110,16 +112,8 @@ public class ClientOperationGUI {
 		panel.add(send);
 		panel.add(newClient);
 		frame.getContentPane().add(panel, BorderLayout.SOUTH);
-		
+
 		btnSendFile = new JButton("Send File");
-		btnSendFile.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				client.getOutput().println("Zdr"+","+client.getUsername()+","+ 1+"," + "sendFile");
-				client.sendFile("E:\\Triangle.jpg");
-				System.out.print("Sending File...");
-				
-			}
-		});
 		panel.add(btnSendFile);
 
 		ComponentListenerCustom listen = new ComponentListenerCustom(this);
@@ -148,6 +142,13 @@ public class ClientOperationGUI {
 		frame.getContentPane().add(friendList, BorderLayout.EAST);
 
 		
+		btnSendFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String path = client.pickFile();
+				sendFile(path);
+			}
+		});
+		
 		Thread tr1 = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -173,7 +174,7 @@ public class ClientOperationGUI {
 			public void run() {
 				frame.addWindowListener(new java.awt.event.WindowAdapter() {
 					public void windowClosing(WindowEvent winEvt) {
-						client.sendMessage("ClosingClient" +"," + client.getUsername());
+						client.sendMessage("ClosingClient" + "," + client.getUsername());
 						client.getOutput().close();
 						try {
 							client.getInput().close();
@@ -191,19 +192,19 @@ public class ClientOperationGUI {
 
 		});
 		tr.start();
-		
+
 		frame.pack();
 	}
 
 	private Object selectionButtonPressed1() {
-		ClientLoginGUI.startGUI();
+		ClientLoginGUI.startGUI(1,2500);
 		return null;
 	}
 
 	private Object selectionButtonPressed() {
 		String title = frame.getTitle();
-		int room = Character.getNumericValue(title.charAt(title.length()-2));
-		String msg = textField.getText().toString() + "," + client.getUsername() + "," + room + ","+ "TextMessage";
+		int room = Character.getNumericValue(title.charAt(title.length() - 2));
+		String msg = textField.getText().toString() + "," + client.getUsername() + "," + room + "," + "TextMessage";
 		client.sendMessage(msg);
 		textField.setText("");
 
@@ -213,9 +214,10 @@ public class ClientOperationGUI {
 	public void concattArea(String msg) {
 		textArea.append((msg + "\n"));
 	}
-	
-	public void sendFile() {
-		// logika za prashtane
-		// message = "sendFile,разширение,
+
+	public void sendFile(String path) {
+		client.getOutput().println("Zdr" + "," + client.getUsername() + "," + 1 + "," + "sendFile");
+		client.sendFile(path);
 	}
+
 }

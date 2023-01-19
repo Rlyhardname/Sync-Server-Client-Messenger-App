@@ -39,13 +39,10 @@ public class ServerGUI {
 	public ServerGUI() {
 		initialize();
 		settings = new ServerSettings();
-		ServerVer2 trash = new ServerVer2(this);
-		Thread trash1 = new Thread(trash);
-		trash1.start();
+		ServerVer2 serverV2 = new ServerVer2(this);
+		Thread serverV2Thread = new Thread(serverV2);
+		serverV2Thread.start();
 		createNewConnection();
-//		server2 = new ServerVer2(this);
-//		Thread serverTwoThread = new Thread(server2);
-//		serverTwoThread.start();
 
 	}
 
@@ -74,24 +71,24 @@ public class ServerGUI {
 			@Override
 			public void run() {
 				print.addActionListener(e -> selectionButtonPressed());
-				
+
 			}
-			
+
 		});
-		
+
 		Thread openNewClientWindow = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 				newClientLogin.addActionListener(e -> selectionButtonPressed1());
-				
+
 			}
-			
+
 		});
-		
+
 		printThread.start();
 		openNewClientWindow.start();
-		
+
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
@@ -116,14 +113,14 @@ public class ServerGUI {
 	}
 
 	private Object selectionButtonPressed1() {
-		ClientLoginGUI.startGUI();
+		ClientLoginGUI.startGUI(1,2500);
 		return null;
 	}
 
 	static void printArea() {
-		System.out.println("printAreaMethod");
 		StringBuffer concat = new StringBuffer();
 		try {
+
 			if (!ServerSettings.onlineUsers.isEmpty()) {
 				System.out.println("Printing Online Users");
 				ServerSettings.onlineUsers.forEach((key, value) -> concat
@@ -131,7 +128,15 @@ public class ServerGUI {
 
 			}
 
-		} catch (ConcurrentModificationException | NullPointerException e) {
+		} catch (ConcurrentModificationException e) {
+			if (concat.equals("") || concat.length() == 0) {
+				textArea.setText("Бурканът преля... Обади се на техника!");
+			}
+			System.err.println("Всички спят...");
+		} catch (NullPointerException e1) {
+			if (concat.equals("") || concat.length() == 0) {
+				textArea.setText("Всички спят...");
+			}
 			System.err.println("Всички спят...");
 		}
 		if (!concat.equals("")) {

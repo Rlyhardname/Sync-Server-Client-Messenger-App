@@ -22,7 +22,6 @@ public class DbServer {
 	Connection conn;
 	static Statement stmt;
 	PreparedStatement prep;
-	Enum task;
 	String[] args;
 
 	DbServer() {
@@ -59,7 +58,7 @@ public class DbServer {
 		} catch (SQLException se) {
 			se.printStackTrace();
 		}
-		// System.out.println("Query has been executed and connection has been closed");
+		 System.out.println("Query has been executed and connection has been closed");
 
 	}
 
@@ -186,7 +185,7 @@ public class DbServer {
 		try {
 			prep = conn.prepareStatement(sql);
 			prep.setString(1, username);
-			rs = prep.executeQuery();// prep.getResultSet();
+			rs = prep.executeQuery();
 			if (!(rs.isBeforeFirst())) {
 
 				return false;
@@ -246,9 +245,6 @@ public class DbServer {
 		String sql = "CREATE TABLE user_log" + "(username VARCHAR(25) NOT NULL," + "login_time datetime DEFAULT NULL,"
 				+ "logout_time datetime DEFAULT NULL," + "allMessagesSent TINYINT DEFAULT 1,"
 				+ "FOREIGN KEY (username) REFERENCES user(username))";
-//				+ "  KEY `user_log_username_fk_idx` (`username`),\n"
-//				+ "  CONSTRAINT `user_log_username_fk` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE CASCADE ON UPDATE CASCADE\n"
-//				+ ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
 		try {
 			if (stmt.execute(sql)) {
 				return true;
@@ -393,8 +389,6 @@ public class DbServer {
 		if (inputUser.equals(user)) {
 
 			String sql = "INSERT INTO Message_data " + "(chat_room_id,username,message_text) " + "VALUES(?,?,?)";
-//				+ "WHERE chat_room_warehouse.room_id=? AND chat_room_warehouse.username=?";
-			// + "SELECT chat_room_id, username " + "FROM chat_room_warehouse "
 			try {
 				prep = conn.prepareStatement(sql);
 				prep.setInt(1, room);
@@ -529,8 +523,8 @@ public class DbServer {
 		String sql = "SELECT message,username,room_id "+
 		"FROM message_data "+
 		"(username) "+
-		"VALUES(?) "+
-	//	"WHERE time_log " 
+		"VALUES(?) ";
+	//	"WHERE time_log " ;
 		ArrayList<String> messages = new ArrayList<String>();
 		try {
 			prep = conn.prepareStatement(sql);

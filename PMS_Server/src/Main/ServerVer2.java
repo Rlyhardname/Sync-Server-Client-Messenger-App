@@ -194,7 +194,7 @@ public class ServerVer2 implements Runnable {
 			dataType = "password";
 		}
 		if (dataType.length() > i) {
-			String msg = "LenghtError" + "," + dataType + "," + "Is too long!";
+			String msg = "TooManyCharacters" + "," + dataType + "," + "Is too long!";
 			sendMessage(msg);
 			return false;
 		}
@@ -229,11 +229,7 @@ public class ServerVer2 implements Runnable {
 							break;
 						DbServer db = new DbServer();
 						if (userMsg[3].equals("sendFile")) {
-							// receiveFile("NewFile2.txt");
-							Socket onlineUser = ServerSettings.onlineUsers.get("account2");
-							PrintWriter resend = new PrintWriter(onlineUser.getOutputStream(), true);
-							resend.println("ReceiveFile" + "," + "Spi mi sa");
-							sendFile(onlineUser);
+							reSendFile();
 
 							// poqsneniq
 							// userMsg[0] - message // userMsg[1] - username // userMsg[2] - Chat_room_ID //
@@ -283,11 +279,7 @@ public class ServerVer2 implements Runnable {
 
 				}
 
-//				Socket friend = ServerSettings.onlineUsers.get(userMsg[1]);
-//				onlineUserOutput = new PrintWriter(friend.getOutputStream(), true);
-//				onlineUserOutput.println(userMsg[0]);
 			} catch (IOException e) {
-				System.out.println("sopa");
 				e.printStackTrace();
 			} catch (NullPointerException e1) {
 				e1.printStackTrace();
@@ -313,10 +305,19 @@ public class ServerVer2 implements Runnable {
 		ServerGUI.printArea();
 	}
 
-	private void sendFile(Socket onlineUser)
+	private void reSendFile()
 
 	{
 		int bytes = 0;
+		Socket onlineUser = ServerSettings.onlineUsers.get("account2");
+		PrintWriter resend = null;
+		try {
+			resend = new PrintWriter(onlineUser.getOutputStream(), true);
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		resend.println("ReceiveFile" + "," + "Spi mi sa");
 
 		try {
 			outputFile = new DataOutputStream(onlineUser.getOutputStream());

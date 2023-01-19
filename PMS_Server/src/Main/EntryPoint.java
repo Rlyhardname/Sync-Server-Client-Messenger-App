@@ -19,7 +19,13 @@ public class EntryPoint {
 //			System.out.println("yes");
 //		};
 		ServerGUI.startGUI();
-		ClientLoginGUI.startGUI();
+		int xStart = 450;
+		for (int j = 0; j < 4; j++) {
+			ClientLoginGUI.startGUI(xStart,j);
+			xStart+=450;
+		}
+		
+		
 //		
 		//Test Eror;
 		

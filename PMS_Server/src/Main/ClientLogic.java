@@ -12,9 +12,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Scanner;
 
-import javax.swing.JFrame;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 
 public class ClientLogic extends Thread {
 
@@ -29,7 +30,7 @@ public class ClientLogic extends Thread {
 	private ClientLoginGUI login;
 	private boolean started;
 	private DataOutputStream outputFile;
-    private DataInputStream inputFile;
+	private DataInputStream inputFile;
 
 	ClientLogic() {
 		{
@@ -40,7 +41,7 @@ public class ClientLogic extends Thread {
 				input = new BufferedReader(new InputStreamReader(link.getInputStream()));
 				output = new PrintWriter(link.getOutputStream(), true);
 				outputFile = new DataOutputStream(link.getOutputStream());
-				inputFile =  new DataInputStream(link.getInputStream());
+				inputFile = new DataInputStream(link.getInputStream());
 			} catch (IOException e) {
 				System.out.println("Host ID not found");
 			}
@@ -75,16 +76,17 @@ public class ClientLogic extends Thread {
 			try {
 
 				String msgIN = input.readLine();
-			String [] splitMessage = msgIN.split(",") ;
-				if(splitMessage[0].equals("ReceiveFile"))
-				{
-					
-					receiveFile("E:\\New folder\\2.jpg");
-					
-				}
+
 				if (msgIN == null) {
 					break;
 				}
+				String[] splitMessage = msgIN.split(",");
+				if (splitMessage[0].equals("ReceiveFile")) {
+
+					String path = saveDirectory();
+					receiveFile(path);
+				}
+
 				clientGUI.concattArea(msgIN);
 			} catch (IOException e) {
 				break;
@@ -175,78 +177,107 @@ public class ClientLogic extends Thread {
 		}
 
 	}
-	
-	
+
 	public void sendFile(String path)
-    
-    {
-        int bytes = 0;
-        // Open the File where he located in your pc
-        File file = new File(path);
-        FileInputStream fileInputStream = null;
+
+	{
+		int bytes = 0;
+		// Open the File where he located in your pc
+		File file = new File(path);
+		FileInputStream fileInputStream = null;
 		try {
 			fileInputStream = new FileInputStream(file);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
- 
-        // send the File
+
+		// send the File
 		try {
 			outputFile.writeLong(file.length());
-        // break file into chunks
-        byte[] buffer = new byte[4 * 1024];
-        while ((bytes = fileInputStream.read(buffer))
-               != -1) {
-          // Send the file to Server Socket 
-        	outputFile.write(buffer, 0, bytes);
-        	outputFile.flush();
-        }
-        // close the file here
-        fileInputStream.close();
-		}
-		catch(IOException e) {
+			// break file into chunks
+			byte[] buffer = new byte[4 * 1024];
+			while ((bytes = fileInputStream.read(buffer)) != -1) {
+				// Send the file to Server Socket
+				outputFile.write(buffer, 0, bytes);
+				outputFile.flush();
+			}
+			// close the file here
+			fileInputStream.close();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    }
-    
-    
-    
-    
-    private void receiveFile(String fileName)
-    		
-    {
-        int bytes = 0;
-        FileOutputStream fileOutputStream = null;
+	}
+
+	private void receiveFile(String fileName)
+
+	{
+		int bytes = 0;
+		FileOutputStream fileOutputStream = null;
 		try {
 			fileOutputStream = new FileOutputStream(fileName);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
- 
+
 		try {
-        long size
-            = inputFile.readLong(); // read file size
-        byte[] buffer = new byte[4 * 1024];
-        while (size > 0
-               && (bytes = inputFile.read(
-                       buffer, 0,
-                       (int)Math.min(buffer.length, size)))
-                      != -1) {
-            // write the file using write method
-            fileOutputStream.write(buffer, 0, bytes);
-            size -= bytes; // read upto file size
-        }
-        
-        System.out.println("File is Received");
-        fileOutputStream.close();
-		}catch(IOException e) {
+			long size = inputFile.readLong(); // read file size
+			byte[] buffer = new byte[4 * 1024];
+			while (size > 0 && (bytes = inputFile.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
+				// write the file using write method
+				fileOutputStream.write(buffer, 0, bytes);
+				size -= bytes; // read upto file size
+			}
+
+			System.out.println("File is Received");
+			fileOutputStream.close();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    }
-	
-	
+	}
+
+	public String pickFile() {
+		JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		
+		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("jpg","jpg"));
+		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("gif","gif"));
+		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("txt","txt"));
+		fileChooser.setAcceptAllFileFilterUsed(true);
+		
+		File file = fileChooser.getSelectedFile();
+		System.out.println(file.getName());
+		
+		String path = "";
+		int r = fileChooser.showSaveDialog(null);
+		if (r == JFileChooser.APPROVE_OPTION) {
+			path = (fileChooser.getSelectedFile().getAbsolutePath());
+		}
+
+		return path;
+	}
+
+	public String saveDirectory() {
+		JFileChooser fileChooserj = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+		fileChooserj.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+		File file = fileChooserj.getSelectedFile();
+		System.out.println(file.getName());
+		
+		fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("jpg","jpg"));
+		fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("gif","gif"));
+		fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("txt","txt"));
+		fileChooserj.setAcceptAllFileFilterUsed(true);
+
+		String path = "";
+		int r = fileChooserj.showSaveDialog(null);
+		if (r == JFileChooser.APPROVE_OPTION) {
+			path = (fileChooserj.getSelectedFile().getAbsolutePath());
+		}
+
+		return path;
+	}
 
 	public void sendMessage(String msg) {
 

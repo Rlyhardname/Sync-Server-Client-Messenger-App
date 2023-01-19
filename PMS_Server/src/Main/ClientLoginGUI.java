@@ -5,8 +5,10 @@ import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.WindowEvent;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileSystemView;
 
 public class ClientLoginGUI {
 
@@ -20,11 +22,28 @@ public class ClientLoginGUI {
 	/**
 	 * Launch the application.
 	 */
-	public static void startGUI() {
+	public static void startGUI(int xAxis, int clock) {
+//		if (numClients == 1) {
+//
+//			EventQueue.invokeLater(new Runnable() {
+//				public void run() {
+//					try {
+//						ClientLoginGUI window = new ClientLoginGUI();
+//						ServerGUI.createNewConnection();
+//						window.frame.setVisible(true);
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//				}
+//			});
+
+		final String[] accounts = { "account1", "account2", "account3", "account4" };
+		final int z = clock;
+		final int x = xAxis;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ClientLoginGUI window = new ClientLoginGUI();
+					ClientLoginGUI window = new ClientLoginGUI(x,accounts[z]);
 					ServerGUI.createNewConnection();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
@@ -32,24 +51,59 @@ public class ClientLoginGUI {
 				}
 			}
 		});
+
+	}
+
+	public JTextField getUsername() {
+		return username;
+	}
+
+	public void setUsername(JTextField username) {
+		this.username = username;
+	}
+
+	public static void startManyGUI(int NumOfClients, int xAxis, String... clientNames) {
+
 	}
 
 	/**
 	 * Create the application.
 	 */
 	public ClientLoginGUI() {
-		initialize();
+		int i = 0;
+		initialize(0);
 		client = new ClientLogic();
 		client.start();
 
 	}
 
+	public ClientLoginGUI(int xAxis, String clientNames) {
+		initialize(xAxis);
+		client = new ClientLogic();
+		client.start();
+		this.username.setText(clientNames);
+
+		Thread user = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				startManyUsers(clientNames, "a");
+			}
+
+		});
+		user.start();
+
+	}
+
 	/**
 	 * Initialize the contents of the frame.
+	 * 
+	 * @param xAxis
 	 */
-	private void initialize() {
+	private void initialize(int xAxis) {
 		frame = new JFrame();
-		frame.setBounds(1200, 100, 450, 300);
+		frame.setBounds((1800 - xAxis), 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(new FlowLayout());
 		username = new JTextField();
@@ -119,7 +173,6 @@ public class ClientLoginGUI {
 				frame.dispose();
 			}
 		} catch (RuntimeException e) {
-			System.out.println("NIDEI BEEEE");
 			frame.dispose();
 		}
 		return null;
@@ -134,18 +187,38 @@ public class ClientLoginGUI {
 
 		try {
 			if (client.accessServer("signup")) {
-				System.out.println("Succesful registration of:" + client.getUsername() +"," + frame.getTitle());
+				System.out.println("Succesful registration of:" + client.getUsername() + "," + frame.getTitle());
 				if (!client.isStarted()) {
 					client.runHandleServer();
 				}
 				frame.dispose();
 			}
 		} catch (RuntimeException e) {
-			System.out.println("NIDEI BEEEE");
 			frame.dispose();
 		}
 
 		return null;
+	}
+
+	private void startManyUsers(String user1, String pass1) {
+
+		String user = user1;
+		String pass = pass1;
+		client.setUsername(user);
+		client.setPassword(pass);
+
+		try {
+			if (client.accessServer("signup")) {
+				System.out.println("Succesful registration of:" + client.getUsername() + "," + frame.getTitle());
+				if (!client.isStarted()) {
+					client.runHandleServer();
+				}
+				frame.dispose();
+			}
+		} catch (RuntimeException e) {
+			frame.dispose();
+		}
+
 	}
 
 }
