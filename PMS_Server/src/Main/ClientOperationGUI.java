@@ -15,6 +15,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+
 import javax.swing.JLabel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -43,6 +45,7 @@ public class ClientOperationGUI {
 	JLabel friendFour;
 	JLabel friendFive;
 	private JButton btnSendFile;
+	private int room;
 	// pICK FILE BUTTON
 
 	/**
@@ -72,10 +75,7 @@ public class ClientOperationGUI {
 		initialize();
 		this.client = client1;
 		client.setGui(this);
-		String concatThis = Character.toString(this.client.username.charAt(7));
-		System.out.println(concatThis);
-		String title = "account"+concatThis+"(room ID: "+concatThis+")";
-		frame.setTitle(title);
+		frame.setTitle(client.getUsername());
 
 	}
 
@@ -99,6 +99,7 @@ public class ClientOperationGUI {
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout());
 		frame.setTitle("frame2");
+		room = 0;
 
 		header = new JPanel();
 		frame.getContentPane().add(header, BorderLayout.NORTH);
@@ -123,23 +124,23 @@ public class ClientOperationGUI {
 		ComponentListenerCustom listen = new ComponentListenerCustom(this);
 		friendList = new JPanel();
 		friendList.setLayout(new GridLayout(5, 1, 0, 0));
-		friendOne = new JLabel("Friend 1: room1 - Acc 1-2   ");
+		friendOne = new JLabel("1 ROOM         ");
 		friendOne.setHorizontalAlignment(SwingConstants.CENTER);
 		friendList.add(friendOne);
 		friendOne.addMouseListener(listen);
-		friendTwo = new JLabel("Friend 2: room2 - Acc 1-3   ");
+		friendTwo = new JLabel("2 ROOM         ");
 		friendTwo.setHorizontalAlignment(SwingConstants.CENTER);
 		friendList.add(friendTwo);
 		friendTwo.addMouseListener(listen);
-		friendThree = new JLabel("Friend 3: room3 - Acc 1-4   ");
+		friendThree = new JLabel("3 ROOM         ");
 		friendThree.setHorizontalAlignment(SwingConstants.CENTER);
 		friendList.add(friendThree);
 		friendThree.addMouseListener(listen);
-		friendFour = new JLabel("Group chat 1: room4 - Acc 1-2-3");
+		friendFour = new JLabel("4 ROOM         ");
 		friendFour.setHorizontalAlignment(SwingConstants.CENTER);
 		friendList.add(friendFour);
 		friendFour.addMouseListener(listen);
-		friendFive = new JLabel("Group chat 2: room5 Acc 1-2-4-5");
+		friendFive = new JLabel("5 ROOM         ");
 		friendFive.setHorizontalAlignment(SwingConstants.CENTER);
 		friendList.add(friendFive);
 		friendFive.addMouseListener(listen);
@@ -201,19 +202,30 @@ public class ClientOperationGUI {
 		frame.pack();
 	}
 
+	public int getRoom() {
+		return room;
+	}
+
+	public void setRoom(int room) {
+		this.room = room;
+	}
+
 	private Object selectionButtonPressed1() {
 		ClientLoginGUI.startGUI();
 		return null;
 	}
 
 	private Object selectionButtonPressed() {
-		String title = frame.getTitle();
-		int room = Character.getNumericValue(title.charAt(title.length() - 2));
+		System.err.println(room);
 		String msg = textField.getText().toString() + "," + client.getUsername() + "," + room + "," + "TextMessage";
 		client.sendMessage(msg);
 		textField.setText("");
 
 		return null;
+	}
+	
+	public void changeLabelColor(JLabel label, Color color) {
+		label.setForeground(color);
 	}
 
 	public void concattArea(String msg) {

@@ -37,16 +37,14 @@ public class ClientLoginGUI {
 
 	}
 
-	public static void startGUImany(int xAxis, int clock) {
+	public static void startManyGUI(int xAxis, String account) {
 
-		final String[] accounts = { "account1", "account2", "account3", "account4","account5", "account6", "account7", "account8",
-				"account9", "account10", "account11", "account12","account13", "account14", "account15", "account16","account17", "account18", "account19", "account20"};
-		final int z = clock;
+
 		final int x = xAxis;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ClientLoginGUI window = new ClientLoginGUI(x, accounts[z]);
+					ClientLoginGUI window = new ClientLoginGUI(x, account);
 					ServerGUI.createNewConnection();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
@@ -62,8 +60,7 @@ public class ClientLoginGUI {
 	 * Create the application.
 	 */
 	public ClientLoginGUI() {
-		int i = 0;
-		initialize(0);
+		initialize(600);
 		client = new ClientLogic();
 		client.start();
 
@@ -73,7 +70,6 @@ public class ClientLoginGUI {
 		initialize(xAxis);
 		client = new ClientLogic();
 		client.start();
-		username.setText(clientNames);
 
 		Thread user = new Thread(new Runnable() {
 

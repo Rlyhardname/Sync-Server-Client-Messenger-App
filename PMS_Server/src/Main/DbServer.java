@@ -121,7 +121,7 @@ public class DbServer {
 	}
 
 	public boolean isRegisteredUser(String username) {
-		String sql = "SELECT username FROM User " + " where username = ?";
+		String sql = "SELECT username FROM User " + "WHERE username = ?";
 		try {
 			prep = conn.prepareStatement(sql);
 			prep.setString(1, username);
