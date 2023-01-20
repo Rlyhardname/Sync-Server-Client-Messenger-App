@@ -372,14 +372,15 @@ public class DbServer {
 
 			while (rs.next()) {
 				inputUser = rs.getString(1);
+				
 			}
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		System.err.println(inputUser);
+		
 
-		if (inputUser.equals(user)) {
+		if (inputUser.toLowerCase().equals(user)) {
 
 			String sql = "INSERT INTO Message_data " + "(chat_room_id,username,message_text) " + "VALUES(?,?,?)";
 			try {
@@ -442,10 +443,12 @@ public class DbServer {
 		ArrayList<String> list = new ArrayList<String>();
 		try {
 			prep = conn.prepareStatement(sql);
-			prep.setInt(1, 1);
+			prep.setInt(1, i);
 			rs = prep.executeQuery();
 			while (rs.next()) {
-				list.add(rs.getString(1));
+				String user = rs.getString(1).toLowerCase();
+				System.err.println(user);
+				list.add(user);
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

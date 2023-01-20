@@ -243,6 +243,7 @@ public class ServerVer2 implements Runnable {
 						}
 						if (userMsg[3].equals("TextMessage")) {
 							boolean condition = db.storeMessage(userMsg[1], userMsg[0], Integer.parseInt(userMsg[2]));
+							System.err.println(condition);
 							if (condition) {
 
 								new Thread(new Runnable() {
