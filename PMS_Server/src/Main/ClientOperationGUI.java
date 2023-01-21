@@ -44,6 +44,7 @@ public class ClientOperationGUI {
 	JLabel friendThree;
 	JLabel friendFour;
 	JLabel friendFive;
+	JLabel fileDemonstrationRoom;
 	private JButton btnSendFile;
 	private int room;
 	// pICK FILE BUTTON
@@ -143,13 +144,18 @@ public class ClientOperationGUI {
 		friendFive = new JLabel("5 ROOM         ");
 		friendFive.setHorizontalAlignment(SwingConstants.CENTER);
 		friendList.add(friendFive);
-		friendFive.addMouseListener(listen);
+		friendFive.addMouseListener(listen);		
+		fileDemonstrationRoom = new JLabel("987 fileDemonstrationRoom");
+		fileDemonstrationRoom.setHorizontalAlignment(SwingConstants.CENTER);
+		friendList.add(fileDemonstrationRoom);
+		fileDemonstrationRoom.addMouseListener(listen);
 		frame.getContentPane().add(friendList, BorderLayout.EAST);
 
 		
 		btnSendFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String path = client.pickFile();
+				client.setFilePath(path);
 				sendFile(path);
 			}
 		});
@@ -217,7 +223,7 @@ public class ClientOperationGUI {
 
 	private Object selectionButtonPressed() {
 		System.err.println(room);
-		String msg = textField.getText().toString() + "," + client.getUsername() + "," + room + "," + "TextMessage";
+		String msg = textField.getText().toString() + "," + client.getUsername() + "," + getRoom() + "," + "TextMessage";
 		client.sendMessage(msg);
 		textField.setText("");
 
@@ -233,8 +239,10 @@ public class ClientOperationGUI {
 	}
 
 	public void sendFile(String path) {
-		client.getOutput().println("Zdr" + "," + client.getUsername() + "," + 1 + "," + "sendFile");
+		String msg = "Hello" + "," + client.getUsername() + "," + getRoom() + "," + "sendFile";
+		client.getOutput().println(msg);
 		client.sendFile(path);
+	
 	}
 
 }

@@ -74,7 +74,7 @@ public class UnusedServerVer1 extends Thread {
 			e.printStackTrace();
 		}
 		while (true) {
-			DbServer db = new DbServer();
+			ServerDB db = new ServerDB();
 
 			// sendMessage("Username", link);
 			// System.out.println("Enter username: ");
@@ -132,7 +132,7 @@ public class UnusedServerVer1 extends Thread {
 		return entries;
 	}
 
-	private void login(String username, DbServer db, Socket link, PrintWriter output) {
+	private void login(String username, ServerDB db, Socket link, PrintWriter output) {
 		// TODO Auto-generated method stub
 		String msg = "LoginSuccess" + "," + "Succesfully logged in!";
 		System.out.println("vliza li v login?");
@@ -199,7 +199,7 @@ public class UnusedServerVer1 extends Thread {
 		return true;
 	}
 
-	private boolean loginUserExists(String username, DbServer db, Socket link, PrintWriter output) {
+	private boolean loginUserExists(String username, ServerDB db, Socket link, PrintWriter output) {
 
 		boolean condition = db.isRegisteredUser(username);
 		if (condition == false) {
@@ -212,7 +212,7 @@ public class UnusedServerVer1 extends Thread {
 		return true;
 	}
 
-	private boolean correctLoginInfo(String username, String password, DbServer db, Socket link, PrintWriter output) {
+	private boolean correctLoginInfo(String username, String password, ServerDB db, Socket link, PrintWriter output) {
 		if (db.passwordIsCorrect(username, password) == false) {
 			String msg = "PasswordError" + "," + "Password doesn't match for username " + username;
 			sendMessage(msg, link,output);
@@ -325,7 +325,7 @@ public class UnusedServerVer1 extends Thread {
 
 	}
 
-	private void updateUser(DbServer db, String user) {
+	private void updateUser(ServerDB db, String user) {
 		// TODO Auto-generated method stub
 		// fetch user socket from map and send message to " USER "
 
@@ -344,7 +344,7 @@ public class UnusedServerVer1 extends Thread {
 	}
 
 	public void createTable() {
-		DbServer db = new DbServer();
+		ServerDB db = new ServerDB();
 		if (db.createTableUser()) {
 			System.out.println("DB succesfully created!");
 		}

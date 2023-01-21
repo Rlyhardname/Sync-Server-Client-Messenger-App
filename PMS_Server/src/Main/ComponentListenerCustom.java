@@ -17,32 +17,37 @@ public class ComponentListenerCustom implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		JLabel obj = (JLabel) e.getComponent();
-		
+
 		gui.changeLabelColor(gui.friendOne, Color.black);
 		gui.changeLabelColor(gui.friendTwo, Color.black);
 		gui.changeLabelColor(gui.friendThree, Color.black);
 		gui.changeLabelColor(gui.friendFour, Color.black);
 		gui.changeLabelColor(gui.friendFive, Color.black);
-		
+		gui.changeLabelColor(gui.fileDemonstrationRoom, Color.black);
+
 		if (obj.equals(gui.friendOne)) {
 			String[] friend = gui.friendOne.getText().split("\\s+");
-			gui.changeLabelColor(gui.friendOne,Color.RED);
+			gui.changeLabelColor(gui.friendOne, Color.RED);
 			gui.setRoom(Integer.parseInt(friend[0]));
-		} else if ( obj.equals(gui.friendTwo)) {
+		} else if (obj.equals(gui.friendTwo)) {
 			String[] friend = gui.friendTwo.getText().split("\\s+");
-			gui.changeLabelColor(gui.friendTwo,Color.RED);
+			gui.changeLabelColor(gui.friendTwo, Color.RED);
 			gui.setRoom(Integer.parseInt(friend[0]));
-		} else if ( obj.equals(gui.friendThree)) {
+		} else if (obj.equals(gui.friendThree)) {
 			String[] friend = gui.friendThree.getText().split("\\s+");
-			gui.changeLabelColor(gui.friendThree,Color.RED);
+			gui.changeLabelColor(gui.friendThree, Color.RED);
 			gui.setRoom(Integer.parseInt(friend[0]));
 		} else if (obj.equals(gui.friendFour)) {
 			String[] friend = gui.friendFour.getText().split("\\s+");
-			gui.changeLabelColor(gui.friendFour,Color.RED);
+			gui.changeLabelColor(gui.friendFour, Color.RED);
 			gui.setRoom(Integer.parseInt(friend[0]));
 		} else if (obj.equals(gui.friendFive)) {
 			String[] friend = gui.friendFive.getText().split("\\s+");
-			gui.changeLabelColor(gui.friendFive,Color.RED);
+			gui.changeLabelColor(gui.friendFive, Color.RED);
+			gui.setRoom(Integer.parseInt(friend[0]));
+		} else if (obj.equals(gui.fileDemonstrationRoom)) {
+			String[] friend = gui.fileDemonstrationRoom.getText().split("\\s+");
+			gui.changeLabelColor(gui.fileDemonstrationRoom, Color.RED);
 			gui.setRoom(Integer.parseInt(friend[0]));
 		}
 	}

@@ -13,7 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class DbServer {
+public class ServerDB {
 
 	static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 	static final String DB_URL = "jdbc:mysql://localhost/girrafe";
@@ -25,7 +25,7 @@ public class DbServer {
 	String[] args;
 	Enum task;
 
-	DbServer() {
+	ServerDB() {
 		conn = null;
 		stmt = null;
 		prep = null;
@@ -463,8 +463,8 @@ public class DbServer {
 			}
 
 		}
-		String[] yes = (String[]) list.toArray(new String[0]);
-		return yes;
+		String[] usersInRoom = (String[]) list.toArray(new String[0]);
+		return usersInRoom;
 	}
 
 	public void insertUserLogLogin(String username) {

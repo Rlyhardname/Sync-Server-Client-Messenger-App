@@ -31,6 +31,15 @@ public class ClientLogic extends Thread {
 	private boolean started;
 	private DataOutputStream outputFile;
 	private DataInputStream inputFile;
+	private String filePath;
+
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
 
 	ClientLogic() {
 		{
@@ -76,24 +85,62 @@ public class ClientLogic extends Thread {
 			try {
 
 				String msgIN = input.readLine();
+				int duckTapeFix = 0;
 
+				System.err.println("Message in client.handleServer" + msgIN);
 				if (msgIN == null) {
 					break;
 				}
 				String[] splitMessage = msgIN.split(",");
-				if (splitMessage[0].equals("ReceiveFile")) {
+				if(splitMessage.length<4) {
+					continue;
+				}
+				if(splitMessage.length==5) {
+					duckTapeFix=1;
+				}
+//				for (String string : splitMessage) {
+//					System.err.println(string);
+//				}
+				if (splitMessage[3].equals("ReceiveFile")) {
 
+					// TODO Auto-generated method stub
+				//	System.err.println("tuka?");
 					String path = saveDirectory();
 					receiveFile(path);
+					clientGUI.concattArea(msgIN);
+//					Thread tr = new Thread(new Runnable() {
+//
+//						@Override
+//						public void run() {
+//							
+//						}
+//						
+//					}); tr.start();
+							
+				
+				} else if(splitMessage[3+duckTapeFix].equals("TextMessage")){
+					clientGUI.concattArea(splitMessage[0+duckTapeFix]);
 				}
+//				if (splitMessage[0].equals("sendFile")) {
+//					
+//					sendFile(getFilePath());
+//				//	output.println("sent");
+//					
+//				}
 
-				clientGUI.concattArea(msgIN);
+//				if(!splitMessage[0].equals("ReceiveFile")) {
+//					
+//				}
+//				if(splitMessage[0]=="-1") {
+//					break;
+//				}
+//				
 			} catch (IOException e) {
 				break;
 			} catch (NullPointerException e1) {
 				break;
 			}
-
+			
 		} while (true);
 	}
 
@@ -200,6 +247,7 @@ public class ClientLogic extends Thread {
 			while ((bytes = fileInputStream.read(buffer)) != -1) {
 				// Send the file to Server Socket
 				outputFile.write(buffer, 0, bytes);
+				//System.out.println("ostanali baitove " +  bytes);
 				outputFile.flush();
 			}
 			// close the file here
@@ -222,40 +270,25 @@ public class ClientLogic extends Thread {
 		}
 
 		try {
+			//System.err.println("priema li?");
+			
 			long size = inputFile.readLong(); // read file size
 			byte[] buffer = new byte[4 * 1024];
 			while (size > 0 && (bytes = inputFile.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
 				// write the file using write method
 				fileOutputStream.write(buffer, 0, bytes);
+			//	System.err.println("priema li?");
 				size -= bytes; // read upto file size
+				
 			}
 
 			System.out.println("File is Received");
+			fileOutputStream.flush();
 			fileOutputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
 
-	public String pickFile() {
-		JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		
-		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("jpg","jpg"));
-		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("gif","gif"));
-		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("txt","txt"));
-		fileChooser.setAcceptAllFileFilterUsed(true);
-		
-		File file = fileChooser.getSelectedFile();
-		System.out.println(file.getName());
-		
-		String path = "";
-		int r = fileChooser.showSaveDialog(null);
-		if (r == JFileChooser.APPROVE_OPTION) {
-			path = (fileChooser.getSelectedFile().getAbsolutePath());
-		}
-
-		return path;
 	}
 
 	public String saveDirectory() {
@@ -263,7 +296,7 @@ public class ClientLogic extends Thread {
 		fileChooserj.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
 		File file = fileChooserj.getSelectedFile();
-		System.out.println(file.getName());
+	//	System.out.println(file.getName());
 		
 		fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("jpg","jpg"));
 		fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("gif","gif"));
@@ -278,6 +311,29 @@ public class ClientLogic extends Thread {
 
 		return path;
 	}
+	
+	public String pickFile() {
+		JFileChooser fileChooserj = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+		fileChooserj.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+		File file = fileChooserj.getSelectedFile();
+	//	System.out.println(file.getName());
+		
+		fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("jpg","jpg"));
+		fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("gif","gif"));
+		fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("txt","txt"));
+		fileChooserj.setAcceptAllFileFilterUsed(true);
+
+		String path = "";
+		int r = fileChooserj.showSaveDialog(null);
+		if (r == JFileChooser.APPROVE_OPTION) {
+			path = (fileChooserj.getSelectedFile().getAbsolutePath());
+		}
+
+		return path;
+	}
+	
+	
 
 	public void sendMessage(String msg) {
 
