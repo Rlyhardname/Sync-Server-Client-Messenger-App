@@ -56,7 +56,7 @@ public class ServerVer2 extends Thread {
 
 			System.out.println("ClientConnected");
 			authentication();
-			// syncClientWithServerDB(); // razpishi tqlo za prashtane na batch file s
+			syncClientWithServerDB(); // razpishi tqlo za prashtane na batch file s
 			// izpusnati saobshteniq
 			handleClient();
 
@@ -129,6 +129,9 @@ public class ServerVer2 extends Thread {
 		ServerDB db = new ServerDB();
 		String[] batch = db.getUnsendMessages(username);
 		if (ServerSettings.onlineUsers.get(username) != null) {
+			for (String string : batch) {
+				output.println(string+","+"TextMessage");
+			}
 			// PRATI PO FAIL SYSTEMATA KATO TEKSTOV FILE
 			// i poiskai potvurjdenie 4e faila e praten uspeshno, ako e praten uspeshno
 			// promeni vsi4ki stari logouti na
@@ -302,6 +305,8 @@ public class ServerVer2 extends Thread {
 					e.printStackTrace();
 				}
 
+			} else {
+				db.alterUserLogoutState(string);
 			}
 			;
 		}

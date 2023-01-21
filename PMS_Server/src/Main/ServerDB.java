@@ -5,11 +5,14 @@ import java.io.FileInputStream;
 import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -516,15 +519,14 @@ public class ServerDB {
 
 	public String[] getUnsendMessages(String username) {
 		// TODO Auto-generated method stub
-		String sql = "SELECT message,username,room_id "+
+		String sql = "SELECT message_text,username,chat_room_id "+
 		"FROM message_data "+
-		"(username) "+
-		"VALUES(?) ";
-	//	"WHERE time_log " ;
+		"WHERE username = ? ";
+	//	"WHERE time_log  " ;
 		ArrayList<String> messages = new ArrayList<String>();
 		try {
 			prep = conn.prepareStatement(sql);
-			prep.setString(2, username);
+			prep.setString(1, username);
 			ResultSet rs = prep.executeQuery();
 			while(rs.next()) {
 			String message = rs.getString(1);
@@ -547,6 +549,41 @@ public class ServerDB {
 				"WHERE chat_room_id=1";
 		try {
 			stmt.executeUpdate(sql);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void alterUserLogoutState(String username) {
+		// TODO Auto-generated method stub
+		String sql = "SELECT MAX(Logout_date) "+
+				"FROM User_Log "+
+				"WHERE username = ? ";
+				Date date = null;
+				try {
+					prep = conn.prepareStatement(sql);
+					prep.setString(1, username);
+					ResultSet rs = prep.executeQuery();
+					while(rs.next()) {
+					date = rs.getDate(1);
+
+					}
+					
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		String update = "UPDATE User_Log "+
+				"(allMessagesSent) " +
+				"VALUES(?) "+
+				"WHERE Logout_date = ?";
+	
+		try {
+			prep = conn.prepareStatement(update);
+			prep.setInt(1, 0);
+			prep.setDate(2, date);
+			prep.executeLargeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
