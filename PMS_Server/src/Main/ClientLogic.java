@@ -87,7 +87,7 @@ public class ClientLogic extends Thread {
 				String msgIN = input.readLine();
 				int duckTapeFix = 0;
 
-				System.err.println("Message in client.handleServer" + msgIN);
+			//	System.err.println("Message in client.handleServer" + msgIN);
 				if (msgIN == null) {
 					break;
 				}

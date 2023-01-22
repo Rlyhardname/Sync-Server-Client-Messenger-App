@@ -73,7 +73,7 @@ public class ServerVer2 extends Thread {
 
 	}
 
-	private void authentication() {
+	private synchronized void authentication() {
 		while (true) {
 			ServerDB db = new ServerDB();
 			String[] commandUserPass;
@@ -130,13 +130,12 @@ public class ServerVer2 extends Thread {
 		String[] batch = db.getUnsendMessages(username);
 		if (ServerSettings.onlineUsers.get(username) != null) {
 			for (String string : batch) {
-				output.println(string+","+"TextMessage");
+				
+				output.println(string);
 			}
-			// PRATI PO FAIL SYSTEMATA KATO TEKSTOV FILE
-			// i poiskai potvurjdenie 4e faila e praten uspeshno, ako e praten uspeshno
-			// promeni vsi4ki stari logouti na
-			// na pole user_log logout_time na 0
+
 		}
+		db.closeConnection();
 	}
 
 	private boolean loginUserExists(ServerDB db) {
@@ -221,7 +220,6 @@ public class ServerVer2 extends Thread {
 
 	private void handleClient() throws IOException {
 		String msg = "";
-		// PrintWriter onlineUserOutput = null;
 		do {
 
 			try {
@@ -232,8 +230,6 @@ public class ServerVer2 extends Thread {
 					continue;
 				}
 				String[] userMsg = msg.split(",");
-
-				// System.err.println("KAKVO IDVA? " + userMsg[0] + userMsg[1]);
 				if (userMsg[0].equals("ClosingClient"))
 					break;
 
@@ -241,16 +237,7 @@ public class ServerVer2 extends Thread {
 				if (userMsg[3].equals("sendFile")) { // SEND FILE logic
 					reSendFile(userMsg[2], userMsg[1], db);
 					db.closeConnection();
-
-					// poqsneniq
-					// userMsg[0] - message // userMsg[1] - username // userMsg[2] - Chat_room_ID //
-					// userMsg[3] = "sendFile "
-					// receive file + obrabotki
-
-					// FileInputStream file - файлът - obrabotkata tuka i puskash v dolnata funkciq
-					// db.StoreFile(userMsg[0],userMsg[1],userMsg[2], file); // dobavi i faila koito
-					// shte se slaga v bazata kato parametur
-
+					// userMsg[0] - message // userMsg[1] - username // userMsg[2] - Chat_room_ID // // userMsg[3] = "msgType"
 				}
 
 //				new Thread(new Runnable() {
@@ -258,7 +245,6 @@ public class ServerVer2 extends Thread {
 //					public void run() {
 				if (isTextMessage(userMsg[3])) { // SEND MSG LOGIC
 					boolean isMessageStored = db.storeMessage(userMsg[1], userMsg[0], Integer.parseInt(userMsg[2]));
-					System.err.println(isMessageStored);
 					if (isMessageStored) {
 						sendMsgOnlineRoomUsers(db, userMsg[2], userMsg[1], userMsg[0]);
 						db.closeConnection();
@@ -292,21 +278,22 @@ public class ServerVer2 extends Thread {
 
 	private void sendMsgOnlineRoomUsers(ServerDB db, String room, String user, String message) {
 		String[] users = db.getRoomUsers(Integer.parseInt(room)); // room_ID
-		for (String string : users) {
-			if (ServerSettings.onlineUsers.get(string) != null) { // db.checkIfRoomUsersOnline(string)
+		for (String roomUser : users) {
+			if (ServerSettings.onlineUsers.get(roomUser) != null) { // db.checkIfRoomUsersOnline(string)
 
-				Socket userSocket = ServerSettings.onlineUsers.get(string);
-				PrintWriter distribute;
+				Socket userSocket = ServerSettings.onlineUsers.get(roomUser);
+				PrintWriter distribute = null;
 				try {
 					distribute = new PrintWriter(userSocket.getOutputStream(), true);
-					distribute.println(message + "," + room + "," + user + "," + "TextMessage");
+					System.err.println(message + "," + room + "," + roomUser + "," + "WTF");
+					distribute.println(message + "," + room + "," + roomUser + "," + "TextMessage");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
 			} else {
-				db.alterUserLogoutState(string);
+				db.alterUserLogoutState(roomUser);
 			}
 			;
 		}
@@ -327,13 +314,6 @@ public class ServerVer2 extends Thread {
 
 	{
 
-		// output.println("sendFile");
-//		try {
-//			msg = inputFile.readUTF();
-//		} catch (IOException e3) {
-//			// TODO Auto-generated catch block
-//			e3.printStackTrace();
-//		}
 		String[] usersInRoom = db.getRoomUsers(Integer.parseInt(room));
 		for (String user : usersInRoom) {
 
@@ -349,50 +329,33 @@ public class ServerVer2 extends Thread {
 				}
 				resend.println(
 						usernameSendingFile + "," + " is sendingFile in room " + "," + "room" + "," + "ReceiveFile");
-
-//				if (input.readLine().equals("go"))
-//					;
-				{
-
-//					try {
-//						sleep(10000);
-//					} catch (InterruptedException e2) {
-//						// TODO Auto-generated catch block
-//						e2.printStackTrace();
-//					}
-					DataOutputStream outputFile1 = null;
-					try {
-						outputFile1 = new DataOutputStream(onlineUser.getOutputStream());
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-
-					try {
-
-						byte[] buffer = new byte[4 * 1024];
-
-						// find an effective way to get out of this cycle(probably change
-						// dataoutputstream to smth else
-						long size = inputFile.readLong();
-
-						while ((size > 0 && (bytes = inputFile.read(buffer)) != -1)) {
-							outputFile1.write(buffer, 0, bytes);
-
-							size -= bytes;
-							outputFile1.flush();
-						}
-						// inputFile.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-
+				DataOutputStream outputFile1 = null;
+				try {
+					outputFile1 = new DataOutputStream(onlineUser.getOutputStream());
+				} catch (IOException e1) {
+					e1.printStackTrace();
 				}
 
+				try {
+
+					byte[] buffer = new byte[4 * 1024];
+					long size = inputFile.readLong();
+
+					while ((size > 0 && (bytes = inputFile.read(buffer)) != -1)) {
+						outputFile1.write(buffer, 0, bytes);
+
+						size -= bytes;
+						outputFile1.flush();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				resend.flush();
-				// resend.close();
+				//resend.close();
 			}
 
 		}
+
 	}
 
 }

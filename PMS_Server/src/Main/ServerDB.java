@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -62,10 +63,9 @@ public class ServerDB {
 		} catch (SQLException se) {
 			se.printStackTrace();
 		}
-		 System.out.println("Query has been executed and connection has been closed");
+		System.out.println("Query has been executed and connection has been closed");
 
 	}
-
 
 	// returns resultSet with all user_ID's that equal the args[0]
 	public ArrayList<String> selectRoomUsers() throws SQLException {
@@ -336,7 +336,6 @@ public class ServerDB {
 	public void addChatRoom(String room) {
 		String sql = "INSERT INTO chat_room " + "(room_name) " + "VALUES(?)";
 
-
 		try {
 			prep = conn.prepareStatement(sql);
 			prep.setString(1, room);
@@ -350,7 +349,6 @@ public class ServerDB {
 
 	public void fillRoom(int room, String user) {
 		String sql = "INSERT INTO chat_room_warehouse " + "VALUES(?,?)";
-
 
 		try {
 			prep = conn.prepareStatement(sql);
@@ -375,13 +373,12 @@ public class ServerDB {
 
 			while (rs.next()) {
 				inputUser = rs.getString(1);
-				
+
 			}
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
 
 		if (inputUser.toLowerCase().equals(user)) {
 
@@ -501,6 +498,7 @@ public class ServerDB {
 	public void StoreFile(String message, String username, int roomID, FileInputStream file) {
 		// TODO Auto-generated method stub
 
+		
 		String sql = "INSERT INTO message_data " + "(message,username) " + "VALUES(?,NOW())";
 		try {
 			prep = conn.prepareStatement(sql);
@@ -519,34 +517,63 @@ public class ServerDB {
 
 	public String[] getUnsendMessages(String username) {
 		// TODO Auto-generated method stub
-		String sql = "SELECT message_text,username,chat_room_id "+
-		"FROM message_data "+
-		"WHERE username = ? ";
-	//	"WHERE time_log  " ;
-		ArrayList<String> messages = new ArrayList<String>();
-		try {
-			prep = conn.prepareStatement(sql);
-			prep.setString(1, username);
-			ResultSet rs = prep.executeQuery();
-			while(rs.next()) {
-			String message = rs.getString(1);
-			String user = rs.getString(2);
-			int room = rs.getInt(3);
-			messages.add(message+","+user+","+room);
-			}
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		String [] batch = messages.toArray(new String[0]);
-		return batch;
 		
+		ResultSet rs = null;
+		Timestamp timestamp = getTimestamp(username);
+		boolean isUnsend = false;
+		System.err.println("Time stamp" + timestamp);
+		
+		String tiniInt = "SELECT allMessagesSent FROM User_log "+
+						"WHERE logout_time = ? and allMessagesSent = ? ";
+			
+		try {
+			prep = conn.prepareStatement(tiniInt);
+			prep.setTimestamp(1, timestamp);
+			prep.setInt(2, 0);
+			rs = prep.executeQuery();
+			while(rs.next()) {
+				  if(rs.getInt(1)==0) {
+					  isUnsend = true;
+				  }
+			}
+
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		System.out.println(isUnsend);
+		if(isUnsend) {
+			String sql = "SELECT message_text,username,chat_room_id " 
+		+ "FROM message_data " +
+		"WHERE username != ? and timeLOG > ?";
+			ArrayList<String> messages = new ArrayList<String>();
+			try {
+				prep = conn.prepareStatement(sql);
+				prep.setString(1, username);
+				prep.setTimestamp(2, timestamp);
+				rs = prep.executeQuery();
+				while (rs.next()) {
+					String message = rs.getString(1);
+					String user = rs.getString(2);
+					int room = rs.getInt(3);
+					messages.add(message + "," + user + "," + room + "," +"TextMessage");
+				}
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			String[] batch = messages.toArray(new String[0]);
+			return batch;
+		}
+		
+		
+		return new String[0];
+
 	}
-	
+
 	public void deleteEntry() {
-		String sql = "DELETE FROM chat_room_warehouse "+
-				"WHERE chat_room_id=1";
+		String sql = "DELETE FROM chat_room_warehouse " + "WHERE chat_room_id=1";
 		try {
 			stmt.executeUpdate(sql);
 		} catch (SQLException e) {
@@ -554,35 +581,39 @@ public class ServerDB {
 			e.printStackTrace();
 		}
 	}
+	
+	public Timestamp getTimestamp(String username) {
+		String sql = "SELECT Logout_time " + "FROM User_Log " + "WHERE username = ?";
+		Timestamp dateTimeStamp = null;
+		try {
+			prep = conn.prepareStatement(sql);
+			prep.setString(1, username);
+			ResultSet rs = prep.executeQuery();
+			while (rs.next()) {
+
+				Timestamp timestamp = rs.getTimestamp(1);
+				
+				if (timestamp != null) {
+					dateTimeStamp = timestamp;
+					System.out.println(timestamp);
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return dateTimeStamp;
+	}
 
 	public void alterUserLogoutState(String username) {
-		// TODO Auto-generated method stub
-		String sql = "SELECT MAX(Logout_date) "+
-				"FROM User_Log "+
-				"WHERE username = ? ";
-				Date date = null;
-				try {
-					prep = conn.prepareStatement(sql);
-					prep.setString(1, username);
-					ResultSet rs = prep.executeQuery();
-					while(rs.next()) {
-					date = rs.getDate(1);
+		Timestamp dateTimeStamp = getTimestamp(username);
+		String update = "UPDATE User_Log " + "SET allMessagesSent = ? " + "WHERE Logout_time = ? and username = ?";
 
-					}
-					
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		String update = "UPDATE User_Log "+
-				"(allMessagesSent) " +
-				"VALUES(?) "+
-				"WHERE Logout_date = ?";
-	
 		try {
 			prep = conn.prepareStatement(update);
 			prep.setInt(1, 0);
-			prep.setDate(2, date);
+			prep.setTimestamp(2, dateTimeStamp);
+			prep.setString(3, username);
 			prep.executeLargeUpdate();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
