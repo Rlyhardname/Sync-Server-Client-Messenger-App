@@ -1,21 +1,15 @@
 package Main;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.sql.Blob;
-import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ServerDB {
 
@@ -67,9 +61,8 @@ public class ServerDB {
 
 	}
 
-	// returns resultSet with all user_ID's that equal the args[0]
 	public ArrayList<String> selectRoomUsers() throws SQLException {
-		// Maybe change to String[] after tests
+
 		ArrayList<String> users = new ArrayList<String>();
 		String sql = "Select username from user where user = ?";
 		prep = conn.prepareStatement(sql);
@@ -99,22 +92,6 @@ public class ServerDB {
 		}
 
 		return users;
-	}
-
-	private void notifyUser(String user) {
-		if (isOnline(user)) {
-
-			// napravi neshto
-		}
-		// TODO Auto-generated method stub
-		// check if user is online and if true = send update
-		if (isOnline(user)) {
-
-		}
-		;
-		// else if offline do nothing, and when user gets online he will ask for updates
-		// when connecting(will send his db i guess and we compare to our and send him
-		// updated tables info which he can imput in his db)
 	}
 
 	private boolean isOnline(String user) {
@@ -399,11 +376,6 @@ public class ServerDB {
 		return false;
 	}
 
-	public void loginTime(String username) {
-		// TODO Auto-generated method stub
-		// LocalDateTime.now() insert into user_log where username = username;
-	}
-
 	public void alterTable() {
 		String sql = "ALTER TABLE message_data " + "ADD file BLOB DEFAULT NULL";
 		try {
@@ -424,19 +396,6 @@ public class ServerDB {
 		}
 	}
 
-	public String[] getArgs() {
-		return args;
-	}
-
-	public void setArgs(String[] args) {
-		this.args = args;
-	}
-
-	public boolean checkIfRoomUsersOnline(String string) {
-
-		return true;
-	}
-
 	public String[] getRoomUsers(int i) {
 		String sql = "SELECT Username " + "FROM chat_room_warehouse " + "WHERE chat_room_id=?";
 		ResultSet rs = null;
@@ -447,7 +406,6 @@ public class ServerDB {
 			rs = prep.executeQuery();
 			while (rs.next()) {
 				String user = rs.getString(1).toLowerCase();
-				System.err.println(user);
 				list.add(user);
 			}
 		} catch (SQLException e) {
@@ -498,7 +456,6 @@ public class ServerDB {
 	public void StoreFile(String message, String username, int roomID, FileInputStream file) {
 		// TODO Auto-generated method stub
 
-		
 		String sql = "INSERT INTO message_data " + "(message,username) " + "VALUES(?,NOW())";
 		try {
 			prep = conn.prepareStatement(sql);
@@ -517,35 +474,31 @@ public class ServerDB {
 
 	public String[] getUnsendMessages(String username) {
 		// TODO Auto-generated method stub
-		
+
 		ResultSet rs = null;
 		Timestamp timestamp = getTimestamp(username);
 		boolean isUnsend = false;
-		System.err.println("Time stamp" + timestamp);
-		
-		String tiniInt = "SELECT allMessagesSent FROM User_log "+
-						"WHERE logout_time = ? and allMessagesSent = ? ";
-			
+
+		String tiniInt = "SELECT allMessagesSent FROM User_log " + "WHERE logout_time = ? and allMessagesSent = ? ";
+
 		try {
 			prep = conn.prepareStatement(tiniInt);
 			prep.setTimestamp(1, timestamp);
 			prep.setInt(2, 0);
 			rs = prep.executeQuery();
-			while(rs.next()) {
-				  if(rs.getInt(1)==0) {
-					  isUnsend = true;
-				  }
+			while (rs.next()) {
+				if (rs.getInt(1) == 0) {
+					isUnsend = true;
+				}
 			}
 
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		System.out.println(isUnsend);
-		if(isUnsend) {
-			String sql = "SELECT message_text,username,chat_room_id " 
-		+ "FROM message_data " +
-		"WHERE username != ? and timeLOG > ?";
+		if (isUnsend) {
+			String sql = "SELECT message_text,username,chat_room_id " + "FROM message_data "
+					+ "WHERE username != ? and timeLOG > ?";
 			ArrayList<String> messages = new ArrayList<String>();
 			try {
 				prep = conn.prepareStatement(sql);
@@ -556,7 +509,7 @@ public class ServerDB {
 					String message = rs.getString(1);
 					String user = rs.getString(2);
 					int room = rs.getInt(3);
-					messages.add(message + "," + user + "," + room + "," +"TextMessage");
+					messages.add(message + "," + user + "," + room + "," + "TextMessage");
 				}
 
 			} catch (SQLException e) {
@@ -566,8 +519,7 @@ public class ServerDB {
 			String[] batch = messages.toArray(new String[0]);
 			return batch;
 		}
-		
-		
+
 		return new String[0];
 
 	}
@@ -581,7 +533,7 @@ public class ServerDB {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public Timestamp getTimestamp(String username) {
 		String sql = "SELECT Logout_time " + "FROM User_Log " + "WHERE username = ?";
 		Timestamp dateTimeStamp = null;
@@ -592,10 +544,9 @@ public class ServerDB {
 			while (rs.next()) {
 
 				Timestamp timestamp = rs.getTimestamp(1);
-				
+
 				if (timestamp != null) {
 					dateTimeStamp = timestamp;
-					System.out.println(timestamp);
 				}
 			}
 		} catch (SQLException e) {

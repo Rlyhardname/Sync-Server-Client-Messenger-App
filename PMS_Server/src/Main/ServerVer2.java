@@ -1,20 +1,12 @@
 package Main;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ConcurrentModificationException;
 
 public class ServerVer2 extends Thread {
 
@@ -56,8 +48,7 @@ public class ServerVer2 extends Thread {
 
 			System.out.println("ClientConnected");
 			authentication();
-			syncClientWithServerDB(); // razpishi tqlo za prashtane na batch file s
-			// izpusnati saobshteniq
+			syncClientWithServerDB();
 			handleClient();
 
 		} catch (NullPointerException e1) {
@@ -73,7 +64,7 @@ public class ServerVer2 extends Thread {
 
 	}
 
-	private synchronized void authentication() {
+	private void authentication() {
 		while (true) {
 			ServerDB db = new ServerDB();
 			String[] commandUserPass;
@@ -130,7 +121,7 @@ public class ServerVer2 extends Thread {
 		String[] batch = db.getUnsendMessages(username);
 		if (ServerSettings.onlineUsers.get(username) != null) {
 			for (String string : batch) {
-				
+
 				output.println(string);
 			}
 
@@ -162,17 +153,14 @@ public class ServerVer2 extends Thread {
 
 	private void login(ServerDB db) {
 		String msg = "LoginSuccess" + "," + "Succesfully logged in!";
-		System.out.println("vliza li v login?");
 		sendMessage(msg);
 		ServerSettings.onlineUsers.put(username, link);
-		db.loginTime(username);
 	}
 
 	private void createAccount(ServerDB db) throws IOException {
 		do {
 			if (userDataIsValid(20)) {
 				if (!db.isRegisteredUser(this.username)) {
-					System.out.println("Write password for new account");
 					if (userDataIsValid(32)) {
 						if (db.createUser(username, password)) {
 							String msg = "AccountCreated" + "," + "Account Succesfully created!";
@@ -237,22 +225,24 @@ public class ServerVer2 extends Thread {
 				if (userMsg[3].equals("sendFile")) { // SEND FILE logic
 					reSendFile(userMsg[2], userMsg[1], db);
 					db.closeConnection();
-					// userMsg[0] - message // userMsg[1] - username // userMsg[2] - Chat_room_ID // // userMsg[3] = "msgType"
+					// userMsg[0] - message // userMsg[1] - username // userMsg[2] - Chat_room_ID //
+					// // userMsg[3] = "msgType"
 				}
 
-//				new Thread(new Runnable() {
-//					@Override
-//					public void run() {
-				if (isTextMessage(userMsg[3])) { // SEND MSG LOGIC
-					boolean isMessageStored = db.storeMessage(userMsg[1], userMsg[0], Integer.parseInt(userMsg[2]));
-					if (isMessageStored) {
-						sendMsgOnlineRoomUsers(db, userMsg[2], userMsg[1], userMsg[0]);
-						db.closeConnection();
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						if (isTextMessage(userMsg[3])) { // SEND MSG LOGIC
+							boolean isMessageStored = db.storeMessage(userMsg[1], userMsg[0],
+									Integer.parseInt(userMsg[2]));
+							if (isMessageStored) {
+								sendMsgOnlineRoomUsers(db, userMsg[2], userMsg[1], userMsg[0]);
+								db.closeConnection();
+							}
+						}
 					}
-				}
-//					}
-//
-//				}).start();
+
+				}).start();
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -277,15 +267,14 @@ public class ServerVer2 extends Thread {
 	}
 
 	private void sendMsgOnlineRoomUsers(ServerDB db, String room, String user, String message) {
-		String[] users = db.getRoomUsers(Integer.parseInt(room)); // room_ID
+		String[] users = db.getRoomUsers(Integer.parseInt(room));
 		for (String roomUser : users) {
-			if (ServerSettings.onlineUsers.get(roomUser) != null) { // db.checkIfRoomUsersOnline(string)
+			if (ServerSettings.onlineUsers.get(roomUser) != null) {
 
 				Socket userSocket = ServerSettings.onlineUsers.get(roomUser);
 				PrintWriter distribute = null;
 				try {
 					distribute = new PrintWriter(userSocket.getOutputStream(), true);
-					System.err.println(message + "," + room + "," + roomUser + "," + "WTF");
 					distribute.println(message + "," + room + "," + roomUser + "," + "TextMessage");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -351,7 +340,7 @@ public class ServerVer2 extends Thread {
 					e.printStackTrace();
 				}
 				resend.flush();
-				//resend.close();
+				// resend.close();
 			}
 
 		}

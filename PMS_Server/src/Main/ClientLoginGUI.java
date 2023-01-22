@@ -71,13 +71,13 @@ public class ClientLoginGUI {
 		client = new ClientLogic();
 		client.start();
 
-		startManyUsers(clientNames, "a");
+		
 		Thread user = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				
+				startManyUsers(clientNames, "a");
 			}
 
 		});
