@@ -74,6 +74,7 @@ public class ServerVer2 extends Thread {
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (NullPointerException e1) {
+				e1.printStackTrace();
 				break;
 			}
 			commandUserPass = msg.split(",");
@@ -81,6 +82,8 @@ public class ServerVer2 extends Thread {
 			try {
 				username = commandUserPass[1];
 			} catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
+				e.printStackTrace();
+				//output.println("UsernameException"+","+"sorry");
 				continue;
 			}
 
@@ -91,6 +94,8 @@ public class ServerVer2 extends Thread {
 				try {
 					password = commandUserPass[2];
 				} catch (ArrayIndexOutOfBoundsException e) {
+					e.printStackTrace();
+					output.println("\"PasswordError\" + \",\" + \"Password doesn't match for username \" + username");
 					continue;
 				}
 
@@ -109,6 +114,7 @@ public class ServerVer2 extends Thread {
 					createAccount(db);
 				} catch (IOException | NullPointerException e) {
 					e.printStackTrace();
+					
 				}
 
 			}
@@ -169,6 +175,7 @@ public class ServerVer2 extends Thread {
 						} else {
 							String msg = "CreateAccountError" + "," + "Database error, try again!";
 							sendMessage(msg);
+							break;
 						}
 					}
 

@@ -53,6 +53,7 @@ public class ClientLogic extends Thread {
 				outputFile = new DataOutputStream(link.getOutputStream());
 				inputFile = new DataInputStream(link.getInputStream());
 			} catch (IOException e) {
+				e.printStackTrace();
 				System.out.println("Host ID not found");
 			}
 
@@ -106,8 +107,10 @@ public class ClientLogic extends Thread {
 				}
 
 			} catch (IOException e) {
+				e.printStackTrace();
 				break;
 			} catch (NullPointerException e1) {
+				e1.printStackTrace();
 				break;
 			}
 

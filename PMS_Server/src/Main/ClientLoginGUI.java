@@ -164,6 +164,7 @@ public class ClientLoginGUI {
 				frame.dispose();
 			}
 		} catch (RuntimeException e) {
+			e.printStackTrace();
 			frame.dispose();
 		}
 		return null;
@@ -187,6 +188,7 @@ public class ClientLoginGUI {
 				frame.dispose();
 			}
 		} catch (RuntimeException e) {
+			e.printStackTrace();
 			frame.dispose();
 		}
 
@@ -208,6 +210,7 @@ public class ClientLoginGUI {
 				frame.dispose();
 			}
 		} catch (RuntimeException e) {
+			e.printStackTrace();
 			frame.dispose();
 		}
 

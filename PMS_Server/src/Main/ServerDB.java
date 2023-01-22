@@ -135,6 +135,8 @@ public class ServerDB {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (NullPointerException e1) {
+			e1.printStackTrace();
 		}
 		return false;
 	}
