@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Iterator;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -216,7 +217,6 @@ public class ClientLogic extends Thread {
 			while ((bytes = fileInputStream.read(buffer)) != -1) {
 				// Send the file to Server Socket
 				outputFile.write(buffer, 0, bytes);
-				// System.out.println("ostanali baitove " + bytes);
 				outputFile.flush();
 			}
 			// close the file here
@@ -238,17 +238,18 @@ public class ClientLogic extends Thread {
 			e.printStackTrace();
 		}
 
+		System.err.println("do tuk stiga li?");
 		try {
-			// System.err.println("priema li?");
 
-			long size = inputFile.readLong(); // read file size
+		 //	long size = inputFile.readLong(); // read file size
 			byte[] buffer = new byte[4 * 1024];
-			while (size > 0 && (bytes = inputFile.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
+			while ((bytes = inputFile.read(buffer))!= -1) {
 				// write the file using write method
+				System.out.println(" Buffer " + buffer + " bytes " + bytes);
 				fileOutputStream.write(buffer, 0, bytes);
-				// System.err.println("priema li?");
-				size -= bytes; // read upto file size
-
+				if(bytes<4096) {
+					break;
+				}
 			}
 
 			System.out.println("File is Received");
@@ -265,7 +266,6 @@ public class ClientLogic extends Thread {
 		fileChooserj.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
 		File file = fileChooserj.getSelectedFile();
-		// System.out.println(file.getName());
 
 		fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("jpg", "jpg"));
 		fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("gif", "gif"));
@@ -286,7 +286,6 @@ public class ClientLogic extends Thread {
 		fileChooserj.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
 		File file = fileChooserj.getSelectedFile();
-		// System.out.println(file.getName());
 
 		fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("jpg", "jpg"));
 		fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("gif", "gif"));

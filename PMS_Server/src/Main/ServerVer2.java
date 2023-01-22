@@ -332,14 +332,19 @@ public class ServerVer2 extends Thread {
 
 					while ((size > 0 && (bytes = inputFile.read(buffer)) != -1)) {
 						outputFile1.write(buffer, 0, bytes);
-
+						System.out.println("size " + size  + " Buffer " + buffer);
 						size -= bytes;
 						outputFile1.flush();
+						if(bytes<4096) {
+							break;
+						}
+						
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				resend.flush();
+				//outputFile1.close();
 				// resend.close();
 			}
 
