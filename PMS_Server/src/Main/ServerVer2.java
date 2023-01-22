@@ -83,7 +83,7 @@ public class ServerVer2 extends Thread {
 				username = commandUserPass[1];
 			} catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
 				e.printStackTrace();
-				//output.println("UsernameException"+","+"sorry");
+				output.println("UsernameException"+","+"sorry");
 				continue;
 			}
 
@@ -180,8 +180,10 @@ public class ServerVer2 extends Thread {
 					}
 
 				}
+				output.println("user is registred sorry" + "," + " SORRY");
+				break;
 			}
-
+			
 		} while (true);
 
 	}
