@@ -1,4 +1,4 @@
-package Main;
+package client;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -9,6 +9,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileSystemView;
+
+import server.ServerGUI;
 
 public class ClientLoginGUI {
 

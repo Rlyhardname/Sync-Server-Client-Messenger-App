@@ -1,4 +1,4 @@
-package Main;
+package client;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -17,6 +17,8 @@ import java.util.Iterator;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
+
+import server.ServerSettings;
 
 public class ClientLogic extends Thread {
 

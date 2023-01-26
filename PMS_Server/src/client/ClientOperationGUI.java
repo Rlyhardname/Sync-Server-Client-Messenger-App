@@ -1,4 +1,4 @@
-package Main;
+package client;
 
 import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
@@ -28,6 +28,8 @@ import javax.swing.BoxLayout;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileSystemView;
 
+import server.ServerSettings;
+
 public class ClientOperationGUI {
 	private ClientLogic client;
 	JFrame frame;
@@ -39,12 +41,16 @@ public class ClientOperationGUI {
 	private JPanel friendList;
 	private JPanel header;
 	private JTextField textField;
-	JLabel friendOne;
-	JLabel friendTwo;
-	JLabel friendThree;
-	JLabel friendFour;
-	JLabel friendFive;
-	JLabel fileDemonstrationRoom;
+	private JLabel friendOne;
+	private JLabel friendTwo;
+	private JLabel friendThree;
+	private JLabel friendFour;
+	private JLabel friendFive;
+	private JLabel fileDemonstrationRoom;
+	public JPanel getFriendList() {
+		return friendList;
+	}
+
 	private JButton btnSendFile;
 	private int room;
 	// pICK FILE BUTTON
@@ -243,6 +249,58 @@ public class ClientOperationGUI {
 		client.getOutput().println(msg);
 		client.sendFile(path);
 	
+	}
+
+	public void setFriendList(JPanel friendList) {
+		this.friendList = friendList;
+	}
+
+	public JLabel getFriendOne() {
+		return friendOne;
+	}
+
+	public void setFriendOne(JLabel friendOne) {
+		this.friendOne = friendOne;
+	}
+
+	public JLabel getFriendTwo() {
+		return friendTwo;
+	}
+
+	public void setFriendTwo(JLabel friendTwo) {
+		this.friendTwo = friendTwo;
+	}
+
+	public JLabel getFriendThree() {
+		return friendThree;
+	}
+
+	public void setFriendThree(JLabel friendThree) {
+		this.friendThree = friendThree;
+	}
+
+	public JLabel getFriendFour() {
+		return friendFour;
+	}
+
+	public void setFriendFour(JLabel friendFour) {
+		this.friendFour = friendFour;
+	}
+
+	public JLabel getFriendFive() {
+		return friendFive;
+	}
+
+	public void setFriendFive(JLabel friendFive) {
+		this.friendFive = friendFive;
+	}
+
+	public JLabel getFileDemonstrationRoom() {
+		return fileDemonstrationRoom;
+	}
+
+	public void setFileDemonstrationRoom(JLabel fileDemonstrationRoom) {
+		this.fileDemonstrationRoom = fileDemonstrationRoom;
 	}
 
 }

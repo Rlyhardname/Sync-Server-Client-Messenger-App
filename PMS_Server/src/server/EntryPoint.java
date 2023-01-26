@@ -1,4 +1,6 @@
-package Main;
+package server;
+
+import client.ClientLoginGUI;
 
 public class EntryPoint {
 
