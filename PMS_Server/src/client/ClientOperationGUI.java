@@ -28,6 +28,7 @@ import javax.swing.BoxLayout;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileSystemView;
 
+import client.interfaces.FriendListSelectionListener;
 import server.ServerSettings;
 
 public class ClientOperationGUI {
@@ -128,7 +129,7 @@ public class ClientOperationGUI {
 		btnSendFile = new JButton("Send File");
 		panel.add(btnSendFile);
 
-		ComponentListenerCustom listen = new ComponentListenerCustom(this);
+		FriendListSelectionListener listen = new FriendListSelectionListener(this);
 		friendList = new JPanel();
 		friendList.setLayout(new GridLayout(5, 1, 0, 0));
 		friendOne = new JLabel("1 ROOM         ");

@@ -61,6 +61,7 @@ public class ServerGUI {
 	public ServerGUI() {
 		initialize();
 		settings = new ServerSettings();
+		System.out.println(settings);
 		ServerVer2 serverV2 = new ServerVer2(this);
 		Thread serverV2Thread = new Thread(serverV2);
 		serverV2Thread.start();
@@ -136,6 +137,7 @@ public class ServerGUI {
 
 	private Object selectionButtonPressed1() {
 		ClientLoginGUI.startGUI();
+		createNewConnection();
 		return null;
 	}
 

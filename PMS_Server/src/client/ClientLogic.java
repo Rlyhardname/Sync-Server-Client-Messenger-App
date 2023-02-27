@@ -50,6 +50,7 @@ public class ClientLogic extends Thread {
 				setStarted(false);
 				host = InetAddress.getLocalHost();
 				link = new Socket(host, PORT);
+				System.err.println(host);
 				input = new BufferedReader(new InputStreamReader(link.getInputStream()));
 				output = new PrintWriter(link.getOutputStream(), true);
 				outputFile = new DataOutputStream(link.getOutputStream());
@@ -245,7 +246,6 @@ public class ClientLogic extends Thread {
 
 		System.err.println("do tuk stiga li?");
 		try {
-
 		 //	long size = inputFile.readLong(); // read file size
 			byte[] buffer = new byte[4 * 1024];
 			while ((bytes = inputFile.read(buffer))!= -1) {

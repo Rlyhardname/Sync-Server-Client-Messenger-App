@@ -1,4 +1,4 @@
-package client;
+package client.interfaces;
 
 import java.awt.Color;
 import java.awt.event.MouseEvent;
@@ -6,11 +6,13 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JLabel;
 
-public class ComponentListenerCustom implements MouseListener {
+import client.ClientOperationGUI;
+
+public class FriendListSelectionListener implements MouseListener {
 
 	ClientOperationGUI gui;
 
-	public ComponentListenerCustom(ClientOperationGUI clientOperationGUI) {
+	public FriendListSelectionListener(ClientOperationGUI clientOperationGUI) {
 		gui = clientOperationGUI;
 	}
 

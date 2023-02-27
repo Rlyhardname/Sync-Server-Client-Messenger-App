@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+
+
 public class ServerVer2 extends Thread {
 
 	private Socket link;
@@ -17,6 +19,8 @@ public class ServerVer2 extends Thread {
 	private String password;
 	private DataOutputStream outputFile;
 	private DataInputStream inputFile;
+	private boolean duckTape;
+	private String duckTapeMsg;
 
 	ServerVer2() {
 		Initialize();
@@ -29,6 +33,7 @@ public class ServerVer2 extends Thread {
 
 	private void Initialize() {
 		try {
+			duckTape = false;
 			link = ServerSettings.serverSocket.accept();
 			output = new PrintWriter(link.getOutputStream(), true);
 			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
@@ -61,7 +66,7 @@ public class ServerVer2 extends Thread {
 
 	@Override
 	public void run() {
-
+		
 	}
 
 	private void authentication() {
@@ -69,18 +74,29 @@ public class ServerVer2 extends Thread {
 			ServerDB db = new ServerDB();
 			String[] commandUserPass;
 			String msg = "";
+			System.err.println("hmm");
 			try {
-				msg = input.readLine();
+				if(duckTape != true) {
+					msg = input.readLine();
+					
+				} else {
+					System.out.println(duckTapeMsg);
+					msg = duckTapeMsg;
+					duckTape = false;
+				}
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (NullPointerException e1) {
 				e1.printStackTrace();
 				break;
 			}
+			concatIncomingMessage(msg);
 			commandUserPass = msg.split(",");
 
 			try {
 				username = commandUserPass[1];
+				password = commandUserPass[2];
 			} catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
 				e.printStackTrace();
 				output.println("UsernameException"+","+"sorry");
@@ -91,18 +107,19 @@ public class ServerVer2 extends Thread {
 
 			if (!commandUserPass[0].equals("SIGN UP")) {
 
-				try {
-					password = commandUserPass[2];
-				} catch (ArrayIndexOutOfBoundsException e) {
-					e.printStackTrace();
-					output.println("\"PasswordError\" + \",\" + \"Password doesn't match for username \" + username");
-					continue;
-				}
+//				try {
+//					
+//				} catch (ArrayIndexOutOfBoundsException e) {
+//					e.printStackTrace();
+//					output.println("\"PasswordError\" + \",\" + \"Password doesn't match for username \" + username");
+//					continue;
+//				}
 
 				System.out.println("Client returned password : " + password);
 				if (loginUserExists(db)) {
 					if (correctLoginInfo(db)) {
 						login(db);
+						duckTape = false;
 						db.insertUserLogLogin(username);
 						db.closeConnection();
 						break;
@@ -168,6 +185,7 @@ public class ServerVer2 extends Thread {
 			if (userDataIsValid(20)) {
 				if (!db.isRegisteredUser(this.username)) {
 					if (userDataIsValid(32)) {
+						System.err.println("validen li e usera?");
 						if (db.createUser(username, password)) {
 							String msg = "AccountCreated" + "," + "Account Succesfully created!";
 							sendMessage(msg);
@@ -214,6 +232,7 @@ public class ServerVer2 extends Thread {
 
 		return true;
 	}
+	
 
 	private void handleClient() throws IOException {
 		String msg = "";
@@ -222,14 +241,25 @@ public class ServerVer2 extends Thread {
 			try {
 
 				msg = input.readLine();
-
+				
 				if ((msg == null) || (msg.startsWith(","))) {
 					continue;
 				}
 				String[] userMsg = msg.split(",");
+				if(userMsg[2].equals("ANDROIDLOGOUT")) {
+					ServerGUI.createNewConnection();
+					break;
+				}
 				if (userMsg[0].equals("ClosingClient"))
 					break;
 
+//				if(userMsg[0].equals("login") || userMsg[0].equals("SIGN UP")) {
+//					duckTapeMsg = msg;
+//					duckTape = true;
+//					username = userMsg[1];
+//					password = userMsg[2];
+//					authentication();
+//				}
 				ServerDB db = new ServerDB();
 				if (userMsg[3].equals("sendFile")) { // SEND FILE logic
 					reSendFile(userMsg[2], userMsg[1], db);
@@ -265,6 +295,7 @@ public class ServerVer2 extends Thread {
 		output.close();
 		input.close();
 		link.close();
+		System.err.println("Client dc'ed");
 
 	}
 
@@ -359,6 +390,10 @@ public class ServerVer2 extends Thread {
 
 		}
 
+	}
+	
+	private void concatIncomingMessage(String str) {
+		ServerGUI.textArea.append(str);
 	}
 
 }

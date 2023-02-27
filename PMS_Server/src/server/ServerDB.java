@@ -108,6 +108,7 @@ public class ServerDB {
 			ResultSet rs = prep.executeQuery();
 			while (rs.next()) {
 				if (rs.getString(1) != null) {
+					System.out.println("Takuv user sushtestvuva");
 					return true;
 				}
 			}

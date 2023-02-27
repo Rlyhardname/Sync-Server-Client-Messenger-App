@@ -65,7 +65,6 @@ public class ClientLoginGUI {
 		initialize(600);
 		client = new ClientLogic();
 		client.start();
-
 	}
 
 	public ClientLoginGUI(int xAxis, String clientNames) {

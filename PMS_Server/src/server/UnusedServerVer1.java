@@ -138,7 +138,7 @@ public class UnusedServerVer1 extends Thread {
 		System.out.println("vliza li v login?");
 		sendMessage(msg, link, output);
 		onlineUsers.put(username, link);
-		db.loginTime(username);
+		//db.loginTime(username);
 	}
 
 	public static synchronized void printActiveUsers() {
