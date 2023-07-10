@@ -1,13 +1,10 @@
 package client;
 
 import java.awt.EventQueue;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -21,12 +18,7 @@ import javax.swing.JLabel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.GridLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.BoxLayout;
 import javax.swing.SwingConstants;
-import javax.swing.filechooser.FileSystemView;
 
 import client.interfaces.FriendListSelectionListener;
 import server.ServerSettings;

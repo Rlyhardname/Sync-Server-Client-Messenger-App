@@ -1,17 +1,12 @@
 package client;
-
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.event.WindowEvent;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JTextField;
-import javax.swing.filechooser.FileSystemView;
-
+import lombok.Data;
 import server.ServerGUI;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowEvent;
+
+@Data
 public class ClientLoginGUI {
 
 	private JFrame frame;
@@ -217,15 +212,5 @@ public class ClientLoginGUI {
 
 		return null;
 	}
-
-
-	public JTextField getUsername() {
-		return username;
-	}
-
-	public void setUsername(JTextField username) {
-		this.username = username;
-	}
-
 
 }
