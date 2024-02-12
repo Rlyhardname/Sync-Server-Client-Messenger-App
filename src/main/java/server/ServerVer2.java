@@ -1,5 +1,7 @@
 package server;
 
+import client.model.User;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -8,250 +10,227 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+public class ServerVer2 {
+    private User user;
+    private Socket link;
+    private PrintWriter output;
+    private BufferedReader input;
+    private DataOutputStream outputFile;
+    private DataInputStream inputFile;
 
+    ServerVer2() {
+        Initialize();
+    }
 
-public class ServerVer2 extends Thread {
+    ServerVer2(ServerGUI GUI) {
+        ServerSettings.serverDefaultSettings(GUI);
 
-	private Socket link;
-	private PrintWriter output;
-	private BufferedReader input;
-	private String username;
-	private String password;
-	private DataOutputStream outputFile;
-	private DataInputStream inputFile;
-	private boolean duckTape;
-	private String duckTapeMsg;
+    }
 
-	ServerVer2() {
-		Initialize();
-	}
+    private void Initialize() {
+        try {
+            link = ServerSettings.serverSocket.accept();
+            output = new PrintWriter(link.getOutputStream(), true);
+            input = new BufferedReader(new InputStreamReader(link.getInputStream()));
+            inputFile = new DataInputStream(link.getInputStream());
+        } catch (IOException e1) {
+            try {
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+            e1.printStackTrace();
+        }
 
-	ServerVer2(ServerGUI GUI) {
-		ServerSettings.serverDefaultSettings(GUI);
+    }
 
-	}
+    void connectClient() {
+        try {
+            System.out.println("Client Connected");
+            authentication();
+            syncClientWithServerDB();
+            handleClient();
 
-	private void Initialize() {
-		try {
-			duckTape = false;
-			link = ServerSettings.serverSocket.accept();
-			output = new PrintWriter(link.getOutputStream(), true);
-			input = new BufferedReader(new InputStreamReader(link.getInputStream()));
-			inputFile = new DataInputStream(link.getInputStream());
-		} catch (IOException e1) {
-			try {
-			} catch (NullPointerException e) {
-				e.printStackTrace();
-			}
-			e1.printStackTrace();
-		}
+        } catch (NullPointerException e1) {
+            e1.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-	}
+    }
 
-	void connectClient() {
-		try {
+    private void authentication() {
+        while (true) {
+            String[] commandUserPass;
+            String msg = "";
+            System.err.println("hmm");
+            try {
+                msg = input.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (NullPointerException e1) {
+                e1.printStackTrace();
+                break;
+            }
+            concatIncomingMessage(msg);
+            commandUserPass = msg.split(",");
 
-			System.out.println("ClientConnected");
-			authentication();
-			syncClientWithServerDB();
-			handleClient();
+            try {
+                user = new User(commandUserPass[1], commandUserPass[2]);
+            } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
+                e.printStackTrace();
+                // TODO add exception handling
+                output.println("UsernameException" + "," + "sorry");
+                continue;
+            }
 
-		} catch (NullPointerException e1) {
-			e1.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+            System.out.println("Client returned username : " + user.getUsername());
 
-	}
-
-	@Override
-	public void run() {
-		
-	}
-
-	private void authentication() {
-		while (true) {
-			ServerDB db = new ServerDB();
-			String[] commandUserPass;
-			String msg = "";
-			System.err.println("hmm");
-			try {
-				if(duckTape != true) {
-					msg = input.readLine();
-					
-				} else {
-					System.out.println(duckTapeMsg);
-					msg = duckTapeMsg;
-					duckTape = false;
-				}
-				
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (NullPointerException e1) {
-				e1.printStackTrace();
-				break;
-			}
-			concatIncomingMessage(msg);
-			commandUserPass = msg.split(",");
-
-			try {
-				username = commandUserPass[1];
-				password = commandUserPass[2];
-			} catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
-				e.printStackTrace();
-				output.println("UsernameException"+","+"sorry");
-				continue;
-			}
-
-			System.out.println("Client returned username : " + username);
-
-			if (!commandUserPass[0].equals("SIGN UP")) {
+            ServerDB db = new ServerDB();
+            if (commandUserPass[0].equals("LOGIN")) {
 
 //				try {
-//					
+//
 //				} catch (ArrayIndexOutOfBoundsException e) {
 //					e.printStackTrace();
 //					output.println("\"PasswordError\" + \",\" + \"Password doesn't match for username \" + username");
 //					continue;
 //				}
 
-				System.out.println("Client returned password : " + password);
-				if (loginUserExists(db)) {
-					if (correctLoginInfo(db)) {
-						login(db);
-						duckTape = false;
-						db.insertUserLogLogin(username);
-						db.closeConnection();
-						break;
-					}
-				}
+                if (loginUserExists(db)) {
+                    if (correctLoginInfo(db)) {
+                        login(db);
+                        db.logUserLogin(user.getUsername());
+                        db.closeConnection();
+                        break;
+                    }
+                }
 
-			} else if (commandUserPass[0].equals("SIGN UP")) {
-				try {
-					createAccount(db);
-				} catch (IOException | NullPointerException e) {
-					e.printStackTrace();
-					
-				}
+            } else if (commandUserPass[0].equals("SIGN UP")) {
+                try {
+                    createAccount(db);
+                } catch (IOException | NullPointerException e) {
+                    e.printStackTrace();
 
-			}
-		}
+                }
 
-	}
+            }
+        }
 
-	private void syncClientWithServerDB() {
-		ServerDB db = new ServerDB();
-		String[] batch = db.getUnsendMessages(username);
-		if (ServerSettings.onlineUsers.get(username) != null) {
-			for (String string : batch) {
+    }
 
-				output.println(string);
-			}
+    private void syncClientWithServerDB() {
+        ServerDB db = new ServerDB();
+        String[] batch = db.getUnsendMessages(username);
+        if (ServerSettings.onlineUsers.get(username) != null) {
+            for (String string : batch) {
 
-		}
-		db.closeConnection();
-	}
+                output.println(string);
+            }
 
-	private boolean loginUserExists(ServerDB db) {
+        }
+        db.closeConnection();
+    }
 
-		boolean condition = db.isRegisteredUser(username);
-		if (condition == false) {
-			String msg = "UsernameError" + "," + "There is no user: " + username + " in our databases!";
-			sendMessage(msg);
-			return false;
+    private boolean loginUserExists(ServerDB db) {
 
-		}
+        boolean condition = db.isRegisteredUser(username);
+        if (condition == false) {
+            String msg = "UsernameError" + "," + "There is no user: " + username + " in our databases!";
+            sendMessage(msg);
+            return false;
 
-		return true;
-	}
+        }
 
-	private boolean correctLoginInfo(ServerDB db) {
-		if (db.passwordIsCorrect(username, password) == false) {
-			String msg = "PasswordError" + "," + "Password doesn't match for username " + username;
-			sendMessage(msg);
-			return false;
-		}
-		return true;
-	}
+        return true;
+    }
 
-	private void login(ServerDB db) {
-		String msg = "LoginSuccess" + "," + "Succesfully logged in!";
-		sendMessage(msg);
-		ServerSettings.onlineUsers.put(username, link);
-	}
+    private boolean correctLoginInfo(ServerDB db) {
+        if (db.passwordIsCorrect(username, password) == false) {
+            String msg = "PasswordError" + "," + "Password doesn't match for username " + username;
+            sendMessage(msg);
+            return false;
+        }
+        return true;
+    }
 
-	private void createAccount(ServerDB db) throws IOException {
-		do {
-			if (userDataIsValid(20)) {
-				if (!db.isRegisteredUser(this.username)) {
-					if (userDataIsValid(32)) {
-						System.err.println("validen li e usera?");
-						if (db.createUser(username, password)) {
-							String msg = "AccountCreated" + "," + "Account Succesfully created!";
-							sendMessage(msg);
-							break;
-						} else {
-							String msg = "CreateAccountError" + "," + "Database error, try again!";
-							sendMessage(msg);
-							break;
-						}
-					}
+    private void login(ServerDB db) {
+        String msg = "LoginSuccess" + "," + "Succesfully logged in!";
+        sendMessage(msg);
+        ServerSettings.onlineUsers.put(username, link);
+    }
 
-				}
-				output.println("user is registred sorry" + "," + " SORRY");
-				break;
-			}
-			
-		} while (true);
+    private void createAccount(ServerDB db) throws IOException {
+        do {
+            if (userDataIsValid(20)) {
+                if (!db.isRegisteredUser(this.username)) {
+                    if (userDataIsValid(32)) {
+                        System.err.println("validen li e usera?");
+                        if (db.createUser(username, password)) {
+                            String msg = "AccountCreated" + "," + "Account Succesfully created!";
+                            sendMessage(msg);
+                            break;
+                        } else {
+                            String msg = "CreateAccountError" + "," + "Database error, try again!";
+                            sendMessage(msg);
+                            break;
+                        }
+                    }
 
-	}
+                }
+                output.println("user is registred sorry" + "," + " SORRY");
+                break;
+            }
 
-	private boolean userDataIsValid(int i) {
-		String dataType = "";
-		if (i == 20) {
-			dataType = "username";
-		} else if (i == 32) {
-			dataType = "password";
-		}
-		if (dataType.length() > i) {
-			String msg = "TooManyCharacters" + "," + dataType + "," + "Is too long!";
-			sendMessage(msg);
-			return false;
-		}
-		String[] forbbidenSymbols = { "#", "$", ",", "%", "!", "@", "^", "*", "(", ")", "+", "{", "}", "[", "]", "'",
-				"\"", " Insert ", " Update ", " Delete " };
+        } while (true);
 
-		for (String string : forbbidenSymbols) {
-			if (dataType.contains(string)) {
-				String msg = "ForbidenSymbolRegister" + "," + dataType + "," + "Contrains forbidden symbol!" + ","
-						+ string;
-				sendMessage(msg);
-				return false;
-			}
-		}
+    }
 
-		return true;
-	}
-	
+    private boolean userDataIsValid(int i) {
+        String dataType = "";
+        if (i == 20) {
+            dataType = "username";
+        } else if (i == 32) {
+            dataType = "password";
+        }
+        if (dataType.length() > i) {
+            String msg = "TooManyCharacters" + "," + dataType + "," + "Is too long!";
+            sendMessage(msg);
+            return false;
+        }
+        String[] forbbidenSymbols = {"#", "$", ",", "%", "!", "@", "^", "*", "(", ")", "+", "{", "}", "[", "]", "'",
+                "\"", " Insert ", " Update ", " Delete "};
 
-	private void handleClient() throws IOException {
-		String msg = "";
-		do {
+        for (String string : forbbidenSymbols) {
+            if (dataType.contains(string)) {
+                String msg = "ForbidenSymbolRegister" + "," + dataType + "," + "Contrains forbidden symbol!" + ","
+                        + string;
+                sendMessage(msg);
+                return false;
+            }
+        }
 
-			try {
+        return true;
+    }
 
-				msg = input.readLine();
-				
-				if ((msg == null) || (msg.startsWith(","))) {
-					continue;
-				}
-				String[] userMsg = msg.split(",");
-				if(userMsg[2].equals("ANDROIDLOGOUT")) {
-					ServerGUI.createNewConnection();
-					break;
-				}
-				if (userMsg[0].equals("ClosingClient"))
-					break;
+
+    private void handleClient() throws IOException {
+        String msg = "";
+        do {
+
+            try {
+
+                msg = input.readLine();
+
+                if ((msg == null) || (msg.startsWith(","))) {
+                    continue;
+                }
+                String[] userMsg = msg.split(",");
+                if (userMsg[2].equals("ANDROIDLOGOUT")) {
+                    ServerGUI.createNewConnection();
+                    break;
+                }
+                if (userMsg[0].equals("ClosingClient"))
+                    break;
 
 //				if(userMsg[0].equals("login") || userMsg[0].equals("SIGN UP")) {
 //					duckTapeMsg = msg;
@@ -260,140 +239,138 @@ public class ServerVer2 extends Thread {
 //					password = userMsg[2];
 //					authentication();
 //				}
-				ServerDB db = new ServerDB();
-				if (userMsg[3].equals("sendFile")) { // SEND FILE logic
-					reSendFile(userMsg[2], userMsg[1], db);
-					db.closeConnection();
-					// userMsg[0] - message // userMsg[1] - username // userMsg[2] - Chat_room_ID //
-					// // userMsg[3] = "msgType"
-				}
+                ServerDB db = new ServerDB();
+                if (userMsg[3].equals("sendFile")) { // SEND FILE logic
+                    reSendFile(userMsg[2], userMsg[1], db);
+                    db.closeConnection();
+                    // userMsg[0] - message // userMsg[1] - username // userMsg[2] - Chat_room_ID //
+                    // // userMsg[3] = "msgType"
+                }
 
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						if (isTextMessage(userMsg[3])) { // SEND MSG LOGIC
-							boolean isMessageStored = db.storeMessage(userMsg[1], userMsg[0],
-									Integer.parseInt(userMsg[2]));
-							if (isMessageStored) {
-								sendMsgOnlineRoomUsers(db, userMsg[2], userMsg[1], userMsg[0]);
-								db.closeConnection();
-							}
-						}
-					}
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isTextMessage(userMsg[3])) { // SEND MSG LOGIC
+                            boolean isMessageStored = db.storeMessage(userMsg[1], userMsg[0],
+                                    Integer.parseInt(userMsg[2]));
+                            if (isMessageStored) {
+                                sendMsgOnlineRoomUsers(db, userMsg[2], userMsg[1], userMsg[0]);
+                                db.closeConnection();
+                            }
+                        }
+                    }
 
-				}).start();
+                }).start();
 
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (NullPointerException e1) {
-				e1.printStackTrace();
-			}
-		} while (true);
-		ServerDB db = new ServerDB();
-		db.insertUserLogout(username);
-		db.closeConnection();
-		output.close();
-		input.close();
-		link.close();
-		System.err.println("Client dc'ed");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (NullPointerException e1) {
+                e1.printStackTrace();
+            }
+        } while (true);
+        ServerDB db = new ServerDB();
+        db.insertUserLogout(username);
+        db.closeConnection();
+        output.close();
+        input.close();
+        link.close();
+        System.err.println("Client dc'ed");
 
-	}
+    }
 
-	private boolean isTextMessage(String msg) {
-		if (msg.equals("TextMessage")) {
-			return true;
-		}
-		return false;
-	}
+    private boolean isTextMessage(String msg) {
+        if (msg.equals("TextMessage")) {
+            return true;
+        }
+        return false;
+    }
 
-	private void sendMsgOnlineRoomUsers(ServerDB db, String room, String user, String message) {
-		String[] users = db.getRoomUsers(Integer.parseInt(room));
-		for (String roomUser : users) {
-			if (ServerSettings.onlineUsers.get(roomUser) != null) {
+    private void sendMsgOnlineRoomUsers(ServerDB db, String room, String user, String message) {
+        String[] users = db.getRoomUsers(Integer.parseInt(room));
+        for (String roomUser : users) {
+            if (ServerSettings.onlineUsers.get(roomUser) != null) {
 
-				Socket userSocket = ServerSettings.onlineUsers.get(roomUser);
-				PrintWriter distribute = null;
-				try {
-					distribute = new PrintWriter(userSocket.getOutputStream(), true);
-					distribute.println(message + "," + room + "," + roomUser + "," + "TextMessage");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+                Socket userSocket = ServerSettings.onlineUsers.get(roomUser);
+                PrintWriter distribute = null;
+                try {
+                    distribute = new PrintWriter(userSocket.getOutputStream(), true);
+                    distribute.println(message + "," + room + "," + roomUser + "," + "TextMessage");
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
 
-			} else {
-				db.alterUserLogoutState(roomUser);
-			}
-			;
-		}
+            } else {
+                db.alterUserLogoutState(roomUser);
+            }
+            ;
+        }
 
-	}
+    }
 
-	private void sendMessage(String msg) {
+    private void sendMessage(String msg) {
 
-		output.println(msg);
+        output.println(msg);
 
-	}
+    }
 
-	public static synchronized void printActiveUsers() {
-		ServerGUI.printArea();
-	}
+    public static synchronized void printActiveUsers() {
+        ServerGUI.printArea();
+    }
 
-	private void reSendFile(String room, String usernameSendingFile, ServerDB db) throws IOException
+    private void reSendFile(String room, String usernameSendingFile, ServerDB db) throws IOException {
 
-	{
+        String[] usersInRoom = db.getRoomUsers(Integer.parseInt(room));
+        for (String user : usersInRoom) {
 
-		String[] usersInRoom = db.getRoomUsers(Integer.parseInt(room));
-		for (String user : usersInRoom) {
+            Socket onlineUser = ServerSettings.onlineUsers.get(user);
+            if (onlineUser != null && !usernameSendingFile.toLowerCase().equals(user)) {
+                int bytes = 0;
+                PrintWriter resend = null;
+                try {
+                    resend = new PrintWriter(onlineUser.getOutputStream(), true);
+                } catch (IOException e2) {
+                    // TODO Auto-generated catch block
+                    e2.printStackTrace();
+                }
+                resend.println(
+                        usernameSendingFile + "," + " is sendingFile in room " + "," + "room" + "," + "ReceiveFile");
+                DataOutputStream outputFile1 = null;
+                try {
+                    outputFile1 = new DataOutputStream(onlineUser.getOutputStream());
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
 
-			Socket onlineUser = ServerSettings.onlineUsers.get(user);
-			if (onlineUser != null && !usernameSendingFile.toLowerCase().equals(user)) {
-				int bytes = 0;
-				PrintWriter resend = null;
-				try {
-					resend = new PrintWriter(onlineUser.getOutputStream(), true);
-				} catch (IOException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				}
-				resend.println(
-						usernameSendingFile + "," + " is sendingFile in room " + "," + "room" + "," + "ReceiveFile");
-				DataOutputStream outputFile1 = null;
-				try {
-					outputFile1 = new DataOutputStream(onlineUser.getOutputStream());
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+                try {
 
-				try {
+                    byte[] buffer = new byte[4 * 1024];
+                    long size = inputFile.readLong();
 
-					byte[] buffer = new byte[4 * 1024];
-					long size = inputFile.readLong();
+                    while ((size > 0 && (bytes = inputFile.read(buffer)) != -1)) {
+                        outputFile1.write(buffer, 0, bytes);
+                        System.out.println("size " + size + " Buffer " + buffer);
+                        size -= bytes;
+                        outputFile1.flush();
+                        if (bytes < 4096) {
+                            break;
+                        }
 
-					while ((size > 0 && (bytes = inputFile.read(buffer)) != -1)) {
-						outputFile1.write(buffer, 0, bytes);
-						System.out.println("size " + size  + " Buffer " + buffer);
-						size -= bytes;
-						outputFile1.flush();
-						if(bytes<4096) {
-							break;
-						}
-						
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				resend.flush();
-				//outputFile1.close();
-				// resend.close();
-			}
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                resend.flush();
+                //outputFile1.close();
+                // resend.close();
+            }
 
-		}
+        }
 
-	}
-	
-	private void concatIncomingMessage(String str) {
-		ServerGUI.textArea.append(str);
-	}
+    }
+
+    private void concatIncomingMessage(String str) {
+        ServerGUI.textArea.append(str);
+    }
 
 }
