@@ -2,6 +2,7 @@ package client;
 
 import client.model.Config;
 import client.model.User;
+import common.Command;
 import server.ServerSettings;
 
 import java.io.*;
@@ -39,11 +40,11 @@ public class MessageLogic {
                 }
 
 
-                if (splitMessage[3].equals("ReceiveFile")) {
+                if (splitMessage[3].equals(Command.RECEIVE_FILE.name())) {
                     String path = FileTransfer.pickDirectory();
                     FileTransfer.receiveFile(path, connection);
                     clientGUI.concattArea(received);
-                } else if (splitMessage[3].equals("TextMessage")) {
+                } else if (splitMessage[3].equals(Command.TEXT_MESSAGE.name())) {
                     clientGUI.concattArea(splitMessage[0]);
                 }
 
@@ -69,7 +70,7 @@ public class MessageLogic {
 
     public boolean isLoginSuccess() {
         String received = receiveMessage();
-        if (received.equals("LoginSuccess,Successfully logged in!")) {
+        if (received.equals(Command.LOGIN_SUCCESS.name()+",Successfully logged in!")) {
             return true;
         }
         System.out.println(received);
@@ -91,7 +92,6 @@ public class MessageLogic {
     }
 
     public boolean login() {
-
         do {
             try {
                 String serverMsg = connection.getInput().readLine();
@@ -101,7 +101,7 @@ public class MessageLogic {
                 } else if (serverMsg.equals("Password")) {
                     System.out.println(serverMsg);
                     connection.getOutput().println(user.getPassword());
-                } else if (serverMsg.equals("LoginSuccess\" + \",\" + \"Successfully logged in!")) {
+                } else if (serverMsg.equals(Command.LOGIN_SUCCESS.name() + "," + "Successfully logged in!")) {
                     System.out.println(serverMsg);
                     break;
                 } else {

@@ -21,7 +21,6 @@ public class LoginGUI {
         EventQueue.invokeLater(() -> {
             try {
                 LoginGUI window = new LoginGUI();
-                ServerGUI.createNewConnection();
                 window.frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();
