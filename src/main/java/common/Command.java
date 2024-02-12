@@ -1,6 +1,12 @@
 package common;
 
 public enum Command {
+    LOGIN,
+    SIGN_UP,
+    NICKNAME_UNAVAILABLE,
+    REGISTER_ATTEMPT,
+    REGISTER_SUCCESS,
+    REGISTER_FAIL,
     LOGIN_SUCCESS,
     LOGIN_FAIL,
     TEXT_MESSAGE,
