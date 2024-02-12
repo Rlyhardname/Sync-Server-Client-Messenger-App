@@ -1,0 +1,12 @@
+package common;
+
+public enum Command {
+    LOGIN_SUCCESS,
+    LOGIN_FAIL,
+    TEXT_MESSAGE,
+    SEND_FILE,
+    RECEIVE_FILE,
+    CLOSING_CONNECTION,
+    FORBIDDEN_SYMBOL,
+    TOO_MANY_CHARACTERS
+}
