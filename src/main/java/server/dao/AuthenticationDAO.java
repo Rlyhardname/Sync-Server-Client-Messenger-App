@@ -1,12 +1,14 @@
 package server.dao;
 
+import client.model.User;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class AuthenticationDAO {
+public class AuthenticationDAO implements AuthDAO<User> {
     private final DataSource dataSource;
 
     public AuthenticationDAO(DataSource dataSource) {

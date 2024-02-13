@@ -20,11 +20,12 @@ public class Config {
             //setStarted(false);
             host = InetAddress.getLocalHost();
             link = new Socket(host, PORT);
-            System.err.println(host);
+            System.err.println("HOST NAME " + host);
             input = new BufferedReader(new InputStreamReader(link.getInputStream()));
             output = new PrintWriter(link.getOutputStream(), true);
             outputFile = new DataOutputStream(link.getOutputStream());
             inputFile = new DataInputStream(link.getInputStream());
+            System.err.println("New Connection is running");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Host ID not found");

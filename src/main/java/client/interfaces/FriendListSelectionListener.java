@@ -6,14 +6,14 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JLabel;
 
-import client.ClientOperationGUI;
+import client.AppGUI;
 
 public class FriendListSelectionListener implements MouseListener {
 
-	ClientOperationGUI gui;
+	AppGUI gui;
 
-	public FriendListSelectionListener(ClientOperationGUI clientOperationGUI) {
-		gui = clientOperationGUI;
+	public FriendListSelectionListener(AppGUI appGUI) {
+		gui = appGUI;
 	}
 
 	@Override
