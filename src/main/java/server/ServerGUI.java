@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.util.ConcurrentModificationException;
-import java.util.Objects;
+import server.dao.*;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -12,10 +12,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import client.LoginGUI;
+import server.dao.DataBaseConfigurations;
 
 public class ServerGUI {
-    private ServerSettings settings;
-    private static ServerGUI serverGUI;
+    private ServerSettings serverSettings;
+    private DataBaseConfigurations dataBaseConfigurations;
     private JFrame frame;
     static JTextArea textArea;
 
@@ -25,9 +26,7 @@ public class ServerGUI {
     public static void startGUI() {
         EventQueue.invokeLater(() -> {
             try {
-                if (Objects.isNull(serverGUI)) {
-                    serverGUI = new ServerGUI();
-                }
+                new ServerGUI();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -40,18 +39,13 @@ public class ServerGUI {
      * Create the application.
      */
     public ServerGUI() {
+        serverSettings = new ServerSettings();
+        dataBaseConfigurations = new DataBaseConfigurations("girrafe", "jdbc:mysql://localhost/girrafe", "root", "dCBZXTf49PcL3L97lWXP");
         initialize();
-        settings = new ServerSettings();
-        ServerSettings.serverDefaultSettings(this);
-        while (true) {
-            ServerVer2 serverV2 = new ServerVer2();
-            if (Objects.nonNull(serverV2)) {
-                createNewConnection(serverV2);
-            } else {
-                // TODO log
-            }
-        }
-
+        DataSourcePool.instanceOf(dataBaseConfigurations.newMysqlDataSource());
+        new Thread(() -> {
+            startServer();
+        }).start();
     }
 
     /**
@@ -84,11 +78,13 @@ public class ServerGUI {
 
         new Thread(() -> print.addActionListener(e -> printUsersAndAdditionalInfo())).start();
         new Thread(() -> newClientLogin.addActionListener(e -> clientLoginTestButton())).start();
+
+        frame.setVisible(true);
     }
 
-    private void createNewConnection(ServerVer2 serverVer2) {
+    public void startServer() {
         new Thread(() -> {
-            serverVer2.connectClient();
+            new ServerVer2();
         }).start();
     }
 
@@ -98,9 +94,9 @@ public class ServerGUI {
     }
 
     private Object clientLoginTestButton() {
-        LoginGUI.startGUI();
-        ServerVer2 serverV2 = new ServerVer2();
-        createNewConnection(serverV2);
+//        LoginGUI.startGUI();
+//        ServerVer2 serverV2 = new ServerVer2();
+//        createNewConnection(serverV2);
         return null;
     }
 
