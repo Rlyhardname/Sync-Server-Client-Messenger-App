@@ -19,4 +19,6 @@ public interface StorageDAO<T> {
 
     boolean storeMessage(String username, String msg, int room);
 
+    String[] getRoomUsers(int roomId);
+
 }

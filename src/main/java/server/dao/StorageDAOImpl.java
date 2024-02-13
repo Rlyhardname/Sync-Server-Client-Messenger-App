@@ -205,5 +205,33 @@ public class StorageDAOImpl implements StorageDAO<User> {
         return false;
     }
 
+    public String[] getRoomUsers(int i) {
+        String sql = "SELECT Username " + "FROM chat_room_warehouse " + "WHERE chat_room_id=?";
+        ResultSet rs = null;
+        ArrayList<String> list = new ArrayList<String>();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement prep = conn.prepareStatement(sql)) {
+            prep.setInt(1, i);
+            rs = prep.executeQuery();
+            while (rs.next()) {
+                String user = rs.getString(1).toLowerCase();
+                list.add(user);
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            try {
+                rs.close();
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+        String[] usersInRoom = list.toArray(new String[0]);
+        return usersInRoom;
+    }
+
 }
 
