@@ -32,6 +32,7 @@ public class ServerVer2 {
     private boolean hasInitialized() {
         try {
             link = ServerSettings.serverSocket.accept();
+            System.out.println("server created!");
             new Thread(() -> {
                 new ServerVer2();
             }).start();
@@ -220,6 +221,7 @@ public class ServerVer2 {
         do {
             try {
                 msg = input.readLine();
+                System.out.println("message + " + msg);
                 if ((msg == null) || (msg.startsWith(","))) {
                     continue;
                 }
