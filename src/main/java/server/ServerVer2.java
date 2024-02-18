@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Optional;
 
 public class ServerVer2 {
@@ -55,7 +56,7 @@ public class ServerVer2 {
         try {
             System.out.println("Client Connected");
             authentication();
-            syncClientWithServerDB();
+            // syncClientWithServerDB();
             handleClient();
 
         } catch (NullPointerException e1) {
@@ -83,7 +84,7 @@ public class ServerVer2 {
             } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
                 e.printStackTrace();
                 // TODO add exception handling
-                output.println("UsernameException" + "," + "sorry");
+                sendMessage("UsernameException" + "," + "sorry");
                 continue;
             }
 
@@ -103,7 +104,7 @@ public class ServerVer2 {
                 break;
             } else if (commandUserPass[0].equals(Command.SIGN_UP.name())) {
                 try {
-                    createAccount();
+                    isAccountCreated();
                 } catch (IOException | NullPointerException e) {
                     e.printStackTrace();
 
@@ -119,7 +120,7 @@ public class ServerVer2 {
         String[] batch = storageDAO.fetchAllByNameUnsentMessages(user.getUsername());
         if (ServerSettings.onlineUsers.get(user.getUsername()) != null) {
             for (String string : batch) {
-                output.println(string);
+                sendMessage(string);
             }
 
         }
@@ -149,38 +150,40 @@ public class ServerVer2 {
     }
 
     private void login() {
+        System.out.println("login message? " + Command.LOGIN_SUCCESS.name());
         String msg = Command.LOGIN_SUCCESS.name() + "," + "Successfully logged in!";
-        ServerSettings.onlineUsers.put(user.getUsername(), link);
         sendMessage(msg);
+        ServerSettings.onlineUsers.put(user.getUsername(), link);
+
     }
 
-    private void createAccount() throws IOException {
+    private boolean isAccountCreated() throws IOException {
         do {
             if (!userDataIsValid(20, user.getUsername())) {
-                break;
+                return false;
             }
 
             AuthDAO authDAO = new AuthenticationDAO(DataSourcePool.instanceOf());
             if (authDAO.isUserRegistered(user.getUsername())) {
-                output.println(Command.NICKNAME_UNAVAILABLE.name());
-                break;
+                sendMessage(Command.NICKNAME_UNAVAILABLE.name());
+                return false;
             }
 
             if (!userDataIsValid(32, user.getPassword())) {
-                break;
+                return false;
             }
 
             StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
             Optional<User> userOpt = storageDAO.createUser(user.getUsername(), user.getPassword());
             if (userOpt.isPresent()) {
-                String msg = Command.REGISTER_SUCCESS + "," + "Account Successfully created!";
+                String msg = Command.REGISTER_SUCCESS.name() + "," + "Account Successfully created!";
                 sendMessage(msg);
             } else {
-                String msg = Command.REGISTER_FAIL + "," + "Database error, try again!";
+                String msg = Command.REGISTER_FAIL.name() + "," + "Database error, try again!";
                 sendMessage(msg);
             }
 
-            break;
+            return true;
         } while (true);
 
     }
@@ -209,6 +212,11 @@ public class ServerVer2 {
 
     /**
      * <pre>
+     *      * userMsg[0] - msgType;
+     *      * userMsg[1] - username;
+     *      * userMsg[2] - Chat_room_ID;
+     *      * userMsg[3] = message;
+     *
      * userMsg[0] - message;
      * userMsg[1] - username;
      * userMsg[2] - Chat_room_ID;
@@ -226,27 +234,32 @@ public class ServerVer2 {
                     continue;
                 }
                 String[] userMsg = msg.split(",");
+                String command = userMsg[0];
+                String username = userMsg[1];
+                int room = Integer.parseInt(userMsg[2]);
+                String message = userMsg[3];
 
-                if (userMsg[0].equals("ClosingClient")) {
+                if (command.equals(Command.CLOSING_CONNECTION.name())) {
                     break;
                 }
 
-                if (userMsg[3].equals("sendFile")) { // SEND FILE logic
-                    reSendFile(userMsg[2], userMsg[1]);
+                if (command.equals("sendFile")) { // SEND FILE logic
+                    reSendFile(room, username);
 
                 }
 
-                new Thread(() -> {
-                    if (isTextMessage(userMsg[3])) { // SEND MSG LOGIC
+                if (isTextMessage(command)) {
+                    System.err.println("server receices" + Arrays.toString(userMsg));
+                    new Thread(() -> {
+                        // SEND MSG LOGIC
                         StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-                        boolean isMessageStored = storageDAO.storeMessage(userMsg[1], userMsg[0],
-                                Integer.parseInt(userMsg[2]));
+                        boolean isMessageStored = storageDAO.storeMessage(username, message, room);
                         if (isMessageStored) {
-                            sendMsgOnlineRoomUsers(userMsg[2], userMsg[1], userMsg[0]);
+                            sendMsgOnlineRoomUsers(room, username, message);
                         }
                     }
-                }).start();
-
+                    ).start();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (NullPointerException e1) {
@@ -259,7 +272,8 @@ public class ServerVer2 {
             output.close();
             input.close();
             link.close();
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -267,22 +281,22 @@ public class ServerVer2 {
     }
 
     private boolean isTextMessage(String msg) {
-        if (msg.equals("TextMessage")) {
+        if (msg.equals(Command.TEXT_MESSAGE.name())) {
             return true;
         }
         return false;
     }
 
-    private void sendMsgOnlineRoomUsers(String room, String user, String message) {
+    private void sendMsgOnlineRoomUsers(int room, String user, String message) {
         StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-        String[] users = storageDAO.getRoomUsers(Integer.parseInt(room));
+        String[] users = storageDAO.getRoomUsers(room);
         for (String roomUser : users) {
             if (ServerSettings.onlineUsers.get(roomUser) != null) {
                 Socket userSocket = ServerSettings.onlineUsers.get(roomUser);
                 PrintWriter distribute = null;
                 try {
                     distribute = new PrintWriter(userSocket.getOutputStream(), true);
-                    distribute.println(message + "," + room + "," + roomUser + "," + "TextMessage");
+                    distribute.println(Command.TEXT_MESSAGE.name()+"," + roomUser + "," + room  + "," + message+"\n");
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -297,12 +311,12 @@ public class ServerVer2 {
     }
 
     private void sendMessage(String msg) {
-        output.println(msg);
+        output.println(msg+"\n");
     }
 
-    private void reSendFile(String room, String usernameSendingFile) {
+    private void reSendFile(int room, String usernameSendingFile) {
         StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-        String[] usersInRoom = storageDAO.getRoomUsers(Integer.parseInt(room));
+        String[] usersInRoom = storageDAO.getRoomUsers(room);
         for (String user : usersInRoom) {
 
             Socket onlineUser = ServerSettings.onlineUsers.get(user);
