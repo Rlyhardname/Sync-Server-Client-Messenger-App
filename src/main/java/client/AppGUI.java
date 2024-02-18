@@ -1,7 +1,7 @@
 package client;
 
 import client.interfaces.FriendListSelectionListener;
-import server.ServerSettings;
+import common.Command;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,6 +35,7 @@ public class AppGUI {
     public static void startClientGUI(MessageLogic messageLogicArg) {
         EventQueue.invokeLater(() -> {
             try {
+                System.out.println("username in appGUI constructor" + messageLogicArg.getUser().getUsername());
                 AppGUI window = new AppGUI(messageLogicArg);
                 window.frame.setVisible(true);
             } catch (Exception e) {
@@ -47,8 +48,14 @@ public class AppGUI {
      * Create the application.
      */
     public AppGUI(MessageLogic messageLogicArg) {
-        initialize();
+        System.out.println("username in appGUI" + messageLogicArg);
         this.messageLogic = messageLogicArg;
+        initialize();
+        new Thread(() -> {
+            messageLogic.handleServer(this);
+        }).start();
+
+
     }
 
     /**
@@ -61,7 +68,7 @@ public class AppGUI {
         frame.setTitle("application interface");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout());
-        frame.setTitle("frame2");
+        frame.setTitle(messageLogic.getUser().getUsername());
         room = 0;
 
         header = new JPanel();
@@ -124,7 +131,7 @@ public class AppGUI {
         new Thread(() -> frame.addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(WindowEvent winEvt) {
                 try {
-                    messageLogic.sendMessage("ClosingClient" + "," + messageLogic.getUser().getUsername());
+                    messageLogic.sendMessage(Command.CLOSING_CONNECTION.name() + "," + messageLogic.getUser().getUsername());
                 } finally {
                     try {
                         messageLogic.getConnection().getInput().close();
@@ -133,9 +140,9 @@ public class AppGUI {
                     }
                 }
 
-                if (!ServerSettings.onlineUsers.isEmpty()) {
-                    ServerSettings.onlineUsers.remove(messageLogic.getUser().getUsername());
-                }
+//                if (!ServerSettings.onlineUsers.isEmpty()) {
+//                    ServerSettings.onlineUsers.remove(messageLogic.getUser().getUsername());
+//                }
 
             }
         })).start();
@@ -158,7 +165,7 @@ public class AppGUI {
 
     private Object sendMessage() {
         System.err.println(room);
-        String msg = textField.getText().toString() + "," + messageLogic.getUser().getUsername() + "," + getRoom() + "," + "TextMessage";
+        String msg = Command.TEXT_MESSAGE.name() + "," + messageLogic.getUser().getUsername() + "," + getRoom() + "," + textField.getText().toString();
         messageLogic.sendMessage(msg);
         textField.setText("");
 
@@ -182,18 +189,23 @@ public class AppGUI {
     public JLabel getFriendOne() {
         return friendOne;
     }
+
     public JLabel getFriendTwo() {
         return friendTwo;
     }
+
     public JLabel getFriendThree() {
         return friendThree;
     }
+
     public JLabel getFriendFour() {
         return friendFour;
     }
+
     public JLabel getFriendFive() {
         return friendFive;
     }
+
     public JLabel getFileDemonstrationRoom() {
         return fileDemonstrationRoom;
     }

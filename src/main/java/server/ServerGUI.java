@@ -83,9 +83,9 @@ public class ServerGUI {
     }
 
     public void startServer() {
-        new Thread(() -> {
+     //   new Thread(() -> {
             new ServerVer2();
-        }).start();
+     //   }).start();
     }
 
     private Object printUsersAndAdditionalInfo() {
