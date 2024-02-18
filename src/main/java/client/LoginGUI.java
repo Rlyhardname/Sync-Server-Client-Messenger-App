@@ -1,6 +1,6 @@
 package client;
 
-import server.ServerGUI;
+import common.Command;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,7 +8,6 @@ import java.awt.event.WindowEvent;
 
 public class LoginGUI {
     private JFrame frame;
-    private MessageLogic messageLogic;
     private JTextField username;
     private JTextField password;
     private JButton signUp;
@@ -34,7 +33,6 @@ public class LoginGUI {
      */
     public LoginGUI() {
         initialize(600);
-        new Thread(() -> messageLogic = new MessageLogic());
     }
 
     private void initialize(int xAxis) {
@@ -68,35 +66,52 @@ public class LoginGUI {
     }
 
     private Object login() {
-        try {
-            if (messageLogic.accessServer("login", username.getText(), password.getText())) {
-                messageLogic.runHandleServer();
-                System.out.println("Client: " + username.getText() + " has logged in!");
-                AppGUI.startClientGUI(messageLogic);
-                frame.dispose();
-            }
-        } catch (RuntimeException e) {
-            signUp.setText("LOGIN FAILED");
-            e.printStackTrace();
-            frame.dispose();
-        }
+        MessageLogic messageLogic = new MessageLogic();
+        new Thread(() -> {
+            try {
+                if (messageLogic.accessServer(Command.LOGIN.name(), username.getText(), password.getText())) {
+                    System.out.println("is it true?");
+                    messageLogic.runHandleServer();
+                    System.out.println("Client: " + username.getText() + " has logged in!");
 
+                } else {
+                    // TODO log failed access, have popup to client
+                }
+
+            } catch (RuntimeException e) {
+                // TODO log failed access, have popup to client
+                signUp.setText("LOGIN FAILED");
+                e.printStackTrace();
+
+            }
+
+        }).start();
+        AppGUI.startClientGUI(messageLogic);
+        frame.dispose();
         return null;
     }
 
     private Object register() {
-        try {
-            if (messageLogic.accessServer("signup", username.getText(), password.getText())) {
-                System.out.println("Successful registration of:" + username.getText() + "," + frame.getTitle());
-                messageLogic.runHandleServer();
+        MessageLogic messageLogic = new MessageLogic();
+        new Thread(() -> {
+            try {
+                if (messageLogic.accessServer(Command.SIGN_UP.name(), username.getText(), password.getText())) {
+                    System.out.println("Successful registration of:" + username.getText() + "," + frame.getTitle());
+                    messageLogic.runHandleServer();
+                    frame.dispose();
+                } else {
+                    // TODO log failed access, have popup to client
+                }
+
+            } catch (RuntimeException e) {
+                // TODO log failed access, have popup to client
+                e.printStackTrace();
                 frame.dispose();
             }
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            frame.dispose();
-        }
 
+        }).start();
+        AppGUI.startClientGUI(messageLogic);
+        frame.dispose();
         return null;
     }
-
 }
