@@ -20,31 +20,60 @@ public class MessageLogic {
     }
 
     public void runHandleServer() {
-            handleServer();
+           // this.clientGUI = clientGUI;
+           // handleServer();
     }
 
-    public void handleServer() {
+    public void handleServer(AppGUI clientGUI) {
+        this.clientGUI = clientGUI;
         do {
             try {
-                String[] received = connection.getInput().readLine().split(",");
-                if (received == null) {
-                    System.out.println("handle server failed...");
-                    break;
+                BufferedReader input =  connection.getInput();
+                String line = "";
+                while ((line = input.readLine())!=null){
+                    if(line.equals("")){
+                        continue;
+                    }
+                    String[] pack = line.split(",");
+                    String command = pack[0];
+                    String username = pack[1];
+                    String room = pack[2];
+                    String message = pack[3];
+
+                if(command.equals(Command.LOGIN_SUCCESS.name())){
+                    System.out.println("successfully logged in!");
+                    continue;
+                }
+                    if(command.equals(Command.TEXT_MESSAGE.name())){
+                        System.out.println("at least we know we received it..");
+                        clientGUI.concatArea(username+ ": "+ message);
+                        continue;
+                    }
                 }
 
-                System.out.println(received.length);
-                // TODO why is this here?
-                if (received.length < 4) {
+                if (line == null) {
+                    System.out.println("handle server failed...");
+                    // TODO logout or some way to handle
                     continue;
                 }
 
-                if (received[3].equals(Command.RECEIVE_FILE.name())) {
-                    String path = FileTransfer.pickDirectory();
-                    FileTransfer.receiveFile(path, connection);
-                    clientGUI.concatArea(Arrays.toString(received));
-                } else if (received[3].equals(Command.TEXT_MESSAGE.name())) {
-                    clientGUI.concatArea(received[0]);
-                }
+
+
+
+
+                System.out.println("message length " + line.length() + line);
+                // TODO why is this here?
+//                if (received.length < 4) {
+//                    continue;
+//                }
+
+//                if (received[3].equals(Command.RECEIVE_FILE.name())) {
+//                    String path = FileTransfer.pickDirectory();
+//                    FileTransfer.receiveFile(path, connection);
+//                    clientGUI.concatArea(Arrays.toString(received));
+//                } else if (received[3].equals(Command.TEXT_MESSAGE.name())) {
+//                    clientGUI.concatArea(received[0]);
+//                }
 
             } catch (IOException e) {
                 System.out.println("exception 1");
@@ -58,6 +87,10 @@ public class MessageLogic {
 
         } while (true);
     }
+
+//    handleCommands(String[] block){
+//        if(block)
+//    }
 
     boolean accessServer(String command, String username, String password) {
         loginMessage(command, username, password);
@@ -76,7 +109,6 @@ public class MessageLogic {
             return true;
         }
 
-        System.out.println(Arrays.toString(received));
         return false;
     }
 
