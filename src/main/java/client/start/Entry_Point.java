@@ -1,4 +1,4 @@
-package client.entryPoint;
+package client.start;
 
 import client.LoginGUI;
 

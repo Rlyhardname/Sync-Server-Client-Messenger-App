@@ -3,9 +3,9 @@ package client;
 import client.model.Config;
 import client.model.User;
 import common.Command;
-import server.ServerSettings;
 
 import java.io.*;
+import java.util.Arrays;
 
 public class MessageLogic {
     private AppGUI clientGUI;
@@ -20,38 +20,38 @@ public class MessageLogic {
     }
 
     public void runHandleServer() {
-        if (!ServerSettings.onlineUsers.isEmpty()) {
             handleServer();
-        }
     }
 
     public void handleServer() {
         do {
             try {
-                String received = connection.getInput().readLine();
+                String[] received = connection.getInput().readLine().split(",");
                 if (received == null) {
+                    System.out.println("handle server failed...");
                     break;
                 }
 
-                String[] splitMessage = received.split(",");
+                System.out.println(received.length);
                 // TODO why is this here?
-                if (splitMessage.length < 4) {
+                if (received.length < 4) {
                     continue;
                 }
 
-
-                if (splitMessage[3].equals(Command.RECEIVE_FILE.name())) {
+                if (received[3].equals(Command.RECEIVE_FILE.name())) {
                     String path = FileTransfer.pickDirectory();
                     FileTransfer.receiveFile(path, connection);
-                    clientGUI.concattArea(received);
-                } else if (splitMessage[3].equals(Command.TEXT_MESSAGE.name())) {
-                    clientGUI.concattArea(splitMessage[0]);
+                    clientGUI.concatArea(Arrays.toString(received));
+                } else if (received[3].equals(Command.TEXT_MESSAGE.name())) {
+                    clientGUI.concatArea(received[0]);
                 }
 
             } catch (IOException e) {
+                System.out.println("exception 1");
                 e.printStackTrace();
                 break;
             } catch (NullPointerException e1) {
+                System.out.println("exception 2");
                 e1.printStackTrace();
                 break;
             }
@@ -59,36 +59,41 @@ public class MessageLogic {
         } while (true);
     }
 
-    boolean accessServer(String string, String username, String password) {
-        loginMessage(string, username, password);
+    boolean accessServer(String command, String username, String password) {
+        loginMessage(command, username, password);
         if (isLoginSuccess()) {
             user = new User(username, password);
             return true;
         }
+
         return false;
     }
 
     public boolean isLoginSuccess() {
-        String received = receiveMessage();
-        if (received.equals(Command.LOGIN_SUCCESS.name()+",Successfully logged in!")) {
+        String[] received = receiveMessage();
+        System.out.println(" received commands "  + Arrays.toString(received));
+        if (received[0].equals(Command.LOGIN_SUCCESS.name())) {
             return true;
         }
-        System.out.println(received);
-        return false;
 
+        System.out.println(Arrays.toString(received));
+        return false;
     }
 
     public void sendMessage(String message) {
         connection.getOutput().println(message);
     }
 
-    public String receiveMessage() {
+    public String[] receiveMessage() {
+        String[] arr;
         try {
-            String msg = connection.getInput().readLine();
+             arr = connection.getInput().readLine().split(",");
+             return arr;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "";
+
+        return new String[0];
     }
 
     public boolean login() {
@@ -130,43 +135,22 @@ public class MessageLogic {
 
     public void loginMessage(String command, String user, String pass) {
         String msg = concatStrings(user, pass).toString();
-        String action = command.equals("login") ? "LOGIN" + "," + msg : "SIGN UP" + "," + msg;
+        String action = command.equals(Command.LOGIN.name()) ? Command.LOGIN.name() + "," + msg : Command.SIGN_UP.name() + "," + msg;
+        System.out.println("Command " + action );
         connection.getOutput().println(action);
     }
-
-
-    // TODO does this make sense?
-
 
     public AppGUI getClientGUI() {
         return clientGUI;
     }
-
-    public void setClientGUI(AppGUI clientGUI) {
-        this.clientGUI = clientGUI;
-    }
-
     public LoginGUI getLogin() {
         return login;
     }
-
-    public void setLogin(LoginGUI login) {
-        this.login = login;
-    }
-
     public Config getConnection() {
         return connection;
     }
-
-    public void setConnection(Config connection) {
-        this.connection = connection;
-    }
-
     public User getUser() {
         return user;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
 }

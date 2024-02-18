@@ -11,12 +11,13 @@ public class ServerSettings {
 
     static {
         try {
-            serverSocket = new ServerSocket(PORT);
+            if (serverSocket == null) {
+                serverSocket = new ServerSocket(PORT);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static ConcurrentHashMap<String, Socket> onlineUsers = new ConcurrentHashMap<String, Socket>();
-
 }

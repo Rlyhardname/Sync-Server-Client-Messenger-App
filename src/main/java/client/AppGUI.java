@@ -33,14 +33,12 @@ public class AppGUI {
      * Launch the application.
      */
     public static void startClientGUI(MessageLogic messageLogicArg) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    AppGUI window = new AppGUI(messageLogicArg);
-                    window.frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        EventQueue.invokeLater(() -> {
+            try {
+                AppGUI window = new AppGUI(messageLogicArg);
+                window.frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
@@ -121,8 +119,8 @@ public class AppGUI {
             sendFile(path);
         });
 
-        new Thread(() -> send.addActionListener(e -> selectionButtonPressed())).start();
-        new Thread(() -> newClient.addActionListener(e -> selectionButtonPressed1())).start();
+        new Thread(() -> send.addActionListener(e -> sendMessage())).start();
+        new Thread(() -> newClient.addActionListener(e -> newClientTest())).start();
         new Thread(() -> frame.addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(WindowEvent winEvt) {
                 try {
@@ -153,12 +151,12 @@ public class AppGUI {
         this.room = room;
     }
 
-    private Object selectionButtonPressed1() {
+    private Object newClientTest() {
         LoginGUI.startGUI();
         return null;
     }
 
-    private Object selectionButtonPressed() {
+    private Object sendMessage() {
         System.err.println(room);
         String msg = textField.getText().toString() + "," + messageLogic.getUser().getUsername() + "," + getRoom() + "," + "TextMessage";
         messageLogic.sendMessage(msg);
@@ -171,7 +169,7 @@ public class AppGUI {
         label.setForeground(color);
     }
 
-    public void concattArea(String msg) {
+    public void concatArea(String msg) {
         textArea.append((msg + "\n"));
     }
 
@@ -179,59 +177,24 @@ public class AppGUI {
         String msg = "Hello" + "," + messageLogic.getUser().getUsername() + "," + getRoom() + "," + "sendFile";
         messageLogic.getConnection().getOutput().println(msg);
         FileTransfer.sendFile(path, messageLogic.getConnection());
-
-    }
-
-    public void setFriendList(JPanel friendList) {
-        this.friendList = friendList;
     }
 
     public JLabel getFriendOne() {
         return friendOne;
     }
-
-    public void setFriendOne(JLabel friendOne) {
-        this.friendOne = friendOne;
-    }
-
     public JLabel getFriendTwo() {
         return friendTwo;
     }
-
-    public void setFriendTwo(JLabel friendTwo) {
-        this.friendTwo = friendTwo;
-    }
-
     public JLabel getFriendThree() {
         return friendThree;
     }
-
-    public void setFriendThree(JLabel friendThree) {
-        this.friendThree = friendThree;
-    }
-
     public JLabel getFriendFour() {
         return friendFour;
     }
-
-    public void setFriendFour(JLabel friendFour) {
-        this.friendFour = friendFour;
-    }
-
     public JLabel getFriendFive() {
         return friendFive;
     }
-
-    public void setFriendFive(JLabel friendFive) {
-        this.friendFive = friendFive;
-    }
-
     public JLabel getFileDemonstrationRoom() {
         return fileDemonstrationRoom;
     }
-
-    public void setFileDemonstrationRoom(JLabel fileDemonstrationRoom) {
-        this.fileDemonstrationRoom = fileDemonstrationRoom;
-    }
-
 }

@@ -181,11 +181,16 @@ public class StorageDAOImpl implements StorageDAO<User> {
 
             }
 
-            if (inputUser.toLowerCase().equals(username)) {
+        } catch (SQLException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
 
-                String sql2 = "INSERT INTO Message_data " + "(chat_room_id,username,message_text) " + "VALUES(?,?,?)";
+        String sql2 = "INSERT INTO Message_data " + "(chat_room_id,username,message_text) " + "VALUES(?,?,?)";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement prep = conn.prepareStatement(sql2)) {
+            if (inputUser.toLowerCase().equals(username)) {
                 try {
-                    prep.addBatch(sql2);
                     prep.setInt(1, room);
                     prep.setString(2, inputUser);
                     prep.setString(3, msg);
@@ -195,14 +200,12 @@ public class StorageDAOImpl implements StorageDAO<User> {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                return true;
-            }
-        } catch (SQLException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
 
-        return false;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
     }
 
     public String[] getRoomUsers(int i) {
