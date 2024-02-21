@@ -19,61 +19,25 @@ public class MessageLogic {
         }
     }
 
-    public void runHandleServer() {
-           // this.clientGUI = clientGUI;
-           // handleServer();
-    }
-
     public void handleServer(AppGUI clientGUI) {
         this.clientGUI = clientGUI;
         do {
             try {
-                BufferedReader input =  connection.getInput();
+                BufferedReader input = connection.getInput();
                 String line = "";
-                while ((line = input.readLine())!=null){
-                    if(line.equals("")){
+                while ((line = input.readLine()) != null) {
+                    System.out.println(line.length());
+                    if (line.equals("")) {
                         continue;
                     }
+
                     String[] pack = line.split(",");
-                    String command = pack[0];
-                    String username = pack[1];
-                    String room = pack[2];
-                    String message = pack[3];
-
-                if(command.equals(Command.LOGIN_SUCCESS.name())){
-                    System.out.println("successfully logged in!");
-                    continue;
-                }
-                    if(command.equals(Command.TEXT_MESSAGE.name())){
-                        System.out.println("at least we know we received it..");
-                        clientGUI.concatArea(username+ ": "+ message);
+                    if (pack.length == 1) {
                         continue;
                     }
+
+                    handleCommands(pack);
                 }
-
-                if (line == null) {
-                    System.out.println("handle server failed...");
-                    // TODO logout or some way to handle
-                    continue;
-                }
-
-
-
-
-
-                System.out.println("message length " + line.length() + line);
-                // TODO why is this here?
-//                if (received.length < 4) {
-//                    continue;
-//                }
-
-//                if (received[3].equals(Command.RECEIVE_FILE.name())) {
-//                    String path = FileTransfer.pickDirectory();
-//                    FileTransfer.receiveFile(path, connection);
-//                    clientGUI.concatArea(Arrays.toString(received));
-//                } else if (received[3].equals(Command.TEXT_MESSAGE.name())) {
-//                    clientGUI.concatArea(received[0]);
-//                }
 
             } catch (IOException e) {
                 System.out.println("exception 1");
@@ -88,9 +52,34 @@ public class MessageLogic {
         } while (true);
     }
 
-//    handleCommands(String[] block){
-//        if(block)
-//    }
+    private int handleCommands(String[] block) {
+        String command = block[0];
+        String username = block[1];
+        String room = block[2];
+        String message = block[3];
+        if (command.equals(Command.LOGIN_SUCCESS.name())) {
+            System.out.println("successfully logged in!");
+            return 1;
+        }
+
+        if (command.equals(Command.TEXT_MESSAGE.name())) {
+            System.out.println("at least we know we received it..");
+            clientGUI.concatArea(username + ": " + message);
+            return 1;
+        }
+
+        if (command.equals(Command.RECEIVE_FILE.name())) {
+            String path = FileTransfer.pickDirectory();
+            if (!path.equals("") || !path.equals(null)) {
+                FileTransfer.receiveFile(path, connection);
+                clientGUI.concatArea(username + ": sending file " + message);
+                return 1;
+            }
+
+        }
+
+        return -1;
+    }
 
     boolean accessServer(String command, String username, String password) {
         loginMessage(command, username, password);
@@ -104,8 +93,11 @@ public class MessageLogic {
 
     public boolean isLoginSuccess() {
         String[] received = receiveMessage();
-        System.out.println(" received commands "  + Arrays.toString(received));
+        System.out.println(" received commands " + Arrays.toString(received));
         if (received[0].equals(Command.LOGIN_SUCCESS.name())) {
+            return true;
+        }
+        if(received[0].equals(Command.REGISTER_SUCCESS.name())){
             return true;
         }
 
@@ -119,8 +111,8 @@ public class MessageLogic {
     public String[] receiveMessage() {
         String[] arr;
         try {
-             arr = connection.getInput().readLine().split(",");
-             return arr;
+            arr = connection.getInput().readLine().split(",");
+            return arr;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -168,19 +160,22 @@ public class MessageLogic {
     public void loginMessage(String command, String user, String pass) {
         String msg = concatStrings(user, pass).toString();
         String action = command.equals(Command.LOGIN.name()) ? Command.LOGIN.name() + "," + msg : Command.SIGN_UP.name() + "," + msg;
-        System.out.println("Command " + action );
-        connection.getOutput().println(action);
+        System.out.println("Command " + action);
+        sendMessage(action);
     }
 
     public AppGUI getClientGUI() {
         return clientGUI;
     }
+
     public LoginGUI getLogin() {
         return login;
     }
+
     public Config getConnection() {
         return connection;
     }
+
     public User getUser() {
         return user;
     }
