@@ -17,12 +17,14 @@ public class FileTransfer {
         fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("txt", "txt"));
         fileChooserj.setAcceptAllFileFilterUsed(true);
         String path = "";
+        String name = "";
         int r = fileChooserj.showSaveDialog(null);
         if (r == JFileChooser.APPROVE_OPTION) {
-            path = (fileChooserj.getSelectedFile().getAbsolutePath());
+            path = fileChooserj.getSelectedFile().getAbsolutePath();
+            name = fileChooserj.getName();
         }
 
-        return path;
+        return path+","+name;
     }
 
     public static void receiveFile(String fileName, Config connection) {
@@ -43,6 +45,8 @@ public class FileTransfer {
                 System.out.println(" Buffer " + buffer + " bytes " + bytes);
                 fileOutputStream.write(buffer, 0, bytes);
                 if (bytes < 4096) {
+                    System.out.println(" Buffer " + buffer + " bytes " + bytes);
+                    fileOutputStream.write(buffer, 0, bytes);
                     break;
                 }
             }
@@ -52,6 +56,7 @@ public class FileTransfer {
         } finally {
             try {
                 fileOutputStream.flush();
+                connection.getOutputFile().flush();
                 fileOutputStream.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -82,6 +87,9 @@ public class FileTransfer {
                 // Send the file to Server Socket
                 connection.getOutputFile().write(buffer, 0, bytes);
                 connection.getOutputFile().flush();
+                if(bytes==0){
+                    break;
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
