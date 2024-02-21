@@ -19,10 +19,10 @@ import java.util.Optional;
 public class ServerVer2 {
     private User user;
     private Socket link;
-    private PrintWriter output;
-    private BufferedReader input;
-    private DataOutputStream outputFile;
-    private DataInputStream inputFile;
+    private PrintWriter textOutput;
+    private BufferedReader textInput;
+    private DataOutputStream fileOutput;
+    private DataInputStream fileInput;
 
 
     ServerVer2() {
@@ -34,12 +34,10 @@ public class ServerVer2 {
         try {
             link = ServerSettings.serverSocket.accept();
             System.out.println("server created!");
-            new Thread(() -> {
-                new ServerVer2();
-            }).start();
-            output = new PrintWriter(link.getOutputStream(), true);
-            input = new BufferedReader(new InputStreamReader(link.getInputStream()));
-            inputFile = new DataInputStream(link.getInputStream());
+            textOutput = new PrintWriter(link.getOutputStream(), true);
+            textInput = new BufferedReader(new InputStreamReader(link.getInputStream()));
+            fileInput = new DataInputStream(link.getInputStream());
+            fileOutput = new DataOutputStream(link.getOutputStream());
         } catch (IOException e1) {
             try {
             } catch (NullPointerException e) {
@@ -48,6 +46,10 @@ public class ServerVer2 {
             }
             e1.printStackTrace();
             return false;
+        } finally {
+            new Thread(() -> {
+                new ServerVer2();
+            }).start();
         }
         return true;
     }
@@ -69,7 +71,7 @@ public class ServerVer2 {
             String[] commandUserPass;
             String msg = "";
             try {
-                msg = input.readLine();
+                msg = textInput.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (NullPointerException e1) {
@@ -153,7 +155,7 @@ public class ServerVer2 {
         System.out.println("login message? " + Command.LOGIN_SUCCESS.name());
         String msg = Command.LOGIN_SUCCESS.name() + "," + "Successfully logged in!";
         sendMessage(msg);
-        ServerSettings.onlineUsers.put(user.getUsername(), link);
+        ServerSettings.onlineUsers.put(user.getUsername(), this);
 
     }
 
@@ -228,9 +230,10 @@ public class ServerVer2 {
         String msg = "";
         do {
             try {
-                msg = input.readLine();
+                msg = textInput.readLine();
+                System.out.println(Thread.currentThread());
                 System.out.println("message + " + msg);
-                if ((msg == null) || (msg.startsWith(","))) {
+                if ((msg == null) || (msg.startsWith(",") || msg.equals(""))) {
                     continue;
                 }
                 String[] userMsg = msg.split(",");
@@ -240,25 +243,25 @@ public class ServerVer2 {
                 String message = userMsg[3];
 
                 if (command.equals(Command.CLOSING_CONNECTION.name())) {
+                    ServerSettings.onlineUsers.remove(username);
                     break;
                 }
 
-                if (command.equals("sendFile")) { // SEND FILE logic
-                    reSendFile(room, username);
-
+                if (command.equals(Command.SEND_FILE.name())) { // SEND FILE logic
+                    reSendFile(room, username, message); // message = file name in this case;
                 }
 
                 if (isTextMessage(command)) {
                     System.err.println("server receices" + Arrays.toString(userMsg));
-                    new Thread(() -> {
-                        // SEND MSG LOGIC
-                        StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-                        boolean isMessageStored = storageDAO.storeMessage(username, message, room);
-                        if (isMessageStored) {
-                            sendMsgOnlineRoomUsers(room, username, message);
-                        }
+                    //      new Thread(() -> {
+                    // SEND MSG LOGIC
+                    StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+                    boolean isMessageStored = storageDAO.storeMessage(username, message, room);
+                    if (isMessageStored) {
+                        sendMsgOnlineRoomUsers(room, username, message);
                     }
-                    ).start();
+//                    }
+//                    ).start();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -269,8 +272,8 @@ public class ServerVer2 {
         StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
         storageDAO.logUserActivity(user.getUsername());
         try {
-            output.close();
-            input.close();
+            textOutput.close();
+            textInput.close();
             link.close();
         } catch (
                 IOException e) {
@@ -292,16 +295,7 @@ public class ServerVer2 {
         String[] users = storageDAO.getRoomUsers(room);
         for (String roomUser : users) {
             if (ServerSettings.onlineUsers.get(roomUser) != null) {
-                Socket userSocket = ServerSettings.onlineUsers.get(roomUser);
-                PrintWriter distribute = null;
-                try {
-                    distribute = new PrintWriter(userSocket.getOutputStream(), true);
-                    distribute.println(Command.TEXT_MESSAGE.name()+"," + roomUser + "," + room  + "," + message+"\n");
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
+                ServerSettings.onlineUsers.get(roomUser).getTextOutput().println(Command.TEXT_MESSAGE.name() + "," + user + "," + room + "," + message);
             } else {
                 storageDAO.logUserActivity(roomUser);
             }
@@ -311,54 +305,43 @@ public class ServerVer2 {
     }
 
     private void sendMessage(String msg) {
-        output.println(msg+"\n");
+        textOutput.println(msg);
     }
 
-    private void reSendFile(int room, String usernameSendingFile) {
+    private void reSendFile(int room, String usernameSendingFile, String fileName) {
         StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
         String[] usersInRoom = storageDAO.getRoomUsers(room);
         for (String user : usersInRoom) {
-
-            Socket onlineUser = ServerSettings.onlineUsers.get(user);
+            ServerVer2 onlineUser = ServerSettings.onlineUsers.get(user);
             if (onlineUser != null && !usernameSendingFile.toLowerCase().equals(user)) {
                 int bytes = 0;
-                PrintWriter resend = null;
+                onlineUser.getTextOutput().println(Command.RECEIVE_FILE.name() + "," + usernameSendingFile + "," + room + "," + fileName);
+                DataOutputStream sendFile = onlineUser.getFileOutput();
                 try {
-                    resend = new PrintWriter(onlineUser.getOutputStream(), true);
-                } catch (IOException e2) {
-                    // TODO Auto-generated catch block
-                    e2.printStackTrace();
-                }
-                resend.println(
-                        usernameSendingFile + "," + " is sendingFile in room " + "," + "room" + "," + "ReceiveFile");
-                DataOutputStream outputFile1 = null;
-                try {
-                    outputFile1 = new DataOutputStream(onlineUser.getOutputStream());
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-
-                try {
-
                     byte[] buffer = new byte[4 * 1024];
-                    long size = inputFile.readLong();
-
-                    while ((size > 0 && (bytes = inputFile.read(buffer)) != -1)) {
-                        outputFile1.write(buffer, 0, bytes);
+                    long size = fileInput.readLong();
+                    while ((size > 0 && (bytes = fileInput.read(buffer)) != -1)) {
+                        sendFile.write(buffer, 0, bytes);
                         System.out.println("size " + size + " Buffer " + buffer);
                         size -= bytes;
-                        outputFile1.flush();
+                        sendFile.flush();
+                        System.out.println("start sending file... ");
                         if (bytes < 4096) {
                             break;
                         }
 
                     }
+
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    try {
+                        sendFile.flush();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-                resend.flush();
-                //outputFile1.close();
-                // resend.close();
+
             }
 
         }
@@ -371,5 +354,29 @@ public class ServerVer2 {
 
     public static synchronized void printActiveUsers() {
         ServerGUI.printArea();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Socket getLink() {
+        return link;
+    }
+
+    public PrintWriter getTextOutput() {
+        return textOutput;
+    }
+
+    public BufferedReader getTextInput() {
+        return textInput;
+    }
+
+    public DataOutputStream getFileOutput() {
+        return fileOutput;
+    }
+
+    public DataInputStream getFileInput() {
+        return fileInput;
     }
 }
