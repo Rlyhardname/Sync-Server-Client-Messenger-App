@@ -19,5 +19,5 @@ public class ServerSettings {
         }
     }
 
-    public static ConcurrentHashMap<String, Socket> onlineUsers = new ConcurrentHashMap<String, Socket>();
+    public static ConcurrentHashMap<String, ServerVer2> onlineUsers = new ConcurrentHashMap<>();
 }
