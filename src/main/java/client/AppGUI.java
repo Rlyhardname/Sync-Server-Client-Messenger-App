@@ -120,18 +120,19 @@ public class AppGUI {
         fileDemonstrationRoom.addMouseListener(listen);
         frame.getContentPane().add(friendList, BorderLayout.EAST);
 
-        btnSendFile.addActionListener(e -> {
-            String path = FileTransfer.pickDirectory();
-            FileTransfer.sendFile(path, messageLogic.getConnection());
-            sendFile(path);
-        });
+        new Thread(()->btnSendFile.addActionListener(e -> {
+            String[] block = FileTransfer.pickDirectory().split(",");
+            String path = block[0];
+            String fileName = block[1];
+            sendFile(path, fileName);
+        })).start();
 
         new Thread(() -> send.addActionListener(e -> sendMessage())).start();
         new Thread(() -> newClient.addActionListener(e -> newClientTest())).start();
         new Thread(() -> frame.addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(WindowEvent winEvt) {
                 try {
-                    messageLogic.sendMessage(Command.CLOSING_CONNECTION.name() + "," + messageLogic.getUser().getUsername());
+                    messageLogic.sendMessage(Command.CLOSING_CONNECTION.name() + "," + messageLogic.getUser().getUsername() + "," + "-1" + "," + "Pressing X button");
                 } finally {
                     try {
                         messageLogic.getConnection().getInput().close();
@@ -139,11 +140,6 @@ public class AppGUI {
                         throw new RuntimeException(e);
                     }
                 }
-
-//                if (!ServerSettings.onlineUsers.isEmpty()) {
-//                    ServerSettings.onlineUsers.remove(messageLogic.getUser().getUsername());
-//                }
-
             }
         })).start();
 
@@ -180,8 +176,8 @@ public class AppGUI {
         textArea.append((msg + "\n"));
     }
 
-    public void sendFile(String path) {
-        String msg = "Hello" + "," + messageLogic.getUser().getUsername() + "," + getRoom() + "," + "sendFile";
+    public void sendFile(String path, String fileName) {
+        String msg = Command.SEND_FILE.name() + "," + messageLogic.getUser().getUsername() + "," + getRoom() + "," + fileName;
         messageLogic.getConnection().getOutput().println(msg);
         FileTransfer.sendFile(path, messageLogic.getConnection());
     }
