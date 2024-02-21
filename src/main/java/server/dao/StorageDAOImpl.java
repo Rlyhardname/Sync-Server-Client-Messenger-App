@@ -28,22 +28,14 @@ public class StorageDAOImpl implements StorageDAO<User> {
             prep.setString(1, username);
             prep.setString(2, password);
             prep.executeUpdate();
-
-            sql = "SELECT username FROM User " + "WHERE username=?";
-            prep.addBatch(sql);
-            prep.setString(1, username);
-            rs = prep.executeQuery();
-            if (rs.next()) {
-                String name = rs.getString(1);
-                String pass = rs.getString(2);
-                return Optional.of(new User(name, password));
-            }
+            return Optional.of(new User(username,password));
 
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return Optional.of(null);
+
+        return Optional.ofNullable(null);
     }
 
     @Override
