@@ -13,18 +13,15 @@ public class Config {
     private DataInputStream inputFile;
     private Socket link;
 
-    //private boolean started;
-
     public Config() {
         try {
-            //setStarted(false);
             host = InetAddress.getLocalHost();
             link = new Socket(host, PORT);
             System.err.println("HOST NAME " + host);
             input = new BufferedReader(new InputStreamReader(link.getInputStream()));
             output = new PrintWriter(link.getOutputStream(), true);
-            outputFile = new DataOutputStream(link.getOutputStream());
             inputFile = new DataInputStream(link.getInputStream());
+            outputFile = new DataOutputStream(link.getOutputStream());
             System.err.println("New Connection is running");
         } catch (IOException e) {
             e.printStackTrace();
@@ -57,16 +54,8 @@ public class Config {
         return outputFile;
     }
 
-    public void setOutputFile(DataOutputStream outputFile) {
-        this.outputFile = outputFile;
-    }
-
     public DataInputStream getInputFile() {
         return inputFile;
-    }
-
-    public void setInputFile(DataInputStream inputFile) {
-        this.inputFile = inputFile;
     }
 
     public Socket getLink() {
