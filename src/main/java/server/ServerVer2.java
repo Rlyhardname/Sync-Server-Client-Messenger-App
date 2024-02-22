@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
 public class ServerVer2 {
@@ -26,16 +27,17 @@ public class ServerVer2 {
 
 
     ServerVer2() {
-        hasInitialized();
-        connectClient();
+        if (hasInitialized()) {
+            connectClient();
+        }
     }
 
     private boolean hasInitialized() {
         try {
             link = ServerSettings.serverSocket.accept();
             System.out.println("server created!");
-            textOutput = new PrintWriter(link.getOutputStream(), true);
             textInput = new BufferedReader(new InputStreamReader(link.getInputStream()));
+            textOutput = new PrintWriter(link.getOutputStream(), true);
             fileInput = new DataInputStream(link.getInputStream());
             fileOutput = new DataOutputStream(link.getOutputStream());
         } catch (IOException e1) {
@@ -58,7 +60,7 @@ public class ServerVer2 {
         try {
             System.out.println("Client Connected");
             authentication();
-            // syncClientWithServerDB();
+            syncClientWithServerDB();
             handleClient();
 
         } catch (NullPointerException e1) {
@@ -102,7 +104,7 @@ public class ServerVer2 {
 
                 login();
                 StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-                storageDAO.logUserActivity(user.getUsername());
+                storageDAO.logUserLogin(user.getUsername());
                 break;
             } else if (commandUserPass[0].equals(Command.SIGN_UP.name())) {
                 try {
@@ -125,6 +127,7 @@ public class ServerVer2 {
                 sendMessage(string);
             }
 
+            storageDAO.updateUserLogMessageSent(user.getUsername(),1);
         }
     }
 
@@ -233,9 +236,15 @@ public class ServerVer2 {
                 msg = textInput.readLine();
                 System.out.println(Thread.currentThread());
                 System.out.println("message + " + msg);
-                if ((msg == null) || (msg.startsWith(",") || msg.equals(""))) {
+
+                if (Objects.isNull(msg)) {
+                    break;
+                }
+
+                if ((msg.startsWith(",") || msg.equals(""))) {
                     continue;
                 }
+
                 String[] userMsg = msg.split(",");
                 String command = userMsg[0];
                 String username = userMsg[1];
@@ -253,24 +262,27 @@ public class ServerVer2 {
 
                 if (isTextMessage(command)) {
                     System.err.println("server receices" + Arrays.toString(userMsg));
-                    //      new Thread(() -> {
                     // SEND MSG LOGIC
                     StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-                    boolean isMessageStored = storageDAO.storeMessage(username, message, room);
-                    if (isMessageStored) {
-                        sendMsgOnlineRoomUsers(room, username, message);
+                    boolean isUserAuthorizedInRoom = storageDAO.isUserAuthorizedInRoom(username, message, room);
+                    if (!isUserAuthorizedInRoom) {
+                        continue;
                     }
-//                    }
-//                    ).start();
+
+                    storageDAO.saveMessage(username, message, room);
+                    sendMsgOnlineRoomUsers(room, username, message);
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (NullPointerException e1) {
                 e1.printStackTrace();
             }
+
         } while (true);
+
         StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-        storageDAO.logUserActivity(user.getUsername());
+        storageDAO.logUserLogout(user.getUsername());
         try {
             textOutput.close();
             textInput.close();
@@ -280,7 +292,6 @@ public class ServerVer2 {
             throw new RuntimeException(e);
         }
 
-        System.err.println("Client dc'ed");
     }
 
     private boolean isTextMessage(String msg) {
@@ -297,7 +308,7 @@ public class ServerVer2 {
             if (ServerSettings.onlineUsers.get(roomUser) != null) {
                 ServerSettings.onlineUsers.get(roomUser).getTextOutput().println(Command.TEXT_MESSAGE.name() + "," + user + "," + room + "," + message);
             } else {
-                storageDAO.logUserActivity(roomUser);
+                storageDAO.updateUserLogMessageSent(roomUser,0);
             }
 
         }
