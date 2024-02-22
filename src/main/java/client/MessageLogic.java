@@ -57,6 +57,7 @@ public class MessageLogic {
         String username = block[1];
         String room = block[2];
         String message = block[3];
+        System.out.println("current incoming message: " + Arrays.toString(block));
         if (command.equals(Command.LOGIN_SUCCESS.name())) {
             System.out.println("successfully logged in!");
             return 1;
@@ -97,7 +98,7 @@ public class MessageLogic {
         if (received[0].equals(Command.LOGIN_SUCCESS.name())) {
             return true;
         }
-        if(received[0].equals(Command.REGISTER_SUCCESS.name())){
+        if (received[0].equals(Command.REGISTER_SUCCESS.name())) {
             return true;
         }
 
