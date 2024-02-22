@@ -7,17 +7,19 @@ public interface StorageDAO<T> {
 
     Optional<T> createUser(String username, String password);
 
-    void logUserActivity(String username);
+    void logUserLogout(String username);
+    void logUserLogin(String username);
+    void updateUserLogMessageSent(String username,int state);
 
-    void updateUserLog(String username);
-
-    Timestamp fetchTimestamp(String username);
+    Timestamp fetchLastLogoutTimestamp(String username);
 
     void deleteById(int id);
 
     String[] fetchAllByNameUnsentMessages(String username);
 
-    boolean storeMessage(String username, String msg, int room);
+    boolean isUserAuthorizedInRoom(String username, String msg, int room);
+
+    void saveMessage(String username, String msg, int room);
 
     String[] getRoomUsers(int roomId);
 
