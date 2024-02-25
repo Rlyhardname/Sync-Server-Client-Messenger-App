@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.util.ConcurrentModificationException;
+
 import server.dao.*;
 
 import javax.swing.JButton;
@@ -40,6 +41,7 @@ public class ServerGUI {
      */
     public ServerGUI() {
         serverSettings = new ServerSettings();
+        new Thread(() -> serverSettings.pushFriends()).start();
         dataBaseConfigurations = new DataBaseConfigurations("girrafe", "jdbc:mysql://localhost/girrafe", "root", "dCBZXTf49PcL3L97lWXP");
         initialize();
         DataSourcePool.instanceOf(dataBaseConfigurations.newMysqlDataSource());
@@ -77,26 +79,17 @@ public class ServerGUI {
         frame.add(buttons);
 
         new Thread(() -> print.addActionListener(e -> printUsersAndAdditionalInfo())).start();
-        new Thread(() -> newClientLogin.addActionListener(e -> clientLoginTestButton())).start();
-
         frame.setVisible(true);
     }
 
     public void startServer() {
-     //   new Thread(() -> {
-            new ServerVer2();
-     //   }).start();
+        //   new Thread(() -> {
+        new ServerVer2();
+        //   }).start();
     }
 
     private Object printUsersAndAdditionalInfo() {
         printArea();
-        return null;
-    }
-
-    private Object clientLoginTestButton() {
-//        LoginGUI.startGUI();
-//        ServerVer2 serverV2 = new ServerVer2();
-//        createNewConnection(serverV2);
         return null;
     }
 
