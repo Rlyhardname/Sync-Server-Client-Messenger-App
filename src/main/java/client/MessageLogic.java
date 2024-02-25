@@ -8,7 +8,7 @@ import java.io.*;
 import java.util.Arrays;
 
 public class MessageLogic {
-    private AppGUI clientGUI;
+    private AppGUI userGUI;
     private LoginGUI login;
     private Config connection;
     private User user;
@@ -20,7 +20,7 @@ public class MessageLogic {
     }
 
     public void handleServer(AppGUI clientGUI) {
-        this.clientGUI = clientGUI;
+        this.userGUI = clientGUI;
         do {
             try {
                 BufferedReader input = connection.getInput();
@@ -54,32 +54,52 @@ public class MessageLogic {
 
     private int handleCommands(String[] block) {
         String command = block[0];
-        String username = block[1];
-        String room = block[2];
-        String message = block[3];
-        System.out.println("current incoming message: " + Arrays.toString(block));
-        if (command.equals(Command.LOGIN_SUCCESS.name())) {
-            System.out.println("successfully logged in!");
-            return 1;
-        }
+        if (block.length == 4) {
+            String username = block[1];
+            String room = block[2];
+            String message = block[3];
+            System.out.println("current incoming message: " + Arrays.toString(block));
 
-        if (command.equals(Command.TEXT_MESSAGE.name())) {
-            System.out.println("at least we know we received it..");
-            clientGUI.concatArea(username + ": " + message);
-            return 1;
-        }
-
-        if (command.equals(Command.RECEIVE_FILE.name())) {
-            String path = FileTransfer.pickDirectory();
-            if (!path.equals("") || !path.equals(null)) {
-                FileTransfer.receiveFile(path, connection);
-                clientGUI.concatArea(username + ": sending file " + message);
+            if (command.equals(Command.TEXT_MESSAGE.name())) {
+                System.out.println("at least we know we received it..");
+                userGUI.concatArea(username + ": " + message);
                 return 1;
             }
 
+            if (command.equals(Command.RECEIVE_FILE.name())) {
+                String path = FileTransfer.pickDirectory();
+                if (!path.equals("") || !path.equals(null)) {
+                    FileTransfer.receiveFile(path, connection);
+                    userGUI.concatArea(username + ": sending file " + message);
+                    return 1;
+                }
+
+            }
+
+            if (command.equals(Command.LOGIN_SUCCESS.name())) {
+                System.out.println("successfully logged in!");
+                return 1;
+            }
+        }
+
+        if (command.equals(Command.PUSH_FRIENDS.name())) {
+            String[] listOfFriends = constructJList(block);
+            userGUI.setjList(listOfFriends);
         }
 
         return -1;
+    }
+
+    private String[] constructJList(String... block) {
+        String[] listOfFriends = new String[block.length - 1];
+        String filler = "                          ";
+        int fillerLength = filler.length();
+        for (int i = 0; i < listOfFriends.length; i++) {
+            int listItemLength = block[i+1].length();
+            listOfFriends[i] = "    "+block[i+1]+filler.substring(0,fillerLength-listItemLength);
+        }
+
+        return listOfFriends;
     }
 
     boolean accessServer(String command, String username, String password) {
@@ -165,8 +185,8 @@ public class MessageLogic {
         sendMessage(action);
     }
 
-    public AppGUI getClientGUI() {
-        return clientGUI;
+    public AppGUI getUserGUI() {
+        return userGUI;
     }
 
     public LoginGUI getLogin() {
