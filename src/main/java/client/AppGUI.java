@@ -1,6 +1,5 @@
 package client;
 
-import client.interfaces.FriendListSelectionListener;
 import common.Command;
 
 import javax.swing.*;
@@ -13,19 +12,14 @@ public class AppGUI {
     private JFrame frame;
     private JTextArea textArea;
     private JButton newClient;
-    private JButton send;
+    private JButton sendMessageBTN;
     private JScrollPane scrollPane;
     private JPanel panel;
-    private JPanel friendList;
+    private JPanel friendsPanel;
     private JPanel header;
     private JTextField textField;
-    private JLabel friendOne;
-    private JLabel friendTwo;
-    private JLabel friendThree;
-    private JLabel friendFour;
-    private JLabel friendFive;
-    private JLabel fileDemonstrationRoom;
     private JButton btnSendFile;
+    private JList<String> jList;
     private int room;
     // pICK FILE BUTTON
 
@@ -71,64 +65,52 @@ public class AppGUI {
         frame.setTitle(messageLogic.getUser().getUsername());
         room = 0;
 
-        header = new JPanel();
+        // Header
+        header = new JPanel(new BorderLayout());
+        JLabel friendListLabel = new JLabel("Friend List            ");
+        friendListLabel.setHorizontalAlignment(JLabel.RIGHT);
+        header.add(friendListLabel, BorderLayout.EAST);
         frame.getContentPane().add(header, BorderLayout.NORTH);
 
+        // CENTER
         textArea = new JTextArea(10, 10);
         scrollPane = new JScrollPane(textArea);
         frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 
+        // Footer
+        // Widgets
         textField = new JTextField(30);
-        send = new JButton("SEND");
+        sendMessageBTN = new JButton("SEND");
+        btnSendFile = new JButton("Send File");
         newClient = new JButton("NEW CLIENT");
 
+        // BTN panel
         panel = new JPanel();
         panel.add(textField);
-        panel.add(send);
+        panel.add(sendMessageBTN);
+        panel.add(btnSendFile);
         panel.add(newClient);
         frame.getContentPane().add(panel, BorderLayout.SOUTH);
 
-        btnSendFile = new JButton("Send File");
-        panel.add(btnSendFile);
+        //frListListener listen = new frListListener(this);
+        friendsPanel = new JPanel();
+        friendsPanel.setLayout(new GridLayout(0, 1, 0, 0));
+        jList = new JList<>();
+        JPanel east = new JPanel(new BorderLayout());
+        east.add(friendsPanel, BorderLayout.CENTER);
+        friendsPanel.add(jList);
+        frame.getContentPane().add(east
+                , BorderLayout.EAST);
 
-        FriendListSelectionListener listen = new FriendListSelectionListener(this);
-        friendList = new JPanel();
-        friendList.setLayout(new GridLayout(5, 1, 0, 0));
-        friendOne = new JLabel("1 ROOM         ");
-        friendOne.setHorizontalAlignment(SwingConstants.CENTER);
-        friendList.add(friendOne);
-        friendOne.addMouseListener(listen);
-        friendTwo = new JLabel("2 ROOM         ");
-        friendTwo.setHorizontalAlignment(SwingConstants.CENTER);
-        friendList.add(friendTwo);
-        friendTwo.addMouseListener(listen);
-        friendThree = new JLabel("3 ROOM         ");
-        friendThree.setHorizontalAlignment(SwingConstants.CENTER);
-        friendList.add(friendThree);
-        friendThree.addMouseListener(listen);
-        friendFour = new JLabel("4 ROOM         ");
-        friendFour.setHorizontalAlignment(SwingConstants.CENTER);
-        friendList.add(friendFour);
-        friendFour.addMouseListener(listen);
-        friendFive = new JLabel("5 ROOM         ");
-        friendFive.setHorizontalAlignment(SwingConstants.CENTER);
-        friendList.add(friendFive);
-        friendFive.addMouseListener(listen);
-        fileDemonstrationRoom = new JLabel("987 fileDemonstrationRoom");
-        fileDemonstrationRoom.setHorizontalAlignment(SwingConstants.CENTER);
-        friendList.add(fileDemonstrationRoom);
-        fileDemonstrationRoom.addMouseListener(listen);
-        frame.getContentPane().add(friendList, BorderLayout.EAST);
-
-        new Thread(()->btnSendFile.addActionListener(e -> {
+        new Thread(() -> btnSendFile.addActionListener(e -> {
             String[] block = FileTransfer.pickDirectory().split(",");
             String path = block[0];
             String fileName = block[1];
             sendFile(path, fileName);
         })).start();
 
-        new Thread(() -> send.addActionListener(e -> sendMessage())).start();
         new Thread(() -> newClient.addActionListener(e -> newClientTest())).start();
+        new Thread(() -> sendMessageBTN.addActionListener(e -> sendMessage())).start();
         new Thread(() -> frame.addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(WindowEvent winEvt) {
                 try {
@@ -159,6 +141,7 @@ public class AppGUI {
         return null;
     }
 
+
     private Object sendMessage() {
         System.err.println(room);
         String msg = Command.TEXT_MESSAGE.name() + "," + messageLogic.getUser().getUsername() + "," + getRoom() + "," + textField.getText().toString();
@@ -166,6 +149,18 @@ public class AppGUI {
         textField.setText("");
 
         return null;
+    }
+
+    public JList<String> getjList() {
+        return jList;
+    }
+
+    public void setjList(String[] friends) {
+        DefaultListModel model = new DefaultListModel();
+        for (int i = 0; i < friends.length; i++) {
+            model.add(i, friends[i]);
+        }
+        jList.setModel(model);
     }
 
     public void changeLabelColor(JLabel label, Color color) {
@@ -182,27 +177,4 @@ public class AppGUI {
         FileTransfer.sendFile(path, messageLogic.getConnection());
     }
 
-    public JLabel getFriendOne() {
-        return friendOne;
-    }
-
-    public JLabel getFriendTwo() {
-        return friendTwo;
-    }
-
-    public JLabel getFriendThree() {
-        return friendThree;
-    }
-
-    public JLabel getFriendFour() {
-        return friendFour;
-    }
-
-    public JLabel getFriendFive() {
-        return friendFive;
-    }
-
-    public JLabel getFileDemonstrationRoom() {
-        return fileDemonstrationRoom;
-    }
 }

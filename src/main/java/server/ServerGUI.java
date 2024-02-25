@@ -12,7 +12,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import client.LoginGUI;
 import server.dao.DataBaseConfigurations;
 
 public class ServerGUI {
@@ -41,7 +40,7 @@ public class ServerGUI {
      */
     public ServerGUI() {
         serverSettings = new ServerSettings();
-        new Thread(() -> serverSettings.pushFriends()).start();
+        new Thread(() -> serverSettings.pushFriendsList()).start();
         dataBaseConfigurations = new DataBaseConfigurations("girrafe", "jdbc:mysql://localhost/girrafe", "root", "dCBZXTf49PcL3L97lWXP");
         initialize();
         DataSourcePool.instanceOf(dataBaseConfigurations.newMysqlDataSource());
