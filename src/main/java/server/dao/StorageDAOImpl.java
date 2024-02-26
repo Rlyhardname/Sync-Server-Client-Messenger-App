@@ -2,12 +2,12 @@ package server.dao;
 
 import client.model.User;
 import common.Command;
+import common.EMOJI;
+import server.ServerSettings;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class StorageDAOImpl implements StorageDAO<User> {
     private final DataSource dataSource;
@@ -67,7 +67,7 @@ public class StorageDAOImpl implements StorageDAO<User> {
     }
 
     @Override
-    public void updateUserLogMessageSent(String username,int state) {
+    public void updateUserLogMessageSent(String username, int state) {
         Timestamp dateTimeStamp = fetchLastLogoutTimestamp(username);
         String sql = "UPDATE User_Log " + "SET allMessagesSent = ? " + "WHERE Logout_time = ? and username = ?";
         try (Connection conn = dataSource.getConnection();
@@ -256,6 +256,46 @@ public class StorageDAOImpl implements StorageDAO<User> {
         }
         String[] usersInRoom = list.toArray(new String[0]);
         return usersInRoom;
+    }
+
+    @Override
+    public Map<String, String> getFriends(String username) {
+        String sql = "SELECT friend FROM friends WHERE username=?";
+        Map<String, String> friends = new HashMap<>();
+        ResultSet rs = null;
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement prep = conn.prepareStatement(sql)) {
+            prep.setString(1, username);
+            rs = prep.executeQuery();
+
+            while (rs.next()) {
+                String friendName = rs.getString(1);
+                boolean isOnline = ServerSettings.onlineUsers.containsKey(friendName);
+                if (isOnline) {
+                    friends.put(friendName, EMOJI.getEmoji(EMOJI.CHECK_MARK));
+                } else if (!isOnline) {
+                    friends.put(friendName, EMOJI.getEmoji(EMOJI.X_SYMBOL));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (!friends.isEmpty()) {
+            return friends;
+        }
+
+        return null;
     }
 
 }
