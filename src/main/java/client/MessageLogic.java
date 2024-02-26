@@ -4,8 +4,11 @@ import client.model.Config;
 import client.model.User;
 import common.Command;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Random;
 
 public class MessageLogic {
     private AppGUI userGUI;
@@ -93,13 +96,43 @@ public class MessageLogic {
     private String[] constructJList(String... block) {
         String[] listOfFriends = new String[block.length - 1];
         String filler = "                          ";
-        int fillerLength = filler.length();
-        for (int i = 0; i < listOfFriends.length; i++) {
-            int listItemLength = block[i+1].length();
-            listOfFriends[i] = "    "+block[i+1]+filler.substring(0,fillerLength-listItemLength);
+        ArrayDeque<String> randomizedFriendList = fillArrayDeque(listOfFriends.length, block);
+        int index = 0;
+        while (!randomizedFriendList.isEmpty()) {
+            String currentFriend = randomizedFriendList.poll();
+            int listItemLength = currentFriend.length();
+            listOfFriends[index] = "    " + currentFriend + filler.substring(0, filler.length() - listItemLength);
+            index++;
         }
 
         return listOfFriends;
+    }
+
+    private ArrayDeque<String> fillArrayDeque(int length, String[] block) {
+        ArrayDeque<String> randomizedFriendList = new ArrayDeque<>();
+        Random rand = new Random();
+        for (int i = 0; i < length; i++) {
+            String currentFriend = block[i + 1];
+            int randNumber;
+
+            if (currentFriend.codePointAt(0) == 128473) {
+                randNumber = rand.nextInt(6);
+            } else {
+                randNumber = rand.nextInt(9);
+            }
+
+            for (int j = 0; j < currentFriend.length(); j++) {
+
+            }
+            if (randNumber < 3) {
+                randomizedFriendList.push(currentFriend);
+            } else {
+                randomizedFriendList.add(currentFriend);
+            }
+
+        }
+
+        return randomizedFriendList;
     }
 
     boolean accessServer(String command, String username, String password) {
