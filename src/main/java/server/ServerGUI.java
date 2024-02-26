@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import server.dao.DataBaseConfigurations;
+import server.util.Util;
 
 public class ServerGUI {
     private ServerSettings serverSettings;
@@ -40,13 +41,13 @@ public class ServerGUI {
      */
     public ServerGUI() {
         serverSettings = new ServerSettings();
-        new Thread(() -> serverSettings.pushFriendsList()).start();
         dataBaseConfigurations = new DataBaseConfigurations("girrafe", "jdbc:mysql://localhost/girrafe", "root", "dCBZXTf49PcL3L97lWXP");
         initialize();
         DataSourcePool.instanceOf(dataBaseConfigurations.newMysqlDataSource());
         new Thread(() -> {
             startServer();
         }).start();
+        new Thread(() -> Util.pushFriendsList()).start();
     }
 
     /**
@@ -82,9 +83,7 @@ public class ServerGUI {
     }
 
     public void startServer() {
-        //   new Thread(() -> {
         new ServerVer2();
-        //   }).start();
     }
 
     private Object printUsersAndAdditionalInfo() {
