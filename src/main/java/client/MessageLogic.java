@@ -24,6 +24,7 @@ public class MessageLogic {
 
     public void handleServer(AppGUI clientGUI) {
         this.userGUI = clientGUI;
+        pullFriendsRequest();
         do {
             try {
                 BufferedReader input = connection.getInput();
@@ -53,6 +54,9 @@ public class MessageLogic {
             }
 
         } while (true);
+    }
+    private void pullFriendsRequest(){
+        sendMessage(Command.PULL_FRIENDS.name());
     }
 
     private int handleCommands(String[] block) {

@@ -5,6 +5,7 @@ import common.Command;
 import server.dao.*;
 import server.dao.AuthDAO;
 import server.dao.AuthenticationDAO;
+import server.util.Util;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -83,6 +84,7 @@ public class ServerVer2 {
 
             concatIncomingMessage(msg);
             commandUserPass = msg.split(",");
+
             try {
                 user = new User(commandUserPass[1], commandUserPass[2]);
             } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
@@ -246,6 +248,15 @@ public class ServerVer2 {
                 }
 
                 String[] userMsg = msg.split(",");
+
+                if(userMsg.length==1){
+                    if(userMsg[0].equals(Command.PULL_FRIENDS.name())){
+                        Util.pullFriends(user.getUsername());
+                    }
+
+                    continue;
+                }
+
                 String command = userMsg[0];
                 String username = userMsg[1];
                 int room = Integer.parseInt(userMsg[2]);
