@@ -16,4 +16,5 @@ public enum Command {
     FORBIDDEN_SYMBOL,
     TOO_MANY_CHARACTERS,
     PUSH_FRIENDS,
+    PULL_FRIENDS
 }
