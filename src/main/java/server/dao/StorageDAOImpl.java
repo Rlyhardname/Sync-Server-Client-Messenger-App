@@ -259,6 +259,42 @@ public class StorageDAOImpl implements StorageDAO<User> {
     }
 
     @Override
+    public String getRoomIdAndRoomName(String username) {
+        String sql = "select chat_room.chat_room_id, chat_room.room_name from chat_room " +
+                "INNER JOIN chat_room_warehouse " +
+                "ON chat_room.chat_room_id = chat_room_warehouse.chat_room_id " +
+                "WHERE Username = ? AND users_count>2";
+        StringBuffer sb = new StringBuffer();
+        ResultSet rs = null;
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement prep = conn.prepareStatement(sql)) {
+            prep.setString(1, username);
+            rs = prep.executeQuery();
+            while (rs.next()) {
+                int room = rs.getInt(1);
+                String roomName = rs.getString(2);
+                sb.append(",");
+                sb.append(room);
+                sb.append("|");
+                sb.append(roomName);
+            }
+
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            try {
+                rs.close();
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+        return sb.toString();
+    }
+
+    @Override
     public Map<String, String> getFriends(String username) {
         String sql = "SELECT friend FROM friends WHERE username=?";
         Map<String, String> friends = new HashMap<>();

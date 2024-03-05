@@ -28,4 +28,6 @@ public interface StorageDAO<T> {
 
     Map<String, String> getFriends(String username);
 
+    String getRoomIdAndRoomName(String username);
+
 }
