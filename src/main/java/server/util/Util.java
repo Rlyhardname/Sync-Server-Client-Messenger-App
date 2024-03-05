@@ -10,16 +10,15 @@ import java.util.Map;
 import static server.ServerSettings.onlineUsers;
 
 public class Util {
-    public static void pushFriendsList() {
+    public static void pushChatRooms() {
         StorageDAO DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
         while (true) {
             for (var user : onlineUsers.entrySet()) {
-                Map<String, String> friends = DAO.getFriends(user.getKey());
-                user.getValue().getTextOutput().println(appendFriends(friends));
+                pullFriends(DAO, user.getKey());
             }
 
             try {
-                Thread.sleep(60000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -28,18 +27,26 @@ public class Util {
 
     }
 
-    public static void pullFriends(String username) {
-        var printWriter = onlineUsers.get(username).getTextOutput();
+    private static String pullGroupChats(String username) {
         StorageDAO DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+        String gcIdAndName = DAO.getRoomIdAndRoomName(username);
+
+        return gcIdAndName;
+    }
+
+    public static void pullFriends(StorageDAO DAO, String username) {
+        var printWriter = onlineUsers.get(username).getTextOutput();
         Map<String, String> friendsAndStatus = DAO.getFriends(username);
-        printWriter.println(appendFriends(friendsAndStatus));
+        String friends = appendFriends(friendsAndStatus);
+        String groupChats = pullGroupChats(username);
+        printWriter.println(friends + groupChats);
     }
 
     private static String appendFriends(Map<String, String> friends) {
         StringBuffer sb = new StringBuffer();
         for (var friend : friends.entrySet()) {
             if (sb.isEmpty()) {
-                sb.append(Command.PUSH_FRIENDS.name());
+                sb.append(Command.PUSH_FRIENDS);
             }
             sb.append(",");
             sb.append(friend.getValue());
