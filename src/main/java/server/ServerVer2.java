@@ -251,7 +251,8 @@ public class ServerVer2 {
 
                 if(userMsg.length==1){
                     if(userMsg[0].equals(Command.PULL_FRIENDS.name())){
-                        Util.pullFriends(user.getUsername());
+                        StorageDAO DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+                        Util.pullFriends(DAO,user.getUsername());
                     }
 
                     continue;
@@ -260,6 +261,7 @@ public class ServerVer2 {
                 String command = userMsg[0];
                 String username = userMsg[1];
                 int room = Integer.parseInt(userMsg[2]);
+                System.out.println("current room " + room);
                 String message = userMsg[3];
 
                 if (command.equals(Command.CLOSING_CONNECTION.name())) {

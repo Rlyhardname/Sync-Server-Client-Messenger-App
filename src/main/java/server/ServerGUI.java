@@ -47,7 +47,7 @@ public class ServerGUI {
         new Thread(() -> {
             startServer();
         }).start();
-        new Thread(() -> Util.pushFriendsList()).start();
+        new Thread(() -> Util.pushChatRooms()).start();
     }
 
     /**
