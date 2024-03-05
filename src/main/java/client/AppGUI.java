@@ -6,9 +6,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AppGUI {
-    private MessageLogic messageLogic;
+    private client.MessageLogic messageLogic;
     private JFrame frame;
     private JTextArea textArea;
     private JButton newClient;
@@ -20,7 +22,8 @@ public class AppGUI {
     private JTextField textField;
     private JButton btnSendFile;
     private JList<String> jList;
-    private int room;
+    private int selectedRoom;
+    private Map<Integer, String> rooms;
     // pICK FILE BUTTON
 
     /**
@@ -43,6 +46,7 @@ public class AppGUI {
      */
     public AppGUI(MessageLogic messageLogicArg) {
         System.out.println("username in appGUI" + messageLogicArg);
+        rooms = new HashMap<>();
         this.messageLogic = messageLogicArg;
         initialize();
         new Thread(() -> {
@@ -63,7 +67,7 @@ public class AppGUI {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout());
         frame.setTitle(messageLogic.getUser().getUsername());
-        room = 0;
+        selectedRoom = 0;
 
         // Header
         header = new JPanel(new BorderLayout());
@@ -117,7 +121,7 @@ public class AppGUI {
                     messageLogic.sendMessage(Command.CLOSING_CONNECTION.name() + "," + messageLogic.getUser().getUsername() + "," + "-1" + "," + "Pressing X button");
                 } finally {
                     try {
-                        messageLogic.getConnection().getInput().close();
+                        messageLogic.getConnection().getLink().close();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -128,12 +132,12 @@ public class AppGUI {
         frame.pack();
     }
 
-    public int getRoom() {
-        return room;
+    public int getSelectedRoom() {
+        return selectedRoom;
     }
 
-    public void setRoom(int room) {
-        this.room = room;
+    public void setSelectedRoom(int selectedRoom) {
+        this.selectedRoom = selectedRoom;
     }
 
     private Object newClientTest() {
@@ -143,8 +147,8 @@ public class AppGUI {
 
 
     private Object sendMessage() {
-        System.err.println(room);
-        String msg = Command.TEXT_MESSAGE.name() + "," + messageLogic.getUser().getUsername() + "," + getRoom() + "," + textField.getText().toString();
+        System.err.println(selectedRoom);
+        String msg = Command.TEXT_MESSAGE.name() + "," + messageLogic.getUser().getUsername() + "," + getSelectedRoom() + "," + textField.getText().toString();
         messageLogic.sendMessage(msg);
         textField.setText("");
 
@@ -172,9 +176,12 @@ public class AppGUI {
     }
 
     public void sendFile(String path, String fileName) {
-        String msg = Command.SEND_FILE.name() + "," + messageLogic.getUser().getUsername() + "," + getRoom() + "," + fileName;
+        String msg = Command.SEND_FILE.name() + "," + messageLogic.getUser().getUsername() + "," + getSelectedRoom() + "," + fileName;
         messageLogic.getConnection().getOutput().println(msg);
         FileTransfer.sendFile(path, messageLogic.getConnection());
     }
 
+    public Map<Integer, String> getRooms() {
+        return rooms;
+    }
 }
