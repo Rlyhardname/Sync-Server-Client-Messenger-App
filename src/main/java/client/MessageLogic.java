@@ -6,15 +6,14 @@ import common.Command;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Random;
+import java.util.*;
 
 public class MessageLogic {
     private AppGUI userGUI;
     private LoginGUI login;
     private Config connection;
     private User user;
+    private String activeChat;
 
     MessageLogic() {
         {
@@ -55,7 +54,8 @@ public class MessageLogic {
 
         } while (true);
     }
-    private void pullFriendsRequest(){
+
+    private void pullFriendsRequest() {
         sendMessage(Command.PULL_FRIENDS.name());
     }
 
@@ -98,18 +98,18 @@ public class MessageLogic {
     }
 
     private String[] constructJList(String... block) {
-        String[] listOfFriends = new String[block.length - 1];
+
+        List<String> listOfFriends = new LinkedList<>();
         String filler = "                          ";
-        ArrayDeque<String> randomizedFriendList = fillArrayDeque(listOfFriends.length, block);
-        int index = 0;
+        ArrayDeque<String> randomizedFriendList = fillArrayDeque(block.length - 1, block);
         while (!randomizedFriendList.isEmpty()) {
             String currentFriend = randomizedFriendList.poll();
             int listItemLength = currentFriend.length();
-            listOfFriends[index] = "    " + currentFriend + filler.substring(0, filler.length() - listItemLength);
-            index++;
+            listOfFriends.add("    " + currentFriend + filler.substring(0, filler.length() - listItemLength));
         }
 
-        return listOfFriends;
+        System.out.println(Arrays.toString(listOfFriends.toArray()));
+        return listOfFriends.toArray(new String[0]);
     }
 
     private ArrayDeque<String> fillArrayDeque(int length, String[] block) {
@@ -119,15 +119,25 @@ public class MessageLogic {
             String currentFriend = block[i + 1];
             int randNumber;
 
+            if (currentFriend.contains("|")) {
+                String[] roomNumRoomName = currentFriend.split("\\|");
+                int id = Integer.parseInt(roomNumRoomName[0]);
+                userGUI.getRooms().putIfAbsent(id, roomNumRoomName[1]);
+                if (rand.nextInt(21) < 4) {
+                    randomizedFriendList.push(roomNumRoomName[1]);
+                } else {
+                    randomizedFriendList.add(roomNumRoomName[1]);
+                }
+
+                continue;
+            }
+
             if (currentFriend.codePointAt(0) == 128473) {
-                randNumber = rand.nextInt(6);
+                randNumber = rand.nextInt(0, 4);
             } else {
-                randNumber = rand.nextInt(9);
+                randNumber = rand.nextInt(4, 9);
             }
 
-            for (int j = 0; j < currentFriend.length(); j++) {
-
-            }
             if (randNumber < 3) {
                 randomizedFriendList.push(currentFriend);
             } else {
@@ -238,4 +248,13 @@ public class MessageLogic {
         return user;
     }
 
+    public String getActiveChat() {
+        return activeChat;
+    }
+
+    public void setActiveChat(String activeChat) {
+        System.out.println("active chat is: " + activeChat);
+        userGUI.setSelectedRoom(Integer.parseInt(userGUI.getjList().getSelectedValue()));
+        this.activeChat = activeChat;
+    }
 }
