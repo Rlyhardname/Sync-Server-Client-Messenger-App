@@ -8,6 +8,10 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 
 public class AppGUI {
     private client.MessageLogic messageLogic;
@@ -22,8 +26,8 @@ public class AppGUI {
     private JTextField textField;
     private JButton btnSendFile;
     private JList<String> jList;
-    private int selectedRoom;
-    private Map<Integer, String> rooms;
+    private volatile int selectedRoom;
+    private volatile ConcurrentHashMap<String, Integer> rooms = new ConcurrentHashMap<>();
     // pICK FILE BUTTON
 
     /**
@@ -46,7 +50,6 @@ public class AppGUI {
      */
     public AppGUI(MessageLogic messageLogicArg) {
         System.out.println("username in appGUI" + messageLogicArg);
-        rooms = new HashMap<>();
         this.messageLogic = messageLogicArg;
         initialize();
         new Thread(() -> {
@@ -67,7 +70,7 @@ public class AppGUI {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout());
         frame.setTitle(messageLogic.getUser().getUsername());
-        selectedRoom = 0;
+        selectedRoom = 1;
 
         // Header
         header = new JPanel(new BorderLayout());
@@ -78,6 +81,8 @@ public class AppGUI {
 
         // CENTER
         textArea = new JTextArea(10, 10);
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
         scrollPane = new JScrollPane(textArea);
         frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 
@@ -113,6 +118,18 @@ public class AppGUI {
             sendFile(path, fileName);
         })).start();
 
+        jList.addListSelectionListener((e) -> {
+            Object obj = e.getSource();
+            String val = ((JList<String>) obj).getSelectedValue();
+            if (Objects.nonNull(val)) {
+                Integer roomId = getRooms().get(val.trim());
+                if (Objects.nonNull(roomId)) {
+                    setSelectedRoom(roomId);
+                }
+
+            }
+
+        });
         new Thread(() -> newClient.addActionListener(e -> newClientTest())).start();
         new Thread(() -> sendMessageBTN.addActionListener(e -> sendMessage())).start();
         new Thread(() -> frame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -137,6 +154,7 @@ public class AppGUI {
     }
 
     public void setSelectedRoom(int selectedRoom) {
+        System.out.println("current room changed to: " + selectedRoom);
         this.selectedRoom = selectedRoom;
     }
 
@@ -181,7 +199,8 @@ public class AppGUI {
         FileTransfer.sendFile(path, messageLogic.getConnection());
     }
 
-    public Map<Integer, String> getRooms() {
+    public ConcurrentHashMap<String, Integer> getRooms() {
+        System.out.println("returning current room before sending.. " + selectedRoom);
         return rooms;
     }
 }
