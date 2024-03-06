@@ -68,7 +68,6 @@ public class MessageLogic {
             System.out.println("current incoming message: " + Arrays.toString(block));
 
             if (command.equals(Command.TEXT_MESSAGE.name())) {
-                System.out.println("at least we know we received it..");
                 userGUI.concatArea(username + ": " + message);
                 return 1;
             }
@@ -122,7 +121,7 @@ public class MessageLogic {
             if (currentFriend.contains("|")) {
                 String[] roomNumRoomName = currentFriend.split("\\|");
                 int id = Integer.parseInt(roomNumRoomName[0]);
-                userGUI.getRooms().putIfAbsent(id, roomNumRoomName[1]);
+                userGUI.getRooms().putIfAbsent(roomNumRoomName[1], id);
                 if (rand.nextInt(21) < 4) {
                     randomizedFriendList.push(roomNumRoomName[1]);
                 } else {
@@ -145,6 +144,7 @@ public class MessageLogic {
             }
 
         }
+
 
         return randomizedFriendList;
     }
@@ -252,9 +252,4 @@ public class MessageLogic {
         return activeChat;
     }
 
-    public void setActiveChat(String activeChat) {
-        System.out.println("active chat is: " + activeChat);
-        userGUI.setSelectedRoom(Integer.parseInt(userGUI.getjList().getSelectedValue()));
-        this.activeChat = activeChat;
-    }
 }
