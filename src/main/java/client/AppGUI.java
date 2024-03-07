@@ -6,12 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
 
 public class AppGUI {
     private client.MessageLogic messageLogic;
@@ -24,6 +20,8 @@ public class AppGUI {
     private JPanel friendsPanel;
     private JPanel header;
     private JTextField textField;
+    private JComboBox<String> searchBar;
+    private JComboBox<String> friendRequestBar;
     private JButton btnSendFile;
     private JList<String> jList;
     private volatile int selectedRoom;
@@ -65,7 +63,8 @@ public class AppGUI {
     private void initialize() {
         // Init frame
         frame = new JFrame();
-        frame.setBounds(1200, 100, 600, 300);
+        frame.setBounds(800, 100, 665, 300);
+        frame.setResizable(false);
         frame.setTitle("application interface");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout());
@@ -76,7 +75,29 @@ public class AppGUI {
         header = new JPanel(new BorderLayout());
         JLabel friendListLabel = new JLabel("Friend List            ");
         friendListLabel.setHorizontalAlignment(JLabel.RIGHT);
+        //String[] testDropdown = new String[]{"one", "two", "1337"};
+        searchBar = new JComboBox();
+        searchBar.setPreferredSize(new Dimension(150, 20));
+        searchBar.setEditable(true);
+        friendRequestBar = new JComboBox<>();
+        friendRequestBar.setPreferredSize(new Dimension(150, 20));
+        JButton searchBTN = new JButton("\uD83D\uDD0E");
+        searchBTN.setSize(new Dimension(10, 10));
+        JButton friendRequestBTN = new JButton("\uD83D\uDC4B");
+        friendRequestBTN.setSize(new Dimension(10, 10));
+        JButton acceptFriendBTN = new JButton("\u2795");
+        acceptFriendBTN.setSize(new Dimension(10, 10));
+        JButton declineFriendBTN = new JButton("\u2716\uFE0F");
+        declineFriendBTN.setSize(new Dimension(10, 10));
+        JPanel searchPanel = new JPanel(new FlowLayout());
+        searchPanel.add(searchBar);
+        searchPanel.add(searchBTN);
+        searchPanel.add(friendRequestBTN);
+        searchPanel.add(friendRequestBar);
+        searchPanel.add(acceptFriendBTN);
+        searchPanel.add(declineFriendBTN);
         header.add(friendListLabel, BorderLayout.EAST);
+        header.add(searchPanel, BorderLayout.WEST);
         frame.getContentPane().add(header, BorderLayout.NORTH);
 
         // CENTER
@@ -88,17 +109,17 @@ public class AppGUI {
 
         // Footer
         // Widgets
-        textField = new JTextField(30);
+        textField = new JTextField(43);
         sendMessageBTN = new JButton("SEND");
         btnSendFile = new JButton("Send File");
-        newClient = new JButton("NEW CLIENT");
+       // newClient = new JButton("NEW CLIENT");
 
         // BTN panel
         panel = new JPanel();
         panel.add(textField);
         panel.add(sendMessageBTN);
         panel.add(btnSendFile);
-        panel.add(newClient);
+       // panel.add(newClient);
         frame.getContentPane().add(panel, BorderLayout.SOUTH);
 
         //frListListener listen = new frListListener(this);
@@ -130,6 +151,9 @@ public class AppGUI {
             }
 
         });
+
+        searchBTN.addActionListener((e) -> searchPerson());
+
         new Thread(() -> newClient.addActionListener(e -> newClientTest())).start();
         new Thread(() -> sendMessageBTN.addActionListener(e -> sendMessage())).start();
         new Thread(() -> frame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -146,7 +170,8 @@ public class AppGUI {
             }
         })).start();
 
-        frame.pack();
+      //  frame.pack();
+
     }
 
     public int getSelectedRoom() {
@@ -171,6 +196,11 @@ public class AppGUI {
         textField.setText("");
 
         return null;
+    }
+
+    private void searchPerson() {
+        String msg = Command.SEARCH_PERSON.name() + "," + getSearchBar().getSelectedItem();
+        messageLogic.sendMessage(msg);
     }
 
     public JList<String> getjList() {
@@ -202,5 +232,13 @@ public class AppGUI {
     public ConcurrentHashMap<String, Integer> getRooms() {
         System.out.println("returning current room before sending.. " + selectedRoom);
         return rooms;
+    }
+
+    public JComboBox<String> getSearchBar() {
+        return searchBar;
+    }
+
+    public JComboBox<String> getFriendRequestBar() {
+        return friendRequestBar;
     }
 }
