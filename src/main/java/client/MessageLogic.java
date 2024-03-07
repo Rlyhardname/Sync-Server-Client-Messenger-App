@@ -4,6 +4,7 @@ import client.model.Config;
 import client.model.User;
 import common.Command;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
@@ -61,7 +62,9 @@ public class MessageLogic {
 
     private int handleCommands(String[] block) {
         String command = block[0];
-        if (block.length == 4) {
+        if (command.equals(Command.TEXT_MESSAGE.name())
+                || command.equals(Command.RECEIVE_FILE.name())
+                || command.equals(Command.LOGIN_SUCCESS.name())) {
             String username = block[1];
             String room = block[2];
             String message = block[3];
@@ -88,6 +91,15 @@ public class MessageLogic {
             }
         }
 
+        if (command.equals(Command.SEARCH_PERSON.name())) {
+            String[] friendArray = Arrays.stream(block).filter((x) -> !x.equals(Command.SEARCH_PERSON.name())).toArray(String[]::new);
+            userGUI.getSearchBar().removeAllItems();
+            DefaultComboBoxModel model = (DefaultComboBoxModel) userGUI.getSearchBar().getModel();
+            model.addAll(List.of(friendArray));
+            SwingUtilities.invokeLater(() -> userGUI.getSearchBar().setPopupVisible(true));
+        }
+
+
         if (command.equals(Command.PUSH_FRIENDS.name())) {
             String[] listOfFriends = constructJList(block);
             userGUI.setjList(listOfFriends);
@@ -107,7 +119,7 @@ public class MessageLogic {
             listOfFriends.add("    " + currentFriend + filler.substring(0, filler.length() - listItemLength));
         }
 
-        System.out.println(Arrays.toString(listOfFriends.toArray()));
+        System.out.println("JLIST constructing" + Arrays.toString(listOfFriends.toArray()));
         return listOfFriends.toArray(new String[0]);
     }
 
