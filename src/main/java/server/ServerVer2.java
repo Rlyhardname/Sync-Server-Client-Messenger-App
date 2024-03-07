@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -129,7 +130,7 @@ public class ServerVer2 {
                 sendMessage(string);
             }
 
-            storageDAO.updateUserLogMessageSent(user.getUsername(),1);
+            storageDAO.updateUserLogMessageSent(user.getUsername(), 1);
         }
     }
 
@@ -249,14 +250,22 @@ public class ServerVer2 {
 
                 String[] userMsg = msg.split(",");
 
-                if(userMsg.length==1){
-                    if(userMsg[0].equals(Command.PULL_FRIENDS.name())){
-                        StorageDAO DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-                        Util.pullFriends(DAO,user.getUsername());
-                    }
-
+                if (userMsg[0].equals(Command.PULL_FRIENDS.name())) {
+                    StorageDAO DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+                    Util.pullFriends(DAO, user.getUsername());
                     continue;
                 }
+
+                if (userMsg[0].equals(Command.SEARCH_PERSON.name())) {
+                    StorageDAO DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+                    List<String> fetchResults = DAO.fetchSearchResults(userMsg[1]);
+                    fetchResults.add(0,Command.SEARCH_PERSON.name());
+                    String result = String.join(",", fetchResults);
+                    System.out.println("print search result " + result);
+                    sendMessage(result);
+                    continue;
+                }
+
 
                 String command = userMsg[0];
                 String username = userMsg[1];
@@ -321,7 +330,7 @@ public class ServerVer2 {
             if (ServerSettings.onlineUsers.get(roomUser) != null) {
                 ServerSettings.onlineUsers.get(roomUser).getTextOutput().println(Command.TEXT_MESSAGE.name() + "," + user + "," + room + "," + message);
             } else {
-                storageDAO.updateUserLogMessageSent(roomUser,0);
+                storageDAO.updateUserLogMessageSent(roomUser, 0);
             }
 
         }
