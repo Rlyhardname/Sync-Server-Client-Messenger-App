@@ -1,6 +1,7 @@
 package server.dao;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,6 +29,10 @@ public interface StorageDAO<T> {
 
     Map<String, String> getFriends(String username);
 
+    void saveContact(String username1, String username2);
+
     String getRoomIdAndRoomName(String username);
+
+    List<String> fetchSearchResults(String username);
 
 }

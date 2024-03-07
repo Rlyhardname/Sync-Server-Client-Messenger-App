@@ -295,6 +295,29 @@ public class StorageDAOImpl implements StorageDAO<User> {
     }
 
     @Override
+    public List<String> fetchSearchResults(String username) {
+        String sql = "SELECT username " +
+                "from USER " +
+                "WHERE username LIKE CONCAT('%',?,'%') " +
+                "LIMIT 5";
+        ResultSet rs = null;
+        List<String> results = new LinkedList<>();
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement prep = conn.prepareStatement(sql)) {
+            prep.setString(1, username);
+            rs = prep.executeQuery();
+            while (rs.next()) {
+                results.add(rs.getString(1));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        return results;
+    }
+
+    @Override
     public Map<String, String> getFriends(String username) {
         String sql = "SELECT friend FROM friends WHERE username=?";
         Map<String, String> friends = new HashMap<>();
@@ -332,6 +355,21 @@ public class StorageDAOImpl implements StorageDAO<User> {
         }
 
         return null;
+    }
+
+    @Override
+    public void saveContact(String username1, String username2) {
+        String sql = "INSERT INTO friends (username, friend) " +
+                "VALUES(?,?)";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement prep = connection.prepareStatement(sql)) {
+
+            prep.setString(1, username1);
+            prep.setString(2, username2);
+            prep.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
