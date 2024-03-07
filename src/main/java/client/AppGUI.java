@@ -51,8 +51,21 @@ public class AppGUI {
         this.messageLogic = messageLogicArg;
         initialize();
         new Thread(() -> {
-            messageLogic.handleServer(this);
-        }).start();
+            try {
+                messageLogic.handleServer(this);
+            } finally {
+                try {
+                    messageLogic.getConnection().getLink().close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            }
+
+
+        }).
+
+                start();
 
 
     }
@@ -112,14 +125,14 @@ public class AppGUI {
         textField = new JTextField(43);
         sendMessageBTN = new JButton("SEND");
         btnSendFile = new JButton("Send File");
-       // newClient = new JButton("NEW CLIENT");
+        // newClient = new JButton("NEW CLIENT");
 
         // BTN panel
         panel = new JPanel();
         panel.add(textField);
         panel.add(sendMessageBTN);
         panel.add(btnSendFile);
-       // panel.add(newClient);
+        // panel.add(newClient);
         frame.getContentPane().add(panel, BorderLayout.SOUTH);
 
         //frListListener listen = new frListListener(this);
@@ -154,7 +167,7 @@ public class AppGUI {
 
         searchBTN.addActionListener((e) -> searchPerson());
 
-        new Thread(() -> newClient.addActionListener(e -> newClientTest())).start();
+        //new Thread(() -> newClient.addActionListener(e -> newClientTest())).start();
         new Thread(() -> sendMessageBTN.addActionListener(e -> sendMessage())).start();
         new Thread(() -> frame.addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(WindowEvent winEvt) {
@@ -170,7 +183,7 @@ public class AppGUI {
             }
         })).start();
 
-      //  frame.pack();
+        //  frame.pack();
 
     }
 

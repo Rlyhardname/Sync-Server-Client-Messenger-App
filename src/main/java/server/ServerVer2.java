@@ -297,6 +297,7 @@ public class ServerVer2 {
 
             } catch (IOException e) {
                 e.printStackTrace();
+                break;
             } catch (NullPointerException e1) {
                 e1.printStackTrace();
             }
