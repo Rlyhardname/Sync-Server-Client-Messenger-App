@@ -10,10 +10,12 @@
 
 ### Aplication Overview
 
-![Markdown Guide](https://i.ibb.co/njqGcJr/base-window.png)
+<img src="https://i.ibb.co/njqGcJr/base-window.png))https://i.ibb.co/njqGcJr/base-window.png" width="1000" height="500" />
 
 ### How it works
 
 ### Internal/External libraries and tools
 
 ### Pending features
+
+
