@@ -5,7 +5,6 @@
 
 1. Application Overview
 2. How it wokrs
-3. Internal/External libraries and tools
 4. Pending features
 
 ### Aplication Overview
@@ -14,8 +13,14 @@
 
 ### How it works
 
-### Internal/External libraries and tools
+<a href="https://ibb.co/ZhKSQJd"><img src="https://i.ibb.co/p3ZQHP2/2024-03-12-224455.png" alt="2024-03-12-224455" border="0"></a>
 
-### Pending features
+### Future features?
 
+- separate group chats. - Currently one textArea is responsible for all chats, so every authorized chat message goes in one place)
+- message history.- Currently there's persistance in the server database, but no support for client persistence.
+- message encryption and user details encryption
+- video calls
+- voice messages
+- more reliable threading system via virtual threads, executorservice + threadpools, dispatcher or some other more reliable concurency mechanism.
 
