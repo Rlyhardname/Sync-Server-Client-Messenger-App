@@ -9,6 +9,9 @@
 
 ### Aplication Overview(click to enlarge - redirects to ibb image upload)
 
+**Active user/friends/group chats aren't hardcoded, even tho it might look like that in the image**
+
+
 <img src="https://i.ibb.co/njqGcJr/base-window.png))https://i.ibb.co/njqGcJr/base-window.png" width="1000" height="500" />
 
 ### How it works(click to enlarge - redirects to ibb image upload)
