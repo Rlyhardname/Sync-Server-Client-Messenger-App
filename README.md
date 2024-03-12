@@ -47,6 +47,8 @@
 - database logs
 - Data classes
 - Generics
+- exception handling
+- validations
 - Patterns and OOP: DAO,Singleton,Factory,SOLID
 
 ### Future features?
