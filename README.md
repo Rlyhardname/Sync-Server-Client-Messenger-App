@@ -1,5 +1,5 @@
 
-# Client-Server-message-app
+# Sync-Server-Client-Messenger-App
 
 ## Table of context
 
