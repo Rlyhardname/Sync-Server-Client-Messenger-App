@@ -26,7 +26,7 @@
 
 ### Functionality
 
-**UX**
+**UX/UI**
 - sending/receiving messages
 - sending/receiving files
 - receiving missed/offline messages on login
