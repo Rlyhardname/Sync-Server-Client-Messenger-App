@@ -41,9 +41,15 @@ public class ServerGUI {
      */
     public ServerGUI() {
         serverSettings = new ServerSettings();
-        dataBaseConfigurations = new DataBaseConfigurations("girrafe", "jdbc:mysql://localhost/girrafe", "root", "dCBZXTf49PcL3L97lWXP");
+        dataBaseConfigurations = new DataBaseConfigurations("ServerIO", "jdbc:mysql://localhost/ServerIO", "root", "dCBZXTf49PcL3L97lWXP");
         initialize();
         DataSourcePool.instanceOf(dataBaseConfigurations.newMysqlDataSource());
+        try {
+            new SeedDB(dataBaseConfigurations);
+        } catch (RuntimeException e) {
+            ServerGUI.textArea.setText("Error occurred, check database schema");
+        }
+
         new Thread(() -> {
             startServer();
         }).start();

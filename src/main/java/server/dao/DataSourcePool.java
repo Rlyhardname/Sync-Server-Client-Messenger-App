@@ -20,5 +20,7 @@ public class DataSourcePool {
         dataSource = null;
     }
 
-
+    public static DataSource getDataSource() {
+        return dataSource;
+    }
 }
