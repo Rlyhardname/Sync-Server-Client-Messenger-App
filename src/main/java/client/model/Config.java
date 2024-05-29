@@ -5,23 +5,23 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 public class Config {
-    private InetAddress host;
-    private final int PORT = 1337;
-    private PrintWriter output;
-    private BufferedReader input;
-    private DataOutputStream outputFile;
-    private DataInputStream inputFile;
+    public static final int PORT = 1337;
+    private InetAddress hostIP;
+    private BufferedReader messageInput;
+    private PrintWriter messageOutput;
+    private DataOutputStream fileOutput;
+    private DataInputStream fileInput;
     private Socket link;
 
     public Config() {
         try {
-            host = InetAddress.getLocalHost();
-            link = new Socket(host, PORT);
-            System.err.println("HOST NAME " + host);
-            input = new BufferedReader(new InputStreamReader(link.getInputStream()));
-            output = new PrintWriter(link.getOutputStream(), true);
-            inputFile = new DataInputStream(link.getInputStream());
-            outputFile = new DataOutputStream(link.getOutputStream());
+            hostIP = InetAddress.getLocalHost();
+            link = new Socket(hostIP, PORT);
+            System.err.println("HOST NAME " + hostIP);
+            messageInput = new BufferedReader(new InputStreamReader(link.getInputStream()));
+            messageOutput = new PrintWriter(link.getOutputStream(), true);
+            fileInput = new DataInputStream(link.getInputStream());
+            fileOutput = new DataOutputStream(link.getOutputStream());
             System.err.println("New Connection is running");
         } catch (IOException e) {
             e.printStackTrace();
@@ -30,32 +30,32 @@ public class Config {
 
     }
 
-    public InetAddress getHost() {
-        return host;
+    public InetAddress getHostIP() {
+        return hostIP;
     }
 
-    public void setHost(InetAddress host) {
-        this.host = host;
+    public void setHostIP(InetAddress hostIP) {
+        this.hostIP = hostIP;
     }
 
     public int getPORT() {
         return PORT;
     }
 
-    public PrintWriter getOutput() {
-        return output;
+    public PrintWriter getMessageOutput() {
+        return messageOutput;
     }
 
-    public BufferedReader getInput() {
-        return input;
+    public BufferedReader getMessageInput() {
+        return messageInput;
     }
 
-    public DataOutputStream getOutputFile() {
-        return outputFile;
+    public DataOutputStream getFileOutput() {
+        return fileOutput;
     }
 
-    public DataInputStream getInputFile() {
-        return inputFile;
+    public DataInputStream getFileInput() {
+        return fileInput;
     }
 
     public Socket getLink() {
