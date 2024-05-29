@@ -1,6 +1,6 @@
 package server.dao;
 
-import client.model.User;
+import client.models.User;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

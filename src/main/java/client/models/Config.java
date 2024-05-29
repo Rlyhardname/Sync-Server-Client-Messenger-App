@@ -1,4 +1,4 @@
-package client.model;
+package client.models;
 
 import java.io.*;
 import java.net.InetAddress;
