@@ -1,6 +1,6 @@
-package client;
+package client.utils;
 
-import client.model.Config;
+import client.models.Config;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -40,7 +40,7 @@ public class FileTransfer {
         try {
             //	long size = inputFile.readLong(); // read file size
             byte[] buffer = new byte[4 * 1024];
-            while ((bytes = connection.getInputFile().read(buffer)) != -1) {
+            while ((bytes = connection.getFileInput().read(buffer)) != -1) {
                 // write the file using write method
                 System.out.println(" Buffer " + buffer + " bytes " + bytes);
                 fileOutputStream.write(buffer, 0, bytes);
@@ -56,7 +56,7 @@ public class FileTransfer {
         } finally {
             try {
                 fileOutputStream.flush();
-                connection.getOutputFile().flush();
+                connection.getFileOutput().flush();
                 fileOutputStream.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -80,13 +80,13 @@ public class FileTransfer {
 
         // send the File
         try {
-            connection.getOutputFile().writeLong(file.length());
+            connection.getFileOutput().writeLong(file.length());
             // break file into chunks
             byte[] buffer = new byte[4 * 1024];
             while ((bytes = fileInputStream.read(buffer)) != -1) {
                 // Send the file to Server Socket
-                connection.getOutputFile().write(buffer, 0, bytes);
-                connection.getOutputFile().flush();
+                connection.getFileOutput().write(buffer, 0, bytes);
+                connection.getFileOutput().flush();
                 if(bytes==0){
                     break;
                 }
