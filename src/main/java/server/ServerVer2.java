@@ -1,6 +1,6 @@
 package server;
 
-import client.model.User;
+import client.models.User;
 import common.Command;
 import server.dao.*;
 import server.dao.AuthDAO;
@@ -95,7 +95,7 @@ public class ServerVer2 {
                 continue;
             }
 
-            System.out.println("Client returned username : " + user.getUsername());
+            System.out.println("Client returned username : " + user.username());
             if (commandUserPass[0].equals(Command.LOGIN.name())) {
                 if (!loginUserExists()) {
                     continue;
@@ -107,7 +107,7 @@ public class ServerVer2 {
 
                 login();
                 StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-                storageDAO.logUserLogin(user.getUsername());
+                storageDAO.logUserLogin(user.username());
                 break;
             } else if (commandUserPass[0].equals(Command.SIGN_UP.name())) {
                 try {
@@ -124,22 +124,22 @@ public class ServerVer2 {
 
     private void syncClientWithServerDB() {
         StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-        String[] batch = storageDAO.fetchAllByNameUnsentMessages(user.getUsername());
-        if (ServerSettings.onlineUsers.get(user.getUsername()) != null) {
+        String[] batch = storageDAO.fetchAllByNameUnsentMessages(user.username());
+        if (ServerSettings.onlineUsers.get(user.username()) != null) {
             for (String string : batch) {
                 sendMessage(string);
             }
 
-            storageDAO.updateUserLogMessageSent(user.getUsername(), 1);
+            storageDAO.updateUserLogMessageSent(user.username(), 1);
         }
     }
 
     // TODO merge the two functions to disguise internal server logic
     private boolean loginUserExists() {
         AuthDAO dao = new AuthenticationDAO(DataSourcePool.instanceOf());
-        boolean condition = dao.isUserRegistered(user.getUsername());
+        boolean condition = dao.isUserRegistered(user.username());
         if (!condition) {
-            String msg = Command.LOGIN_FAIL.name() + "," + "There is no user: " + user.getUsername() + " in our databases!";
+            String msg = Command.LOGIN_FAIL.name() + "," + "There is no user: " + user.username() + " in our databases!";
             sendMessage(msg);
             return false;
         }
@@ -149,8 +149,8 @@ public class ServerVer2 {
 
     private boolean correctLoginInfo() {
         AuthDAO dao = new AuthenticationDAO(DataSourcePool.instanceOf());
-        if (!dao.passwordIsCorrect(user.getUsername(), user.getPassword())) {
-            String msg = Command.LOGIN_FAIL.name() + "," + "Password doesn't match for username " + user.getUsername();
+        if (!dao.passwordIsCorrect(user.username(), user.password())) {
+            String msg = Command.LOGIN_FAIL.name() + "," + "Password doesn't match for username " + user.username();
             sendMessage(msg);
             return false;
         }
@@ -161,28 +161,28 @@ public class ServerVer2 {
         System.out.println("login message? " + Command.LOGIN_SUCCESS.name());
         String msg = Command.LOGIN_SUCCESS.name() + "," + "Successfully logged in!";
         sendMessage(msg);
-        ServerSettings.onlineUsers.put(user.getUsername(), this);
+        ServerSettings.onlineUsers.put(user.username(), this);
 
     }
 
     private boolean isAccountCreated() throws IOException {
         do {
-            if (!userDataIsValid(20, user.getUsername())) {
+            if (!userDataIsValid(20, user.username())) {
                 return false;
             }
 
             AuthDAO authDAO = new AuthenticationDAO(DataSourcePool.instanceOf());
-            if (authDAO.isUserRegistered(user.getUsername())) {
+            if (authDAO.isUserRegistered(user.username())) {
                 sendMessage(Command.NICKNAME_UNAVAILABLE.name());
                 return false;
             }
 
-            if (!userDataIsValid(32, user.getPassword())) {
+            if (!userDataIsValid(32, user.password())) {
                 return false;
             }
 
             StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-            Optional<User> userOpt = storageDAO.createUser(user.getUsername(), user.getPassword());
+            Optional<User> userOpt = storageDAO.createUser(user.username(), user.password());
             if (userOpt.isPresent()) {
                 String msg = Command.REGISTER_SUCCESS.name() + "," + "Account Successfully created!";
                 sendMessage(msg);
@@ -252,17 +252,37 @@ public class ServerVer2 {
 
                 if (userMsg[0].equals(Command.PULL_FRIENDS.name())) {
                     StorageDAO DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-                    Util.pullFriends(DAO, user.getUsername());
+                    Util.pullFriends(DAO, user.username());
                     continue;
                 }
 
                 if (userMsg[0].equals(Command.SEARCH_PERSON.name())) {
                     StorageDAO DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
                     List<String> fetchResults = DAO.fetchSearchResults(userMsg[1]);
-                    fetchResults.add(0,Command.SEARCH_PERSON.name());
+                    fetchResults.add(0, Command.SEARCH_PERSON.name());
                     String result = String.join(",", fetchResults);
                     System.out.println("print search result " + result);
                     sendMessage(result);
+                    continue;
+                }
+
+                if (userMsg[0].equals(Command.ACCEPT_FRIEND.name())) {
+                    String sender = userMsg[1];
+                    StorageDAO DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+                    if(!DAO.isFriends(user.username(),sender)){
+                        // create new chat_room
+                        // generate name(from the two people's names concatenated eg. Acc1|Acc2, add 2 users in room by default
+                        DAO.createChatRoom(sender,user.username());
+                    }
+
+
+
+                    // add both users to chat_room_warehouse with the new ID created(probably best doing that with trigger)
+                    // eather by trigger or programatically add them also to friends table, with the id of the room and the default room name
+                    // on next server push update the user with new friend/or do individual push only for the 2 users.
+                    DAO.saveContact(user.username(), userMsg[1]);
+                    DAO.saveContact(userMsg[1], user.username());
+                    //sendMessage(result);
                     continue;
                 }
 
@@ -305,7 +325,7 @@ public class ServerVer2 {
         } while (true);
 
         StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-        storageDAO.logUserLogout(user.getUsername());
+        storageDAO.logUserLogout(user.username());
         try {
             textOutput.close();
             textInput.close();

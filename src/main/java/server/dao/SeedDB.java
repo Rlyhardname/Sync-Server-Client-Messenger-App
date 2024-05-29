@@ -34,42 +34,42 @@ public class SeedDB {
         }
 
         String chat_room = "CREATE TABLE IF NOT EXISTS " + dataBaseConfiguration.getName() + ".chat_room (" +
-                "id INT, " +
-                "room_name VARCHAR(64), " +
+                "id INT NOT NULL AUTO_INCREMENT, " +
+                "room_name VARCHAR(64) NOT NULL, " +
                 "users_count INT DEFAULT 2, " +
                 "PRIMARY KEY (id))";
         String user = "CREATE TABLE IF NOT EXISTS " + dataBaseConfiguration.getName() + ".user (" +
-                "username VARCHAR(25), " +
-                "password VARCHAR(32), " +
+                "username VARCHAR(25) NOT NULL, " +
+                "password VARCHAR(32) NOT NULL, " +
                 "PRIMARY KEY (username))";
         String user_log = "CREATE TABLE IF NOT EXISTS " + dataBaseConfiguration.getName() + ".user_log (" +
-                "username VARCHAR(25), " +
+                "username VARCHAR(25) NOT NULL, " +
                 "login_time DATETIME, " +
                 "logout_time DATETIME, " +
-                "all_Messages_Sent TINYINT, " +
+                "all_Messages_Sent TINYINT NOT NULL, " +
                 "CONSTRAINT constraint_username FOREIGN KEY (username) REFERENCES user (username) ON UPDATE CASCADE)";
         String chat_room_warehouse = "CREATE TABLE IF NOT EXISTS " + dataBaseConfiguration.getName() + ".chat_room_warehouse (" +
-                "chat_room_id INT, " +
-                "username VARCHAR(25), " +
+                "chat_room_id INT NOT NULL, " +
+                "username VARCHAR(25) , " +
                 "PRIMARY KEY(chat_room_id, username), " +
                 "CONSTRAINT constraint_room_id_CK FOREIGN KEY (chat_room_id) REFERENCES chat_room (id), " +
                 "CONSTRAINT constraint_username_CK FOREIGN KEY (username) REFERENCES user (username) ON UPDATE CASCADE)";
 
         String friends = "CREATE TABLE IF NOT EXISTS " + dataBaseConfiguration.getName() + ".friends (" +
-                "username VARCHAR(25), " +
-                "friend VARCHAR(25), " +
-                "chat_room_id INT, " +
-                "chat_room_name VARCHAR(64), " +
+                "username VARCHAR(25) NOT NULL, " +
+                "friend VARCHAR(25) NOT NULL, " +
+                "chat_room_id INT NOT NULL, " +
+                "chat_room_name VARCHAR(64) NOT NULL, " +
                 "PRIMARY KEY(username, friend), " +
                 "CONSTRAINT constraint_username_id_CK_F FOREIGN KEY (username) REFERENCES user (username) ON UPDATE CASCADE, " +
                 "CONSTRAINT constraint_friend_CK_F  FOREIGN KEY (friend) REFERENCES user (username) ON UPDATE CASCADE, " +
                 "CONSTRAINT constraint_room_id_CK_F FOREIGN KEY (chat_room_id) REFERENCES chat_room (id))";
 
         String message_data = "CREATE TABLE IF NOT EXISTS " + dataBaseConfiguration.getName() + ".message_data (" +
-                "chat_room_id int, " +
-                "username VARCHAR(25), " +
-                "message_text VARCHAR(128), " +
-                "time_log DATETIME, " +
+                "chat_room_id INT NOT NULL, " +
+                "username VARCHAR(25) NOT NULL, " +
+                "message_text VARCHAR(128) NOT NULL, " +
+                "time_log DATETIME NOT NULL, " +
                 "CONSTRAINT constraint_room_id_CK_MD FOREIGN KEY (chat_room_id) REFERENCES chat_room (id), " +
                 "CONSTRAINT constraint_username_CK_MD  FOREIGN KEY (username) REFERENCES user (username) ON UPDATE CASCADE)";
 
