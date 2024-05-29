@@ -1,10 +1,12 @@
-package server;
+package server.gui;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.util.ConcurrentModificationException;
 
+import server.configurations.ServerSettings;
+import server.services.ServerVer2;
 import server.dao.*;
 
 import javax.swing.JButton;
@@ -13,13 +15,13 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import server.dao.DataBaseConfigurations;
-import server.util.Util;
+import server.utils.Util;
 
 public class ServerGUI {
     private ServerSettings serverSettings;
     private DataBaseConfigurations dataBaseConfigurations;
     private JFrame frame;
-    static JTextArea textArea;
+    public static JTextArea textArea;
 
     /**
      * Launch the application.
@@ -97,7 +99,7 @@ public class ServerGUI {
         return null;
     }
 
-    static void printArea() {
+    public static void printArea() {
         StringBuffer concat = new StringBuffer();
         try {
             if (!ServerSettings.onlineUsers.isEmpty()) {

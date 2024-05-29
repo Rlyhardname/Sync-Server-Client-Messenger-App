@@ -1,4 +1,6 @@
-package server;
+package server.configurations;
+
+import server.services.ServerVer2;
 
 import java.io.IOException;
 import java.net.ServerSocket;

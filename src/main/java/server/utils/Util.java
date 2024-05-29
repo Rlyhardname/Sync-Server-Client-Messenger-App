@@ -1,4 +1,4 @@
-package server.util;
+package server.utils;
 
 import common.Command;
 import server.dao.DataSourcePool;
@@ -7,7 +7,7 @@ import server.dao.StorageDAOImpl;
 
 import java.util.Map;
 
-import static server.ServerSettings.onlineUsers;
+import static server.configurations.ServerSettings.onlineUsers;
 
 public class Util {
     public static void pushChatRooms() {

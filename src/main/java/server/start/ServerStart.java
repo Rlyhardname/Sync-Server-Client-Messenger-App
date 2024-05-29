@@ -1,6 +1,6 @@
 package server.start;
 
-import server.ServerGUI;
+import server.gui.ServerGUI;
 
 public class ServerStart {
     public static void main(String[] args) {

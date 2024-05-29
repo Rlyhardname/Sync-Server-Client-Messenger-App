@@ -3,7 +3,7 @@ package server.dao;
 import client.models.User;
 import common.Command;
 import common.EMOJI;
-import server.ServerSettings;
+import server.configurations.ServerSettings;
 
 import javax.sql.DataSource;
 import java.sql.*;

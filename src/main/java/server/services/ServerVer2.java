@@ -1,11 +1,13 @@
-package server;
+package server.services;
 
 import client.models.User;
 import common.Command;
+import server.configurations.ServerSettings;
 import server.dao.*;
 import server.dao.AuthDAO;
 import server.dao.AuthenticationDAO;
-import server.util.Util;
+import server.gui.ServerGUI;
+import server.utils.Util;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -28,7 +30,7 @@ public class ServerVer2 {
     private DataInputStream fileInput;
 
 
-    ServerVer2() {
+    public ServerVer2() {
         if (hasInitialized()) {
             connectClient();
         }
