@@ -35,4 +35,8 @@ public interface StorageDAO<T> {
 
     List<String> fetchSearchResults(String username);
 
+    void createChatRoom(String sender, String accepter);
+
+    boolean isFriends(String user1, String user2);
+
 }

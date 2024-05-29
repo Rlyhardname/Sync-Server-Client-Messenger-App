@@ -1,6 +1,6 @@
 package server.dao;
 
-import client.model.User;
+import client.models.User;
 import common.Command;
 import common.EMOJI;
 import server.ServerSettings;
@@ -315,6 +315,50 @@ public class StorageDAOImpl implements StorageDAO<User> {
         }
 
         return results;
+    }
+
+    @Override
+    public void createChatRoom(String sender, String accepter) {
+        String sql = "INSERT INTO chat_room (room_name) " +
+                "VALUES(?+|+?)";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement prep = conn.prepareStatement(sql)) {
+            prep.setString(1, sender);
+            prep.setString(2, accepter);
+            prep.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean isFriends(String user1, String user2) {
+        String sql = "SELECT username, friend FROM friends " +
+                "WHERE ( username =? AND friend =?) +" +
+                "OR (username=? AND friend =?) ";
+        ResultSet rs = null;
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement prep = conn.prepareStatement(sql)) {
+            prep.setString(1, user1);
+            prep.setString(2, user2);
+            prep.setString(3, user2);
+            prep.setString(4, user1);
+            rs = prep.executeQuery();
+            while(rs.next()){
+                return true;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if(rs!=null){
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return false;
     }
 
     @Override
