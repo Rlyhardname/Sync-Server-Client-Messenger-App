@@ -1,5 +1,6 @@
-package client;
+package client.gui;
 
+import client.services.MessageLogic;
 import common.Command;
 
 import javax.swing.*;
@@ -75,7 +76,7 @@ public class LoginGUI {
         try {
             if (messageLogic.accessServer(Command.LOGIN.name(), username.getText(), password.getText())) {
                 frame.dispose();
-                System.out.println("username in loginGUI login button logic" + messageLogic.getUser().getUsername());
+                System.out.println("username in loginGUI login button logic" + messageLogic.getUser().username());
                 AppGUI.startClientGUI(messageLogic);
             } else {
                 showMessageDialog(null, "Wrong credentials!");
@@ -95,7 +96,7 @@ public class LoginGUI {
         MessageLogic messageLogic = new MessageLogic();
         try {
             if (messageLogic.accessServer(Command.SIGN_UP.name(), username.getText(), password.getText())) {
-                showMessageDialog(null, "Successfully registered user with username: " + messageLogic.getUser().getUsername());
+                showMessageDialog(null, "Successfully registered user with username: " + messageLogic.getUser().username());
             } else {
                 showMessageDialog(null, "Username already exists!");
             }

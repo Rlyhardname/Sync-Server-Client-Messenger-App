@@ -1,5 +1,7 @@
-package client;
+package client.gui;
 
+import client.utils.FileTransfer;
+import client.services.MessageLogic;
 import common.Command;
 
 import javax.swing.*;
@@ -10,7 +12,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AppGUI {
-    private client.MessageLogic messageLogic;
+    private MessageLogic messageLogic;
     private JFrame frame;
     private JTextArea textArea;
     private JButton newClient;
@@ -34,7 +36,7 @@ public class AppGUI {
     public static void startClientGUI(MessageLogic messageLogicArg) {
         EventQueue.invokeLater(() -> {
             try {
-                System.out.println("username in appGUI constructor" + messageLogicArg.getUser().getUsername());
+                System.out.println("username in appGUI constructor" + messageLogicArg.getUser().username());
                 AppGUI window = new AppGUI(messageLogicArg);
                 window.frame.setVisible(true);
             } catch (Exception e) {
@@ -81,7 +83,7 @@ public class AppGUI {
         frame.setTitle("application interface");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout());
-        frame.setTitle(messageLogic.getUser().getUsername());
+        frame.setTitle(messageLogic.getUser().username());
         selectedRoom = 1;
 
         // Header
@@ -152,6 +154,9 @@ public class AppGUI {
             sendFile(path, fileName);
         })).start();
 
+        acceptFriendBTN.addActionListener((e) -> acceptFriend());
+        declineFriendBTN.addActionListener((e) -> declineFriend());
+
         jList.addListSelectionListener((e) -> {
             Object obj = e.getSource();
             String val = ((JList<String>) obj).getSelectedValue();
@@ -172,7 +177,7 @@ public class AppGUI {
         new Thread(() -> frame.addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(WindowEvent winEvt) {
                 try {
-                    messageLogic.sendMessage(Command.CLOSING_CONNECTION.name() + "," + messageLogic.getUser().getUsername() + "," + "-1" + "," + "Pressing X button");
+                    messageLogic.sendMessage(Command.CLOSING_CONNECTION.name() + "," + messageLogic.getUser().username() + "," + "-1" + "," + "Pressing X button");
                 } finally {
                     try {
                         messageLogic.getConnection().getLink().close();
@@ -185,6 +190,20 @@ public class AppGUI {
 
         //  frame.pack();
 
+    }
+
+    private void acceptFriend() {
+        var item = getFriendRequestBar().getSelectedItem();
+        String msg = Command.ACCEPT_FRIEND.name() + "," + item;
+        getFriendRequestBar().removeItem(item);
+        messageLogic.sendMessage(msg);
+    }
+
+    private void declineFriend() {
+        var item = getFriendRequestBar().getSelectedItem();
+        String msg = Command.DECLINE_FRIEND.name() + "," + item;
+        getFriendRequestBar().removeItem(item);
+        messageLogic.sendMessage(msg);
     }
 
     public int getSelectedRoom() {
@@ -204,7 +223,7 @@ public class AppGUI {
 
     private Object sendMessage() {
         System.err.println(selectedRoom);
-        String msg = Command.TEXT_MESSAGE.name() + "," + messageLogic.getUser().getUsername() + "," + getSelectedRoom() + "," + textField.getText().toString();
+        String msg = Command.TEXT_MESSAGE.name() + "," + messageLogic.getUser().username() + "," + getSelectedRoom() + "," + textField.getText().toString();
         messageLogic.sendMessage(msg);
         textField.setText("");
 
@@ -237,8 +256,8 @@ public class AppGUI {
     }
 
     public void sendFile(String path, String fileName) {
-        String msg = Command.SEND_FILE.name() + "," + messageLogic.getUser().getUsername() + "," + getSelectedRoom() + "," + fileName;
-        messageLogic.getConnection().getOutput().println(msg);
+        String msg = Command.SEND_FILE.name() + "," + messageLogic.getUser().username() + "," + getSelectedRoom() + "," + fileName;
+        messageLogic.getConnection().getMessageOutput().println(msg);
         FileTransfer.sendFile(path, messageLogic.getConnection());
     }
 
@@ -254,4 +273,6 @@ public class AppGUI {
     public JComboBox<String> getFriendRequestBar() {
         return friendRequestBar;
     }
+
+
 }
