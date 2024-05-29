@@ -1,7 +1,10 @@
-package client;
+package client.services;
 
-import client.model.Config;
-import client.model.User;
+import client.gui.AppGUI;
+import client.gui.LoginGUI;
+import client.models.Config;
+import client.models.User;
+import client.utils.FileTransfer;
 import common.Command;
 
 import javax.swing.*;
@@ -16,7 +19,7 @@ public class MessageLogic {
     private User user;
     private String activeChat;
 
-    MessageLogic() {
+    public MessageLogic() {
         {
             connection = new Config();
         }
@@ -27,7 +30,7 @@ public class MessageLogic {
         pullFriendsRequest();
         do {
             try {
-                BufferedReader input = connection.getInput();
+                BufferedReader input = connection.getMessageInput();
                 String line = "";
                 while ((line = input.readLine()) != null) {
                     System.out.println(line.length());
@@ -54,6 +57,7 @@ public class MessageLogic {
             }
 
         } while (true);
+
     }
 
     private void pullFriendsRequest() {
@@ -161,7 +165,7 @@ public class MessageLogic {
         return randomizedFriendList;
     }
 
-    boolean accessServer(String command, String username, String password) {
+    public boolean accessServer(String command, String username, String password) {
         loginMessage(command, username, password);
         if (isLoginSuccess()) {
             user = new User(username, password);
@@ -185,13 +189,13 @@ public class MessageLogic {
     }
 
     public void sendMessage(String message) {
-        connection.getOutput().println(message);
+        connection.getMessageOutput().println(message);
     }
 
     public String[] receiveMessage() {
         String[] arr;
         try {
-            arr = connection.getInput().readLine().split(",");
+            arr = connection.getMessageInput().readLine().split(",");
             return arr;
         } catch (IOException e) {
             e.printStackTrace();
@@ -203,13 +207,13 @@ public class MessageLogic {
     public boolean login() {
         do {
             try {
-                String serverMsg = connection.getInput().readLine();
+                String serverMsg = connection.getMessageInput().readLine();
                 if (serverMsg.equals("Username")) {
                     System.out.println(serverMsg);
-                    connection.getOutput().println(user.getUsername());
+                    connection.getMessageOutput().println(user.username());
                 } else if (serverMsg.equals("Password")) {
                     System.out.println(serverMsg);
-                    connection.getOutput().println(user.getPassword());
+                    connection.getMessageOutput().println(user.password());
                 } else if (serverMsg.equals(Command.LOGIN_SUCCESS.name() + "," + "Successfully logged in!")) {
                     System.out.println(serverMsg);
                     break;
