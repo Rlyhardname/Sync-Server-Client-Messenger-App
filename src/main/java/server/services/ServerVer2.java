@@ -4,22 +4,17 @@ import client.models.User;
 import common.Command;
 import server.configurations.ServerSettings;
 import server.dao.*;
-import server.dao.AuthDAO;
-import server.dao.AuthenticationDAO;
 import server.gui.ServerGUI;
 import server.utils.Util;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import static server.configurations.ApplicationContext.APPLICATION_CONTEXT;
 
 public class ServerVer2 {
     private User user;
@@ -38,24 +33,20 @@ public class ServerVer2 {
 
     private boolean hasInitialized() {
         try {
-            link = ServerSettings.serverSocket.accept();
+            link = ServerSettings.instanceOf().acceptConnection();
+            if (link == null) {
+                return false;
+            }
             System.out.println("server created!");
             textInput = new BufferedReader(new InputStreamReader(link.getInputStream()));
             textOutput = new PrintWriter(link.getOutputStream(), true);
             fileInput = new DataInputStream(link.getInputStream());
             fileOutput = new DataOutputStream(link.getOutputStream());
         } catch (IOException e1) {
-            try {
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-                return false;
-            }
             e1.printStackTrace();
             return false;
         } finally {
-            new Thread(() -> {
-                new ServerVer2();
-            }).start();
+            new Thread(ServerVer2::new).start();
         }
         return true;
     }
@@ -86,6 +77,7 @@ public class ServerVer2 {
             }
 
             concatIncomingMessage(msg);
+            APPLICATION_CONTEXT.addAuthenticationAttempt(msg);
             commandUserPass = msg.split(",");
 
             try {
@@ -108,7 +100,7 @@ public class ServerVer2 {
                 }
 
                 login();
-                StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+                StorageDAO<User> storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
                 storageDAO.logUserLogin(user.username());
                 break;
             } else if (commandUserPass[0].equals(Command.SIGN_UP.name())) {
@@ -125,9 +117,9 @@ public class ServerVer2 {
     }
 
     private void syncClientWithServerDB() {
-        StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+        StorageDAO<User> storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
         String[] batch = storageDAO.fetchAllByNameUnsentMessages(user.username());
-        if (ServerSettings.onlineUsers.get(user.username()) != null) {
+        if (APPLICATION_CONTEXT.isUserOnline(user.username())) {
             for (String string : batch) {
                 sendMessage(string);
             }
@@ -163,39 +155,35 @@ public class ServerVer2 {
         System.out.println("login message? " + Command.LOGIN_SUCCESS.name());
         String msg = Command.LOGIN_SUCCESS.name() + "," + "Successfully logged in!";
         sendMessage(msg);
-        ServerSettings.onlineUsers.put(user.username(), this);
-
+        APPLICATION_CONTEXT.addUserAndServerInstance(user.username(), this);
     }
 
     private boolean isAccountCreated() throws IOException {
-        do {
-            if (!userDataIsValid(20, user.username())) {
-                return false;
-            }
+        if (!userDataIsValid(20, user.username())) {
+            return false;
+        }
 
-            AuthDAO authDAO = new AuthenticationDAO(DataSourcePool.instanceOf());
-            if (authDAO.isUserRegistered(user.username())) {
-                sendMessage(Command.NICKNAME_UNAVAILABLE.name());
-                return false;
-            }
+        AuthDAO authDAO = new AuthenticationDAO(DataSourcePool.instanceOf());
+        if (authDAO.isUserRegistered(user.username())) {
+            sendMessage(Command.NICKNAME_UNAVAILABLE.name());
+            return false;
+        }
 
-            if (!userDataIsValid(32, user.password())) {
-                return false;
-            }
+        if (!userDataIsValid(32, user.password())) {
+            return false;
+        }
 
-            StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-            Optional<User> userOpt = storageDAO.createUser(user.username(), user.password());
-            if (userOpt.isPresent()) {
-                String msg = Command.REGISTER_SUCCESS.name() + "," + "Account Successfully created!";
-                sendMessage(msg);
-            } else {
-                String msg = Command.REGISTER_FAIL.name() + "," + "Database error, try again!";
-                sendMessage(msg);
-            }
+        StorageDAO<User> storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+        Optional<User> userOpt = storageDAO.createUser(user.username(), user.password());
+        if (userOpt.isPresent()) {
+            String msg = Command.REGISTER_SUCCESS.name() + "," + "Account Successfully created!";
+            sendMessage(msg);
+        } else {
+            String msg = Command.REGISTER_FAIL.name() + "," + "Database error, try again!";
+            sendMessage(msg);
+        }
 
-            return true;
-        } while (true);
-
+        return true;
     }
 
     private boolean userDataIsValid(int typeLength, String data) {
@@ -253,13 +241,13 @@ public class ServerVer2 {
                 String[] userMsg = msg.split(",");
 
                 if (userMsg[0].equals(Command.PULL_FRIENDS.name())) {
-                    StorageDAO DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+                    StorageDAO<User> DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
                     Util.pullFriends(DAO, user.username());
                     continue;
                 }
 
                 if (userMsg[0].equals(Command.SEARCH_PERSON.name())) {
-                    StorageDAO DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+                    StorageDAO<User> DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
                     List<String> fetchResults = DAO.fetchSearchResults(userMsg[1]);
                     fetchResults.add(0, Command.SEARCH_PERSON.name());
                     String result = String.join(",", fetchResults);
@@ -270,13 +258,12 @@ public class ServerVer2 {
 
                 if (userMsg[0].equals(Command.ACCEPT_FRIEND.name())) {
                     String sender = userMsg[1];
-                    StorageDAO DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-                    if(!DAO.isFriends(user.username(),sender)){
+                    StorageDAO<User> DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+                    if (!DAO.isFriends(user.username(), sender)) {
                         // create new chat_room
                         // generate name(from the two people's names concatenated eg. Acc1|Acc2, add 2 users in room by default
-                        DAO.createChatRoom(sender,user.username());
+                        DAO.createChatRoom(sender, user.username());
                     }
-
 
 
                     // add both users to chat_room_warehouse with the new ID created(probably best doing that with trigger)
@@ -296,7 +283,7 @@ public class ServerVer2 {
                 String message = userMsg[3];
 
                 if (command.equals(Command.CLOSING_CONNECTION.name())) {
-                    ServerSettings.onlineUsers.remove(username);
+                    APPLICATION_CONTEXT.disconnectUser(user.username());
                     break;
                 }
 
@@ -307,7 +294,7 @@ public class ServerVer2 {
                 if (isTextMessage(command)) {
                     System.err.println("server receices" + Arrays.toString(userMsg));
                     // SEND MSG LOGIC
-                    StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+                    StorageDAO<User> storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
                     boolean isUserAuthorizedInRoom = storageDAO.isUserAuthorizedInRoom(username, message, room);
                     if (!isUserAuthorizedInRoom) {
                         continue;
@@ -326,7 +313,7 @@ public class ServerVer2 {
 
         } while (true);
 
-        StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+        StorageDAO<User> storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
         storageDAO.logUserLogout(user.username());
         try {
             textOutput.close();
@@ -340,18 +327,15 @@ public class ServerVer2 {
     }
 
     private boolean isTextMessage(String msg) {
-        if (msg.equals(Command.TEXT_MESSAGE.name())) {
-            return true;
-        }
-        return false;
+        return msg.equals(Command.TEXT_MESSAGE.name());
     }
 
     private void sendMsgOnlineRoomUsers(int room, String user, String message) {
-        StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+        StorageDAO<User> storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
         String[] users = storageDAO.getRoomUsers(room);
         for (String roomUser : users) {
-            if (ServerSettings.onlineUsers.get(roomUser) != null) {
-                ServerSettings.onlineUsers.get(roomUser).getTextOutput().println(Command.TEXT_MESSAGE.name() + "," + user + "," + room + "," + message);
+            if (APPLICATION_CONTEXT.isUserOnline(roomUser)) {
+                APPLICATION_CONTEXT.fetchServerInstance(roomUser).sendMessage(Command.TEXT_MESSAGE.name() + "," + user + "," + room + "," + message);
             } else {
                 storageDAO.updateUserLogMessageSent(roomUser, 0);
             }
@@ -365,10 +349,10 @@ public class ServerVer2 {
     }
 
     private void reSendFile(int room, String usernameSendingFile, String fileName) {
-        StorageDAO storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+        StorageDAO<User> storageDAO = new StorageDAOImpl(DataSourcePool.instanceOf());
         String[] usersInRoom = storageDAO.getRoomUsers(room);
         for (String user : usersInRoom) {
-            ServerVer2 onlineUser = ServerSettings.onlineUsers.get(user);
+            ServerVer2 onlineUser = APPLICATION_CONTEXT.fetchServerInstance(user);
             if (onlineUser != null && !usernameSendingFile.toLowerCase().equals(user)) {
                 int bytes = 0;
                 onlineUser.getTextOutput().println(Command.RECEIVE_FILE.name() + "," + usernameSendingFile + "," + room + "," + fileName);
@@ -394,7 +378,7 @@ public class ServerVer2 {
                     try {
                         sendFile.flush();
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
                     }
                 }
 
@@ -412,27 +396,12 @@ public class ServerVer2 {
         ServerGUI.printArea();
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public Socket getLink() {
-        return link;
-    }
-
     public PrintWriter getTextOutput() {
         return textOutput;
-    }
-
-    public BufferedReader getTextInput() {
-        return textInput;
     }
 
     public DataOutputStream getFileOutput() {
         return fileOutput;
     }
 
-    public DataInputStream getFileInput() {
-        return fileInput;
-    }
 }

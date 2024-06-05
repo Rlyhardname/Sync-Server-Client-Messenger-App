@@ -6,25 +6,25 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
+import java.util.Objects;
 
 public class FileTransfer {
     public static String pickDirectory() {
-        JFileChooser fileChooserj = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-        fileChooserj.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        File file = fileChooserj.getSelectedFile();
-        fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("jpg", "jpg"));
-        fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("gif", "gif"));
-        fileChooserj.addChoosableFileFilter(new FileNameExtensionFilter("txt", "txt"));
-        fileChooserj.setAcceptAllFileFilterUsed(true);
+        JFileChooser fileChooserJ = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        fileChooserJ.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooserJ.addChoosableFileFilter(new FileNameExtensionFilter("jpg", "jpg"));
+        fileChooserJ.addChoosableFileFilter(new FileNameExtensionFilter("gif", "gif"));
+        fileChooserJ.addChoosableFileFilter(new FileNameExtensionFilter("txt", "txt"));
+        fileChooserJ.setAcceptAllFileFilterUsed(true);
         String path = "";
         String name = "";
-        int r = fileChooserj.showSaveDialog(null);
+        int r = fileChooserJ.showSaveDialog(null);
         if (r == JFileChooser.APPROVE_OPTION) {
-            path = fileChooserj.getSelectedFile().getAbsolutePath();
-            name = fileChooserj.getName();
+            path = fileChooserJ.getSelectedFile().getAbsolutePath();
+            name = fileChooserJ.getName();
         }
 
-        return path+","+name;
+        return path + "," + name;
     }
 
     public static void receiveFile(String fileName, Config connection) {
@@ -55,11 +55,12 @@ public class FileTransfer {
             e.printStackTrace();
         } finally {
             try {
+                // TODO Refactor class, something isn't right here.
                 fileOutputStream.flush();
                 connection.getFileOutput().flush();
                 fileOutputStream.close();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
 
         }
@@ -87,7 +88,7 @@ public class FileTransfer {
                 // Send the file to Server Socket
                 connection.getFileOutput().write(buffer, 0, bytes);
                 connection.getFileOutput().flush();
-                if(bytes==0){
+                if (bytes == 0) {
                     break;
                 }
             }
@@ -95,9 +96,11 @@ public class FileTransfer {
             e.printStackTrace();
         } finally {
             try {
-                fileInputStream.close();
+                if (Objects.nonNull(fileInputStream)) {
+                    fileInputStream.close();
+                }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
 

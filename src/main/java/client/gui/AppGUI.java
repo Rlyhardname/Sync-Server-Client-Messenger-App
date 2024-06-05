@@ -1,7 +1,7 @@
 package client.gui;
 
-import client.utils.FileTransfer;
 import client.services.MessageLogic;
+import client.utils.FileTransfer;
 import common.Command;
 
 import javax.swing.*;
@@ -15,12 +15,7 @@ public class AppGUI {
     private MessageLogic messageLogic;
     private JFrame frame;
     private JTextArea textArea;
-    private JButton newClient;
     private JButton sendMessageBTN;
-    private JScrollPane scrollPane;
-    private JPanel panel;
-    private JPanel friendsPanel;
-    private JPanel header;
     private JTextField textField;
     private JComboBox<String> searchBar;
     private JComboBox<String> friendRequestBar;
@@ -60,7 +55,6 @@ public class AppGUI {
                     messageLogic.getConnection().getLink().close();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    throw new RuntimeException(e);
                 }
             }
 
@@ -87,11 +81,11 @@ public class AppGUI {
         selectedRoom = 1;
 
         // Header
-        header = new JPanel(new BorderLayout());
+        JPanel header = new JPanel(new BorderLayout());
         JLabel friendListLabel = new JLabel("Friend List            ");
         friendListLabel.setHorizontalAlignment(JLabel.RIGHT);
         //String[] testDropdown = new String[]{"one", "two", "1337"};
-        searchBar = new JComboBox();
+        searchBar = new JComboBox<>();
         searchBar.setPreferredSize(new Dimension(150, 20));
         searchBar.setEditable(true);
         friendRequestBar = new JComboBox<>();
@@ -119,7 +113,7 @@ public class AppGUI {
         textArea = new JTextArea(10, 10);
         textArea.setEditable(false);
         textArea.setLineWrap(true);
-        scrollPane = new JScrollPane(textArea);
+        JScrollPane scrollPane = new JScrollPane(textArea);
         frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 
         // Footer
@@ -130,7 +124,7 @@ public class AppGUI {
         // newClient = new JButton("NEW CLIENT");
 
         // BTN panel
-        panel = new JPanel();
+        JPanel panel = new JPanel();
         panel.add(textField);
         panel.add(sendMessageBTN);
         panel.add(btnSendFile);
@@ -138,7 +132,7 @@ public class AppGUI {
         frame.getContentPane().add(panel, BorderLayout.SOUTH);
 
         //frListListener listen = new frListListener(this);
-        friendsPanel = new JPanel();
+        JPanel friendsPanel = new JPanel();
         friendsPanel.setLayout(new GridLayout(0, 1, 0, 0));
         jList = new JList<>();
         JPanel east = new JPanel(new BorderLayout());
@@ -182,7 +176,7 @@ public class AppGUI {
                     try {
                         messageLogic.getConnection().getLink().close();
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
                     }
                 }
             }
@@ -215,19 +209,11 @@ public class AppGUI {
         this.selectedRoom = selectedRoom;
     }
 
-    private Object newClientTest() {
-        LoginGUI.startGUI();
-        return null;
-    }
-
-
-    private Object sendMessage() {
+    private void sendMessage() {
         System.err.println(selectedRoom);
-        String msg = Command.TEXT_MESSAGE.name() + "," + messageLogic.getUser().username() + "," + getSelectedRoom() + "," + textField.getText().toString();
+        String msg = Command.TEXT_MESSAGE.name() + "," + messageLogic.getUser().username() + "," + getSelectedRoom() + "," + textField.getText();
         messageLogic.sendMessage(msg);
         textField.setText("");
-
-        return null;
     }
 
     private void searchPerson() {
@@ -235,22 +221,14 @@ public class AppGUI {
         messageLogic.sendMessage(msg);
     }
 
-    public JList<String> getjList() {
-        return jList;
-    }
-
-    public void setjList(String[] friends) {
-        DefaultListModel model = new DefaultListModel();
+    public void setJList(String[] friends) {
+        DefaultListModel<String> model = new DefaultListModel<>();
         for (int i = 0; i < friends.length; i++) {
             model.add(i, friends[i]);
         }
         jList.setModel(model);
     }
-
-    public void changeLabelColor(JLabel label, Color color) {
-        label.setForeground(color);
-    }
-
+    
     public void concatArea(String msg) {
         textArea.append((msg + "\n"));
     }

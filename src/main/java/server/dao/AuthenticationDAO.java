@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class AuthenticationDAO implements AuthDAO<User> {
+public class AuthenticationDAO implements AuthDAO {
     private final DataSource dataSource;
 
     public AuthenticationDAO(DataSource dataSource) {

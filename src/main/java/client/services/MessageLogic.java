@@ -106,7 +106,7 @@ public class MessageLogic {
 
         if (command.equals(Command.PUSH_FRIENDS.name())) {
             String[] listOfFriends = constructJList(block);
-            userGUI.setjList(listOfFriends);
+            userGUI.setJList(listOfFriends);
         }
 
         return -1;

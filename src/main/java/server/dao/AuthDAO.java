@@ -1,6 +1,6 @@
 package server.dao;
 
-public interface AuthDAO<T> {
+public interface AuthDAO {
 
     boolean isUserRegistered(String username);
 

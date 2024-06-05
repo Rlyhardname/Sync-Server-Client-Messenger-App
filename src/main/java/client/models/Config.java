@@ -30,18 +30,6 @@ public class Config {
 
     }
 
-    public InetAddress getHostIP() {
-        return hostIP;
-    }
-
-    public void setHostIP(InetAddress hostIP) {
-        this.hostIP = hostIP;
-    }
-
-    public int getPORT() {
-        return PORT;
-    }
-
     public PrintWriter getMessageOutput() {
         return messageOutput;
     }

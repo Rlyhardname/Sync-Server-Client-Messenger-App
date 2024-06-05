@@ -4,7 +4,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class MessageBufferBlockingQue {
-    private BlockingQueue<String> MessageBuffer;
+    private final BlockingQueue<String> MessageBuffer;
 
     private MessageBufferBlockingQue() {
         MessageBuffer = new LinkedBlockingQueue<>();

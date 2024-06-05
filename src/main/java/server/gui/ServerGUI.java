@@ -93,8 +93,7 @@ public class ServerGUI {
     }
 
     private void initSettingsAndLaunchServer() {
-        if (initServerSettings()) ;
-        {
+        if (initServerSettings()) {
             new Thread(this::newServerInstance).start();
             new Thread(Util::recurringPushToChatRooms).start();
         }
@@ -118,9 +117,8 @@ public class ServerGUI {
         return false;
     }
 
-    private Object printUsersAndAdditionalInfo() {
+    private void printUsersAndAdditionalInfo() {
         printArea();
-        return null;
     }
 
     public static void printArea() {
@@ -140,7 +138,7 @@ public class ServerGUI {
         }
 
         if (!usersConcatWithPasswords.isEmpty()) {
-            textArea.setText(usersConcatWithPasswords.toString());
+            textArea.setText(usersConcatWithPasswords);
         }
 
     }

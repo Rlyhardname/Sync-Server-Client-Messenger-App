@@ -2,25 +2,19 @@ package server.utils;
 
 import client.models.User;
 import common.Command;
-import server.configurations.ServerSettings;
 import server.dao.DataSourcePool;
 import server.dao.StorageDAO;
 import server.dao.StorageDAOImpl;
 
 import java.util.Map;
 
-import static server.configurations.ApplicationContext.*;
+import static server.configurations.ApplicationContext.APPLICATION_CONTEXT;
 
 public class Util {
     public static void recurringPushToChatRooms() {
         StorageDAO<User> DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
         while (true) {
-            APPLICATION_CONTEXT.getOnlineUsersHashMap().getOnlineUsers().entrySet().stream().forEach(entry ->
-            {
-                String key = entry.getKey();
-                pullFriends(DAO,key);
-            });
-
+            APPLICATION_CONTEXT.getOnlineUsersHashMap().getOnlineUsers().forEach((key, value) -> pullFriends(DAO, key));
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
@@ -31,7 +25,7 @@ public class Util {
 
     }
 
-    public static void pullFriends(StorageDAO DAO, String username) {
+    public static void pullFriends(StorageDAO<User> DAO, String username) {
         var printWriter = APPLICATION_CONTEXT.fetchServerInstance(username).getTextOutput();
         Map<String, String> friendsAndStatus = DAO.getFriends(username);
         String friends = appendFriends(friendsAndStatus);

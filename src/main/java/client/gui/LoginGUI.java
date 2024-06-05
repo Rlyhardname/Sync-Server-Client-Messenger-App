@@ -5,7 +5,6 @@ import common.Command;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowEvent;
 
 import static javax.swing.JOptionPane.showMessageDialog;
 
@@ -35,7 +34,8 @@ public class LoginGUI {
      * Create the application.
      */
     public LoginGUI() {
-        initialize(600);
+        int xAxis = 600;
+        initialize(xAxis);
     }
 
     private void initialize(int xAxis) {
@@ -59,9 +59,6 @@ public class LoginGUI {
 
         //Window close/X button
         new Thread(() -> frame.addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(WindowEvent winEvt) {
-
-            }
         })).start();
 
         // Login
@@ -71,7 +68,7 @@ public class LoginGUI {
         new Thread(() -> signUp.addActionListener(e -> register())).start();
     }
 
-    private Object login() {
+    private void login() {
         MessageLogic messageLogic = new MessageLogic();
         try {
             if (messageLogic.accessServer(Command.LOGIN.name(), username.getText(), password.getText())) {
@@ -89,10 +86,9 @@ public class LoginGUI {
 
         }
 
-        return null;
     }
 
-    private Object register() {
+    private void register() {
         MessageLogic messageLogic = new MessageLogic();
         try {
             if (messageLogic.accessServer(Command.SIGN_UP.name(), username.getText(), password.getText())) {
@@ -107,7 +103,6 @@ public class LoginGUI {
             e.printStackTrace();
         }
 
-        return null;
     }
 
 }

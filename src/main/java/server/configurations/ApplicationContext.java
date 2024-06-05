@@ -38,9 +38,7 @@ public enum ApplicationContext {
 
     public String concatUsersWithPasswordReturnString() {
         StringBuffer concat = new StringBuffer();
-        onlineUsersMap.getOnlineUsers().forEach((key, value) -> concat
-                .append("Active UserName: :" + key + "Active user password: " + value + "\n"));
-
+        onlineUsersMap.getOnlineUsers().forEach((key, value) -> concat.append("Active UserName: :").append(key).append("Active user password: ").append(value).append("\n"));
         return concat.toString();
     }
 
@@ -56,7 +54,7 @@ public enum ApplicationContext {
         return onlineUsersMap.getOnlineUsers().get(username);
     }
 
-    public void addAuthenticationAttempt(String message){
+    public void addAuthenticationAttempt(String message) {
         messageBufferBlockingQue.getMessageBuffer().add(message);
     }
 }

@@ -3,7 +3,7 @@ package server.dao;
 import client.models.User;
 import common.Command;
 import common.EMOJI;
-import server.configurations.ServerSettings;
+import server.configurations.ApplicationContext;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -373,7 +373,7 @@ public class StorageDAOImpl implements StorageDAO<User> {
 
             while (rs.next()) {
                 String friendName = rs.getString(1);
-                boolean isOnline = ServerSettings.onlineUsers.containsKey(friendName);
+                boolean isOnline = ApplicationContext.APPLICATION_CONTEXT.isUserOnline(friendName);
                 if (isOnline) {
                     friends.put(friendName, EMOJI.getEmoji(EMOJI.CHECK_MARK));
                 } else if (!isOnline) {
