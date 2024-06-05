@@ -1,27 +1,22 @@
 package server.gui;
 
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.util.ConcurrentModificationException;
-
 import server.configurations.ServerSettings;
-import server.services.ServerVer2;
-import server.dao.*;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-
 import server.dao.DataBaseConfigurations;
+import server.dao.DataSourcePool;
+import server.dao.SeedDB;
+import server.services.ServerVer2;
 import server.utils.Util;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.ConcurrentModificationException;
+
+import static server.configurations.ApplicationContext.APPLICATION_CONTEXT;
+
 public class ServerGUI {
-    private ServerSettings serverSettings;
+    public static JTextArea textArea;
     private DataBaseConfigurations dataBaseConfigurations;
     private JFrame frame;
-    public static JTextArea textArea;
 
     /**
      * Launch the application.
@@ -42,26 +37,21 @@ public class ServerGUI {
      * Create the application.
      */
     public ServerGUI() {
-        serverSettings = new ServerSettings();
-        dataBaseConfigurations = new DataBaseConfigurations("ServerIO", "jdbc:mysql://localhost/ServerIO", "root", "dCBZXTf49PcL3L97lWXP");
-        initialize();
-        DataSourcePool.instanceOf(dataBaseConfigurations.newMysqlDataSource());
-        try {
-            new SeedDB(dataBaseConfigurations);
-        } catch (RuntimeException e) {
-            ServerGUI.textArea.setText("Error occurred, check database schema");
-        }
+        initView();
 
-        new Thread(() -> {
-            startServer();
-        }).start();
-        new Thread(() -> Util.pushChatRooms()).start();
+        initDB();
+
+        APPLICATION_CONTEXT.initContext();
+
+        initServerSettings();
+
+        initSettingsAndLaunchServer();
     }
 
     /**
      * Initialize the contents of the frame.
      */
-    private void initialize() {
+    private void initView() {
         // Init frame
         frame = new JFrame();
         frame.setBounds(200, 100, 1000, 650);
@@ -75,6 +65,8 @@ public class ServerGUI {
         // Init button pane and add buttons
         JPanel buttons = new JPanel();
         JButton print = new JButton("PRINT USERS");
+        JButton start = new JButton("START SERVER");
+        buttons.add(start);
         buttons.add(print);
         buttons.add(newClientLogin);
         // Init printOut area and add widgets
@@ -90,8 +82,40 @@ public class ServerGUI {
         frame.setVisible(true);
     }
 
-    public void startServer() {
+    private void initDB() {
+        dataBaseConfigurations = new DataBaseConfigurations("ServerIO", "jdbc:mysql://localhost/ServerIO", "root", "dCBZXTf49PcL3L97lWXP");
+        DataSourcePool.instanceOf(dataBaseConfigurations.newMysqlDataSource());
+        try {
+            new SeedDB(dataBaseConfigurations);
+        } catch (RuntimeException e) {
+            ServerGUI.textArea.append("Error occurred, check database schema " + System.lineSeparator());
+        }
+    }
+
+    private void initSettingsAndLaunchServer() {
+        if (initServerSettings()) ;
+        {
+            new Thread(this::newServerInstance).start();
+            new Thread(Util::recurringPushToChatRooms).start();
+        }
+
+    }
+
+    private void newServerInstance() {
         new ServerVer2();
+    }
+
+    private boolean initServerSettings() {
+        try {
+            ServerSettings.startServer();
+            return true;
+        } catch (RuntimeException e) {
+            ServerGUI.textArea.append("server settings didn't load correctly... try relaunch if failed again look at configurations" + System.lineSeparator());
+            // log(e) failed start
+            // popout message that server is down
+        }
+
+        return false;
     }
 
     private Object printUsersAndAdditionalInfo() {
@@ -100,29 +124,24 @@ public class ServerGUI {
     }
 
     public static void printArea() {
-        StringBuffer concat = new StringBuffer();
+        String usersConcatWithPasswords = "";
         try {
-            if (!ServerSettings.onlineUsers.isEmpty()) {
-                ServerSettings.onlineUsers.forEach((key, value) -> concat
-                        .append("Active UserName: :" + key + "Active user password: " + value + "\n"));
+            if (APPLICATION_CONTEXT.isUserCountPositive()) {
+                usersConcatWithPasswords = APPLICATION_CONTEXT.concatUsersWithPasswordReturnString();
             }
 
         } catch (ConcurrentModificationException e) {
-            if (concat.equals("") || concat.length() == 0) {
-                textArea.setText("Бурканът преля... Обади се на техника!");
-            }
+            //log(e);
+            textArea.setText("Should not throw this, online users should be thread safe");
 
         } catch (NullPointerException e1) {
-            if (concat.equals("") || concat.length() == 0) {
-                textArea.setText("Всички спят...");
-            }
+            textArea.setText("No active users online");
 
         }
 
-        if (!concat.equals("")) {
-            textArea.setText(concat.toString());
+        if (!usersConcatWithPasswords.isEmpty()) {
+            textArea.setText(usersConcatWithPasswords.toString());
         }
 
     }
-
 }
