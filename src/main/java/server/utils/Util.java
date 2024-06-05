@@ -1,21 +1,25 @@
 package server.utils;
 
+import client.models.User;
 import common.Command;
+import server.configurations.ServerSettings;
 import server.dao.DataSourcePool;
 import server.dao.StorageDAO;
 import server.dao.StorageDAOImpl;
 
 import java.util.Map;
 
-import static server.configurations.ServerSettings.onlineUsers;
+import static server.configurations.ApplicationContext.*;
 
 public class Util {
-    public static void pushChatRooms() {
-        StorageDAO DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+    public static void recurringPushToChatRooms() {
+        StorageDAO<User> DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
         while (true) {
-            for (var user : onlineUsers.entrySet()) {
-                pullFriends(DAO, user.getKey());
-            }
+            APPLICATION_CONTEXT.getOnlineUsersHashMap().getOnlineUsers().entrySet().stream().forEach(entry ->
+            {
+                String key = entry.getKey();
+                pullFriends(DAO,key);
+            });
 
             try {
                 Thread.sleep(5000);
@@ -27,19 +31,18 @@ public class Util {
 
     }
 
-    private static String pullGroupChats(String username) {
-        StorageDAO DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
-        String gcIdAndName = DAO.getRoomIdAndRoomName(username);
-
-        return gcIdAndName;
-    }
-
     public static void pullFriends(StorageDAO DAO, String username) {
-        var printWriter = onlineUsers.get(username).getTextOutput();
+        var printWriter = APPLICATION_CONTEXT.fetchServerInstance(username).getTextOutput();
         Map<String, String> friendsAndStatus = DAO.getFriends(username);
         String friends = appendFriends(friendsAndStatus);
         String groupChats = pullGroupChats(username);
         printWriter.println(friends + groupChats);
+    }
+
+    private static String pullGroupChats(String username) {
+        StorageDAO<User> DAO = new StorageDAOImpl(DataSourcePool.instanceOf());
+
+        return DAO.getRoomIdAndRoomName(username);
     }
 
     private static String appendFriends(Map<String, String> friends) {
