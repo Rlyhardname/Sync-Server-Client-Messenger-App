@@ -2,7 +2,7 @@ package client.gui;
 
 import client.services.MessageLogic;
 import client.utils.FileTransfer;
-import common.Command;
+import common.enums.Command;
 
 import javax.swing.*;
 import java.awt.*;

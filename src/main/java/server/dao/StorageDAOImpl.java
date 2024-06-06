@@ -1,8 +1,8 @@
 package server.dao;
 
 import client.models.User;
-import common.Command;
-import common.EMOJI;
+import common.enums.Command;
+import common.enums.EMOJI;
 import server.configurations.ApplicationContext;
 
 import javax.sql.DataSource;

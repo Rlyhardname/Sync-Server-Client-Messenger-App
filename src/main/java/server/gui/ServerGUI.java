@@ -13,7 +13,7 @@ import java.awt.*;
 import java.util.ConcurrentModificationException;
 
 import static server.configurations.ApplicationContext.APPLICATION_CONTEXT;
-import static server.concurency.Executor.EXECUTOR;
+import static common.concurency.Executor.EXECUTOR;
 
 public class ServerGUI {
     public static JTextArea textArea;

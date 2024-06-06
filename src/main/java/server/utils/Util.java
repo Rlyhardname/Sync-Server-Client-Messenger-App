@@ -1,7 +1,7 @@
 package server.utils;
 
 import client.models.User;
-import common.Command;
+import common.enums.Command;
 import server.dao.DataSourcePool;
 import server.dao.StorageDAO;
 import server.dao.StorageDAOImpl;

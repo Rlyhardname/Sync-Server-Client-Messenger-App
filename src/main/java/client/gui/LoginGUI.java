@@ -1,7 +1,7 @@
 package client.gui;
 
 import client.services.MessageLogic;
-import common.Command;
+import common.enums.Command;
 
 import javax.swing.*;
 import java.awt.*;

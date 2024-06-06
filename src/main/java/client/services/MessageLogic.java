@@ -4,7 +4,7 @@ import client.gui.AppGUI;
 import client.models.Config;
 import client.models.User;
 import client.utils.FileTransfer;
-import common.Command;
+import common.enums.Command;
 
 import javax.swing.*;
 import java.io.BufferedReader;

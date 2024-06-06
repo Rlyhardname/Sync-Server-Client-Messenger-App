@@ -1,4 +1,4 @@
-package server.concurency;
+package common.concurency;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

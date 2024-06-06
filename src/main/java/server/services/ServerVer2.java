@@ -1,7 +1,7 @@
 package server.services;
 
 import client.models.User;
-import common.Command;
+import common.enums.Command;
 import server.configurations.ServerSettings;
 import server.dao.*;
 import server.gui.ServerGUI;
