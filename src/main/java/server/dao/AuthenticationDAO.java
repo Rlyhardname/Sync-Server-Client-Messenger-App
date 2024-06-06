@@ -1,7 +1,5 @@
 package server.dao;
 
-import client.models.User;
-
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,10 +11,6 @@ public class AuthenticationDAO implements AuthDAO {
 
     public AuthenticationDAO(DataSource dataSource) {
         this.dataSource = dataSource;
-    }
-
-    public DataSource getDataSource() {
-        return dataSource;
     }
 
     public boolean isUserRegistered(String username) {

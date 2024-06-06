@@ -1,7 +1,6 @@
 package client.services;
 
 import client.gui.AppGUI;
-import client.gui.LoginGUI;
 import client.models.Config;
 import client.models.User;
 import client.utils.FileTransfer;
@@ -14,10 +13,8 @@ import java.util.*;
 
 public class MessageLogic {
     private AppGUI userGUI;
-    private LoginGUI login;
     private Config connection;
     private User user;
-    private String activeChat;
 
     public MessageLogic() {
         {
@@ -81,7 +78,7 @@ public class MessageLogic {
 
             if (command.equals(Command.RECEIVE_FILE.name())) {
                 String path = FileTransfer.pickDirectory();
-                if (!path.equals("") || !path.equals(null)) {
+                if (!path.equals(null)) {
                     FileTransfer.receiveFile(path, connection);
                     userGUI.concatArea(username + ": sending file " + message);
                     return 1;
@@ -98,7 +95,7 @@ public class MessageLogic {
         if (command.equals(Command.SEARCH_PERSON.name())) {
             String[] friendArray = Arrays.stream(block).filter((x) -> !x.equals(Command.SEARCH_PERSON.name())).toArray(String[]::new);
             userGUI.getSearchBar().removeAllItems();
-            DefaultComboBoxModel model = (DefaultComboBoxModel) userGUI.getSearchBar().getModel();
+            DefaultComboBoxModel<String> model = (DefaultComboBoxModel) userGUI.getSearchBar().getModel();
             model.addAll(List.of(friendArray));
             SwingUtilities.invokeLater(() -> userGUI.getSearchBar().setPopupVisible(true));
         }
@@ -204,32 +201,6 @@ public class MessageLogic {
         return new String[0];
     }
 
-    public boolean login() {
-        do {
-            try {
-                String serverMsg = connection.getMessageInput().readLine();
-                if (serverMsg.equals("Username")) {
-                    System.out.println(serverMsg);
-                    connection.getMessageOutput().println(user.username());
-                } else if (serverMsg.equals("Password")) {
-                    System.out.println(serverMsg);
-                    connection.getMessageOutput().println(user.password());
-                } else if (serverMsg.equals(Command.LOGIN_SUCCESS.name() + "," + "Successfully logged in!")) {
-                    System.out.println(serverMsg);
-                    break;
-                } else {
-                    System.out.println(serverMsg);
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        } while (true);
-
-        return true;
-    }
-
     public StringBuffer concatStrings(String... data) {
         StringBuffer concat = new StringBuffer();
         for (String string : data) {
@@ -248,24 +219,12 @@ public class MessageLogic {
         sendMessage(action);
     }
 
-    public AppGUI getUserGUI() {
-        return userGUI;
-    }
-
-    public LoginGUI getLogin() {
-        return login;
-    }
-
     public Config getConnection() {
         return connection;
     }
 
     public User getUser() {
         return user;
-    }
-
-    public String getActiveChat() {
-        return activeChat;
     }
 
 }
