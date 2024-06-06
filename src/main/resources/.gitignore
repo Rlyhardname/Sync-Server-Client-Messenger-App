@@ -1,1 +1,5 @@
 /bin/
+src/out/
+.idea/
+out/
+*out/
