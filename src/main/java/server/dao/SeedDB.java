@@ -36,7 +36,7 @@ public class SeedDB {
         String chat_room = "CREATE TABLE IF NOT EXISTS " + dataBaseConfiguration.getName() + ".chat_room (" +
                 "id INT NOT NULL AUTO_INCREMENT, " +
                 "room_name VARCHAR(64) NOT NULL, " +
-                "users_count INT DEFAULT 2, " +
+                "users_count INT DEFAULT 2 NOT NULL, " +
                 "PRIMARY KEY (id))";
         String user = "CREATE TABLE IF NOT EXISTS " + dataBaseConfiguration.getName() + ".user (" +
                 "username VARCHAR(25) NOT NULL, " +
@@ -46,7 +46,7 @@ public class SeedDB {
                 "username VARCHAR(25) NOT NULL, " +
                 "login_time DATETIME, " +
                 "logout_time DATETIME, " +
-                "all_Messages_Sent TINYINT NOT NULL, " +
+                "all_Messages_Sent TINYINT DEFAULT 0 NOT NULL, " +
                 "CONSTRAINT constraint_username FOREIGN KEY (username) REFERENCES user (username) ON UPDATE CASCADE)";
         String chat_room_warehouse = "CREATE TABLE IF NOT EXISTS " + dataBaseConfiguration.getName() + ".chat_room_warehouse (" +
                 "chat_room_id INT NOT NULL, " +
@@ -69,7 +69,7 @@ public class SeedDB {
                 "chat_room_id INT NOT NULL, " +
                 "username VARCHAR(25) NOT NULL, " +
                 "message_text VARCHAR(128) NOT NULL, " +
-                "time_log DATETIME NOT NULL, " +
+                "time_log DATETIME DEFAULT NOW() NOT NULL, " +
                 "CONSTRAINT constraint_room_id_CK_MD FOREIGN KEY (chat_room_id) REFERENCES chat_room (id), " +
                 "CONSTRAINT constraint_username_CK_MD  FOREIGN KEY (username) REFERENCES user (username) ON UPDATE CASCADE)";
 
