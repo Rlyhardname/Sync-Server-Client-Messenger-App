@@ -69,7 +69,7 @@ public class StorageDAOImpl implements StorageDAO<User> {
     @Override
     public void updateUserLogMessageSent(String username, int state) {
         Timestamp dateTimeStamp = fetchLastLogoutTimestamp(username);
-        String sql = "UPDATE User_Log " + "SET allMessagesSent = ? " + "WHERE Logout_time = ? and username = ?";
+        String sql = "UPDATE User_Log " + "SET all_Messages_Sent = ? " + "WHERE Logout_time = ? and username = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement prep = conn.prepareStatement(sql)) {
             prep.setInt(1, state);
@@ -124,7 +124,7 @@ public class StorageDAOImpl implements StorageDAO<User> {
     public String[] fetchAllByNameUnsentMessages(String username) {
         ResultSet rs = null;
         Timestamp timestamp = fetchLastLogoutTimestamp(username);
-        String sql = "SELECT allMessagesSent FROM User_log " + "WHERE logout_time = ? and allMessagesSent = ? ";
+        String sql = "SELECT all_Messages_Sent FROM User_log " + "WHERE logout_time = ? and all_Messages_Sent = ? ";
         Timestamp ts;
         try (Connection conn = dataSource.getConnection();
              PreparedStatement prep = conn.prepareStatement(sql)) {
@@ -155,7 +155,7 @@ public class StorageDAOImpl implements StorageDAO<User> {
 
     private String[] getBatch(String username, Timestamp timestamp) {
         String sql = "SELECT message_text,username,chat_room_id " + "FROM message_data "
-                + "WHERE username != ? and timeLOG > ?";
+                + "WHERE username != ? and time_LOG > ?";
         ArrayList<String> messages = new ArrayList<String>();
         ResultSet rs = null;
         try (Connection conn = dataSource.getConnection();
@@ -260,9 +260,9 @@ public class StorageDAOImpl implements StorageDAO<User> {
 
     @Override
     public String getRoomIdAndRoomName(String username) {
-        String sql = "select chat_room.chat_room_id, chat_room.room_name from chat_room " +
+        String sql = "select chat_room.id, chat_room.room_name from chat_room " +
                 "INNER JOIN chat_room_warehouse " +
-                "ON chat_room.chat_room_id = chat_room_warehouse.chat_room_id " +
+                "ON chat_room.id = chat_room_warehouse.chat_room_id " +
                 "WHERE Username = ? AND users_count>2";
         StringBuffer sb = new StringBuffer();
         ResultSet rs = null;
@@ -320,7 +320,7 @@ public class StorageDAOImpl implements StorageDAO<User> {
     @Override
     public void createChatRoom(String sender, String accepter) {
         String sql = "INSERT INTO chat_room (room_name) " +
-                "VALUES(?+|+?)";
+                "VALUES(?,'|',?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement prep = conn.prepareStatement(sql)) {
             prep.setString(1, sender);
@@ -334,7 +334,7 @@ public class StorageDAOImpl implements StorageDAO<User> {
     @Override
     public boolean isFriends(String user1, String user2) {
         String sql = "SELECT username, friend FROM friends " +
-                "WHERE ( username =? AND friend =?) +" +
+                "WHERE ( username =? AND friend =?) " +
                 "OR (username=? AND friend =?) ";
         ResultSet rs = null;
         try (Connection conn = dataSource.getConnection();
