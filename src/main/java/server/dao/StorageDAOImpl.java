@@ -58,7 +58,7 @@ public class StorageDAOImpl implements StorageDAO<User> {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement prep = conn.prepareStatement(sql)) {
             prep.setString(1, username);
-            prep.executeLargeUpdate();
+            prep.execute();
 
         } catch (SQLException e) {
             // TODO Auto-generated catch block
