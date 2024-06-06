@@ -1,5 +1,6 @@
 package server.gui;
 
+import client.gui.LoginGUI;
 import server.configurations.ServerSettings;
 import server.dao.DataBaseConfigurations;
 import server.dao.DataSourcePool;
@@ -12,6 +13,7 @@ import java.awt.*;
 import java.util.ConcurrentModificationException;
 
 import static server.configurations.ApplicationContext.APPLICATION_CONTEXT;
+import static server.concurency.Executor.EXECUTOR;
 
 public class ServerGUI {
     public static JTextArea textArea;
@@ -37,6 +39,8 @@ public class ServerGUI {
      * Create the application.
      */
     public ServerGUI() {
+        EXECUTOR.defaultImplementation(10);
+
         initView();
 
         initDB();
@@ -78,7 +82,9 @@ public class ServerGUI {
         frame.add(outputArea);
         frame.add(buttons);
 
-        new Thread(() -> print.addActionListener(e -> printUsersAndAdditionalInfo())).start();
+        print.addActionListener(e -> EXECUTOR.execute(printUsersAndAdditionalInfo()));
+        newClientLogin.addActionListener(e -> EXECUTOR.execute(startNewTestClient()));
+
         frame.setVisible(true);
     }
 
@@ -94,8 +100,8 @@ public class ServerGUI {
 
     private void initSettingsAndLaunchServer() {
         if (initServerSettings()) {
-            new Thread(this::newServerInstance).start();
-            new Thread(Util::recurringPushToChatRooms).start();
+            EXECUTOR.execute(this::newServerInstance);
+            EXECUTOR.execute(Util::recurringPushToChatRooms);
         }
 
     }
@@ -115,10 +121,6 @@ public class ServerGUI {
         }
 
         return false;
-    }
-
-    private void printUsersAndAdditionalInfo() {
-        printArea();
     }
 
     public static void printArea() {
@@ -142,4 +144,13 @@ public class ServerGUI {
         }
 
     }
+
+    private Runnable printUsersAndAdditionalInfo() {
+        return ServerGUI::printArea;
+    }
+
+    private Runnable startNewTestClient() {
+        return LoginGUI::startGUI;
+    }
+
 }
